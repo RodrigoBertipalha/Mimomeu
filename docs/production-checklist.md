@@ -40,7 +40,7 @@ produção com autenticação, banco remoto e compartilhamento público.
 
 ## Deploy
 
-- [ ] Criar repositório no GitHub.
+- [x] Criar repositório no GitHub.
 - [ ] Conectar repositório na Vercel.
 - [ ] Configurar variáveis de ambiente na Vercel.
 - [ ] Testar cadastro/login em produção.
