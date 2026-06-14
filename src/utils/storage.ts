@@ -1,7 +1,9 @@
 import type { Gift, GiftPriority, Wishlist } from '../types/wishlist'
 
-const ACTIVE_WISHLIST_KEY = 'listapresente:wishlist'
-const WISHLISTS_KEY = 'listapresente:wishlists'
+const ACTIVE_WISHLIST_KEY = 'mimo-meu:wishlist'
+const WISHLISTS_KEY = 'mimo-meu:wishlists'
+const LEGACY_ACTIVE_WISHLIST_KEY = 'listapresente:wishlist'
+const LEGACY_WISHLISTS_KEY = 'listapresente:wishlists'
 
 export function createId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`
@@ -48,7 +50,9 @@ export function normalizeWishlist(value: Partial<Wishlist>): Wishlist {
 }
 
 export function loadWishlist(): Wishlist | null {
-  const raw = localStorage.getItem(ACTIVE_WISHLIST_KEY)
+  const raw =
+    localStorage.getItem(ACTIVE_WISHLIST_KEY) ??
+    localStorage.getItem(LEGACY_ACTIVE_WISHLIST_KEY)
   if (!raw) return null
 
   try {
@@ -59,7 +63,9 @@ export function loadWishlist(): Wishlist | null {
 }
 
 export function loadWishlists(): Wishlist[] {
-  const raw = localStorage.getItem(WISHLISTS_KEY)
+  const raw =
+    localStorage.getItem(WISHLISTS_KEY) ??
+    localStorage.getItem(LEGACY_WISHLISTS_KEY)
   if (!raw) return []
 
   try {
