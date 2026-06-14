@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mimo Meu - Convite Especial</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Outfit:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#4a2b39",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#bc91a2",
+                    "background": "#fbf9f5",
+                    "secondary-fixed-dim": "#ddc1ac",
+                    "secondary-container": "#fbddc7",
+                    "surface-tint": "#506447",
+                    "on-primary-fixed-variant": "#394c31",
+                    "tertiary-fixed": "#ffd8e6",
+                    "on-secondary-fixed": "#27180b",
+                    "primary-fixed": "#d2eac5",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#263920",
+                    "secondary": "#705a49",
+                    "on-surface-variant": "#444840",
+                    "surface": "#fbf9f5",
+                    "primary": "#506447",
+                    "surface-container-highest": "#e4e2de",
+                    "on-background": "#1b1c19",
+                    "inverse-surface": "#30312e",
+                    "tertiary-fixed-dim": "#e8bacc",
+                    "on-secondary-fixed-variant": "#564333",
+                    "surface-container": "#efeee9",
+                    "surface-variant": "#e4e2de",
+                    "outline": "#74786f",
+                    "surface-container-low": "#f5f3ef",
+                    "tertiary": "#795463",
+                    "surface-container-high": "#e9e8e4",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-surface": "#1b1c19",
+                    "on-tertiary-fixed-variant": "#5f3d4b",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#b6cdaa",
+                    "primary-container": "#8da382",
+                    "on-secondary-container": "#76604e",
+                    "on-primary-fixed": "#0e2009",
+                    "on-tertiary-fixed": "#2e1220",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#fbddc7",
+                    "outline-variant": "#c4c8bd",
+                    "primary-fixed-dim": "#b6cdaa",
+                    "on-secondary": "#ffffff",
+                    "surface-bright": "#fbf9f5",
+                    "surface-dim": "#dbdad6",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin": "32px",
+                    "gutter": "24px",
+                    "sm": "12px",
+                    "md": "24px",
+                    "xl": "80px",
+                    "base": "8px",
+                    "lg": "48px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "body-md": ["Outfit"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "caption": ["Outfit"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "body-lg": ["Outfit"],
+                    "label-md": ["Outfit"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .soft-shadow {
+            shadow-color: #705a49;
+            box-shadow: 0 20px 40px -10px rgba(112, 90, 73, 0.08);
+        }
+        .gift-card:hover .gift-image {
+            transform: scale(1.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #fbf9f5;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d2eac5;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-background sticky top-0 z-50">
+<nav class="flex justify-between items-center w-full px-margin py-sm max-w-[1280px] mx-auto">
+<div class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed-dim">
+                Mimo Meu
+            </div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">share</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">person</button>
+</div>
+</nav>
+</header>
+<main class="max-w-[1280px] mx-auto px-margin py-lg">
+<!-- Hero Section -->
+<section class="mb-xl text-center md:text-left flex flex-col md:flex-row items-center gap-lg">
+<div class="flex-1 space-y-sm">
+<div class="inline-flex items-center gap-xs px-sm py-xs bg-secondary-container text-on-secondary-container rounded-full text-label-md font-label-md">
+<span class="material-symbols-outlined text-[18px]">celebration</span>
+                    CONVITE ESPECIAL
+                </div>
+<h1 class="font-display-lg text-display-lg text-on-surface">Você foi convidado para:<br/><span class="text-primary italic font-semibold">Chá de Casa Nova da Julia &amp; Leo</span></h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                    Estamos muito felizes em compartilhar esse momento com você! Escolha um presente da nossa lista para nos ajudar a montar nosso novo lar com carinho.
+                </p>
+</div>
+<div class="hidden md:block w-48 h-48 rounded-full overflow-hidden border-4 border-white soft-shadow flex-shrink-0">
+<img alt="Event Couple" class="w-full h-full object-cover" data-alt="A warm, candid portrait of a young, happy couple laughing together in a sun-drenched, modern minimalist kitchen. The lighting is golden and airy, reflecting a joyful and welcoming atmosphere. The colors are soft earth tones, Sage Green, and warm creams, perfectly matching the Mimo Meu brand aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLwTMI97y1i0wSlUuKWxCW5g7oou7I9BmrgTHzmSrXf8Z3rDASrkqwfprF8435DnpMr1LNlet-IZYSTK2I58hcDaMhjJHJon-qr5s0lyVAMS1LfRD9RzQMnDjbqDK1ZhpE5_yaBFijRd62WtqtFbjphJIBjlL07lqZMuE_hBEnzsFUiY86veOHd5u4epyUTsFH4FcnRl8vLUrzTOmswwhstzo5jIxT5MxYRofDuURWQDnCcEmw95oC6AAEkhSBdfXag-jEd-9jtPA"/>
+</div>
+</section>
+<!-- Filters & Sort -->
+<div class="flex flex-wrap items-center justify-between gap-md mb-md">
+<div class="flex gap-sm overflow-x-auto pb-xs custom-scrollbar">
+<button class="bg-primary text-on-primary px-md py-xs rounded-full font-label-md text-label-md whitespace-nowrap">Todos</button>
+<button class="bg-surface-container-high text-on-surface-variant px-md py-xs rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-surface-container-highest transition-colors">Cozinha</button>
+<button class="bg-surface-container-high text-on-surface-variant px-md py-xs rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-surface-container-highest transition-colors">Decoração</button>
+<button class="bg-surface-container-high text-on-surface-variant px-md py-xs rounded-full font-label-md text-label-md whitespace-nowrap hover:bg-surface-container-highest transition-colors">Eletros</button>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-md text-label-md text-on-surface-variant">Ordenar:</span>
+<select class="bg-surface-container-low border-none rounded-lg font-label-md text-label-md text-primary focus:ring-2 focus:ring-primary">
+<option>Mais desejados</option>
+<option>Menor preço</option>
+<option>Maior preço</option>
+</select>
+</div>
+</div>
+<!-- Gift Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Card 1 -->
+<div class="gift-card group bg-surface-container-lowest rounded-xl p-md soft-shadow transition-all duration-300 hover:-translate-y-1">
+<div class="relative w-full aspect-square mb-md overflow-hidden rounded-xl bg-surface-container">
+<img alt="Nespresso Vertuo" class="gift-image w-full h-full object-cover transition-transform duration-500" data-alt="A sleek, modern sage green espresso machine sitting on a pristine white marble countertop. Beside it is a steaming ceramic mug of coffee and a small wooden bowl of coffee pods. The scene is bright and minimalist, with soft natural light coming from a nearby window, creating a tactile and premium look." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIUGcYw4WPVUPeDZ2SSRtDZ9sFNiJ4NVMmk6C0Hm38pbLdEPxBgWOfaz2NFwA4h7-t4-LPpb_0JxI-SVEzhK84lEneM2oenIWKzeKUE0v__5a2ceM4J4J4Z1Xs4YUYcVq0KMGQ4SWWx27mzf6LLnPj3mkE3exlsFdWWbCkSGH7Rd4mBEbDH-L-Lp5a2bogjr1_58B9Q-xSUhrkF2tc3JV2kpyAXXOeGjhwYI8hAkYpD58K-C8LjhRFhPYQEFi1OQGTQwvu3ZbqzC4"/>
+<div class="absolute top-sm right-sm">
+<span class="bg-tertiary-container/80 backdrop-blur-sm text-on-tertiary-container px-sm py-xs rounded-full font-label-md text-[10px] uppercase tracking-wider">Essencial</span>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Cafeteira Nespresso Vertuo</h3>
+<p class="font-body-md text-on-surface-variant line-clamp-2 mb-md">Para nossas manhãs começarem sempre com um aroma especial de café fresquinho.</p>
+<div class="flex items-center justify-between mb-lg">
+<div class="flex flex-col">
+<span class="font-caption text-caption text-outline">Preço estimado</span>
+<span class="font-headline-md text-headline-md text-primary font-bold">R$ 850 - 1.100</span>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<button class="w-full bg-primary text-on-primary h-[48px] rounded-lg font-label-md text-label-md flex items-center justify-center gap-xs hover:bg-primary-container transition-colors active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                        Reservar presente
+                    </button>
+<button class="w-full bg-surface-container-low text-secondary h-[48px] rounded-lg font-label-md text-label-md border border-outline-variant hover:bg-surface-container-high transition-colors">
+                        Ver produto
+                    </button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="gift-card group bg-surface-container-lowest rounded-xl p-md soft-shadow transition-all duration-300 hover:-translate-y-1">
+<div class="relative w-full aspect-square mb-md overflow-hidden rounded-xl bg-surface-container">
+<img alt="Dinner Set" class="gift-image w-full h-full object-cover transition-transform duration-500" data-alt="An elegant set of ceramic dinner plates in a soft matte taupe and cream color palette, neatly stacked on a light oak wood table. The background shows a blurry, warm interior with soft-textured linens. The overall feeling is serene, organized, and high-end home decor, with soft diffused daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAavFgWb7NbF1eSVLR9L8LqZ57o1dKpiqpZtY5x7lSXUmuKQYCGvnppQ1UfJgO7VcJGXrMoSjgF8Byl2vxfx5FA-kTYfmNf9XmpdJLNdfKa_OeQz7rrBNuMAcAR_OM_a6k6QcinlN3AvFMNjsDIMCboiqkNIXXOEx7V-gm6APGvCssrhpmdCVrAzBUQ4h065WieYjEqnxlTW3PYlVEGH6wAcCnBuYTg5F8UXhsjqfHRo8MTw0NXmq3lMHi0NsEqmfoyy04mIkGjLPw"/>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Aparelho de Jantar 30pçs</h3>
+<p class="font-body-md text-on-surface-variant line-clamp-2 mb-md">Cerâmica artesanal para recebermos nossos amigos com muito estilo e carinho.</p>
+<div class="flex items-center justify-between mb-lg">
+<div class="flex flex-col">
+<span class="font-caption text-caption text-outline">Preço estimado</span>
+<span class="font-headline-md text-headline-md text-primary font-bold">R$ 450 - 600</span>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<button class="w-full bg-primary text-on-primary h-[48px] rounded-lg font-label-md text-label-md flex items-center justify-center gap-xs hover:bg-primary-container transition-colors active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                        Reservar presente
+                    </button>
+<button class="w-full bg-surface-container-low text-secondary h-[48px] rounded-lg font-label-md text-label-md border border-outline-variant hover:bg-surface-container-high transition-colors">
+                        Ver produto
+                    </button>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="gift-card group bg-surface-container-lowest rounded-xl p-md soft-shadow transition-all duration-300 hover:-translate-y-1">
+<div class="relative w-full aspect-square mb-md overflow-hidden rounded-xl bg-surface-container">
+<img alt="Kitchen Aid" class="gift-image w-full h-full object-cover transition-transform duration-500" data-alt="A classic KitchenAid stand mixer in a sophisticated sage green finish, placed in a bright, modern kitchen setting with clean white subway tiles. There is a dusting of flour on the wooden counter and a vintage glass bowl of fresh eggs nearby. High-key, natural lighting emphasizes the smooth, matte surface of the mixer." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBp1lsjYeyCd8NEaeWyBi6_7scNBWb1eFC_rHspVOxfw1DS43wS73lrivxabWGGE_SBpdsMFRolfgBjxUT680jbpVbYIejZcM18A6LsATghGJLuvExZ4dgs7lGTrG87ReSHw-V-10GsqyxMnenwau_k_QpzlI8O1M9HWBUa_7ZlVs4niJNmfp5ibESdxU_TEAMpO8SZyyewmDcgjrllwrJIiKjxxJEi-od4q5F-HwPnOcyiJpe0m2h_XCx1eBAwi2c95iSC-E7t2LQ"/>
+<div class="absolute top-sm right-sm">
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full font-label-md text-[10px] uppercase tracking-wider">Presente em Grupo</span>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Batedeira KitchenAid Artisan</h3>
+<p class="font-body-md text-on-surface-variant line-clamp-2 mb-md">O sonho da nossa cozinha! Esse presente pode ser dividido entre vários amigos.</p>
+<div class="mb-md">
+<div class="flex justify-between font-caption text-caption text-on-surface-variant mb-xs">
+<span>Arrecadado: R$ 1.200</span>
+<span>Meta: R$ 2.400</span>
+</div>
+<div class="w-full h-[12px] bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full transition-all duration-1000" style="width: 50%;"></div>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<button class="w-full bg-primary text-on-primary h-[48px] rounded-lg font-label-md text-label-md flex items-center justify-center gap-xs hover:bg-primary-container transition-colors active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">groups</span>
+                        Contribuir com grupo
+                    </button>
+<button class="w-full bg-surface-container-low text-secondary h-[48px] rounded-lg font-label-md text-label-md border border-outline-variant hover:bg-surface-container-high transition-colors">
+                        Ver produto
+                    </button>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="gift-card group bg-surface-container-lowest rounded-xl p-md soft-shadow transition-all duration-300 hover:-translate-y-1">
+<div class="relative w-full aspect-square mb-md overflow-hidden rounded-xl bg-surface-container">
+<img alt="Towels" class="gift-image w-full h-full object-cover transition-transform duration-500" data-alt="A stack of plush, high-quality white cotton towels tied with a simple jute string and a sprig of dried eucalyptus. They are resting on a light-colored wooden stool in a soft-lit, minimalist bathroom with beige tiled walls. The atmosphere is spa-like, clean, and tactile, evoking comfort and quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCL7aapEdrOuO2Lm4zOOP1t_gNR7Rh9f7NGG4yTOOw3AiZ405CRE_CTJcIA-7soVQh6FDm0X879a89LFQjXla7kJ1mKs5ad5H36m35WNHTaZHR9Vg_N_Mdvhyhr4EWR7ww-DKeSmJXUg8LVLpPmixrMe5TNdJP3r7jy4wfxQRSti73ieVJ65W1wnt2ls1XS2FQOdVo5YHmH2YStFrSkyZK9EL66q5DLkbIPXyjPA5Sku49O781qhEFKGExsZoCFxcg3dgYPt3lTztM"/>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Jogo de Banho 5 Peças</h3>
+<p class="font-body-md text-on-surface-variant line-clamp-2 mb-md">Algodão egípcio para deixar nossa rotina de autocuidado muito mais confortável.</p>
+<div class="flex items-center justify-between mb-lg">
+<div class="flex flex-col">
+<span class="font-caption text-caption text-outline">Preço estimado</span>
+<span class="font-headline-md text-headline-md text-primary font-bold">R$ 220 - 350</span>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<button class="w-full bg-primary text-on-primary h-[48px] rounded-lg font-label-md text-label-md flex items-center justify-center gap-xs hover:bg-primary-container transition-colors active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                        Reservar presente
+                    </button>
+<button class="w-full bg-surface-container-low text-secondary h-[48px] rounded-lg font-label-md text-label-md border border-outline-variant hover:bg-surface-container-high transition-colors">
+                        Ver produto
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-low border-t border-outline-variant/20 mt-xl">
+<div class="w-full py-lg px-margin flex flex-col md:flex-row justify-between items-center gap-md max-w-[1280px] mx-auto">
+<div class="flex flex-col gap-xs items-center md:items-start">
+<span class="font-headline-md text-headline-md font-semibold text-primary">Mimo Meu</span>
+<p class="font-body-md text-body-md text-on-surface-variant text-center md:text-left">© 2024 Mimo Meu. Effortlessly organized gifting.</p>
+</div>
+<div class="flex gap-lg">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-all underline decoration-primary/30" href="#">About</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-all underline decoration-primary/30" href="#">Privacy</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-all underline decoration-primary/30" href="#">Terms</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-all underline decoration-primary/30" href="#">Support</a>
+</div>
+</div>
+</footer>
+<!-- BottomNavBar (Mobile only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 md:hidden bg-surface-container-lowest shadow-[0_-4px_20px_0_rgba(112,90,73,0.08)] rounded-t-xl">
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 scale-90 duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined">featured_play_list</span>
+<span class="font-label-md text-label-md">Lista</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-md text-label-md">Avisos</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Perfil</span>
+</button>
+</nav>
+<script>
+        // Simple micro-interaction for button press
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.classList.add('scale-95');
+            });
+            button.addEventListener('mouseup', () => {
+                button.classList.remove('scale-95');
+            });
+            button.addEventListener('mouseleave', () => {
+                button.classList.remove('scale-95');
+            });
+        });
+    </script>
+</body></html>

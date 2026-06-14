@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mimo Meu - Criar Lista</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Outfit:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#4a2b39",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#bc91a2",
+                    "background": "#fbf9f5",
+                    "secondary-fixed-dim": "#ddc1ac",
+                    "secondary-container": "#fbddc7",
+                    "surface-tint": "#506447",
+                    "on-primary-fixed-variant": "#394c31",
+                    "tertiary-fixed": "#ffd8e6",
+                    "on-secondary-fixed": "#27180b",
+                    "primary-fixed": "#d2eac5",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#263920",
+                    "secondary": "#705a49",
+                    "on-surface-variant": "#444840",
+                    "surface": "#fbf9f5",
+                    "primary": "#506447",
+                    "surface-container-highest": "#e4e2de",
+                    "on-background": "#1b1c19",
+                    "inverse-surface": "#30312e",
+                    "tertiary-fixed-dim": "#e8bacc",
+                    "on-secondary-fixed-variant": "#564333",
+                    "surface-container": "#efeee9",
+                    "surface-variant": "#e4e2de",
+                    "outline": "#74786f",
+                    "surface-container-low": "#f5f3ef",
+                    "tertiary": "#795463",
+                    "surface-container-high": "#e9e8e4",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-surface": "#1b1c19",
+                    "on-tertiary-fixed-variant": "#5f3d4b",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#b6cdaa",
+                    "primary-container": "#8da382",
+                    "on-secondary-container": "#76604e",
+                    "on-primary-fixed": "#0e2009",
+                    "on-tertiary-fixed": "#2e1220",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#fbddc7",
+                    "outline-variant": "#c4c8bd",
+                    "primary-fixed-dim": "#b6cdaa",
+                    "on-secondary": "#ffffff",
+                    "surface-bright": "#fbf9f5",
+                    "surface-dim": "#dbdad6",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin": "32px",
+                    "gutter": "24px",
+                    "sm": "12px",
+                    "md": "24px",
+                    "xl": "80px",
+                    "base": "8px",
+                    "lg": "48px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "body-md": ["Outfit"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "caption": ["Outfit"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "body-lg": ["Outfit"],
+                    "label-md": ["Outfit"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .form-card-shadow {
+            box-shadow: 0 20px 40px 0 rgba(112, 90, 73, 0.08);
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(80, 100, 71, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-background sticky top-0 z-40">
+<nav class="flex justify-between items-center w-full px-margin py-sm max-w-[1280px] mx-auto">
+<div class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed-dim">
+                Mimo Meu
+            </div>
+<div class="hidden md:flex items-center space-x-lg">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary-container transition-colors duration-200" href="#">Home</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1" href="#">My Lists</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary-container transition-colors duration-200" href="#">Activity</a>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-primary hover:bg-surface-container transition-colors rounded-full">
+<span class="material-symbols-outlined">share</span>
+</button>
+<button class="p-2 text-primary hover:bg-surface-container transition-colors rounded-full">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</nav>
+</header>
+<main class="max-w-[1280px] mx-auto px-margin py-lg md:py-xl">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-xl items-start">
+<!-- Context / Visual Side -->
+<div class="lg:col-span-5 space-y-md">
+<div class="inline-flex items-center px-4 py-2 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md mb-xs">
+                    Nova Jornada
+                </div>
+<h1 class="font-headline-lg text-headline-lg md:text-display-lg font-bold text-primary leading-tight">
+                    Conte-nos sobre o seu evento
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md">
+                    Personalize sua lista para que seus amigos e familiares saibam exatamente como celebrar com você. Cada detalhe conta para tornar esse momento inesquecível.
+                </p>
+<div class="pt-lg hidden lg:block">
+<div class="rounded-xl overflow-hidden aspect-[4/3] relative group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A beautifully set celebratory table with organic textures, soft sage green linens, and cream-colored ceramics. The lighting is warm and natural, filtering through a window to create soft shadows on a beige wall. The scene evokes an intentional, organized, and high-end event planning aesthetic consistent with a nurturing modern brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJU8SSGGiRQIuaXVKW7OKXFZRB7glKmroMAYxnMuPMOa59qsObnESLxHUehAiwhje-9PXztXhqWdOsxJNB3xjQw2irwWUpikKr86KaGhNmg3-TXxMLvNKz6h2NXGTPL-fd_GRmT5uDThDzvU4k_d0IEbJBeRHLD0D183mLtSkzb5IXqnq5BKG_rUDcVZSUVzjKuESi5zBvaWyriRuWHRsOWJZB_lpPXgBsl2nm8j0BcSAfZE_lU4_T6qYX2TRXOEC1vDdywNuv0aU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
+</div>
+</div>
+</div>
+<!-- Form Side -->
+<div class="lg:col-span-7">
+<div class="bg-surface-container-lowest p-md md:p-lg rounded-xl form-card-shadow">
+<form action="#" class="space-y-md">
+<!-- Nome do Evento -->
+<div class="space-y-xs">
+<label class="block font-label-md text-label-md text-primary" for="event-name">
+                                Nome do evento
+                            </label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-md font-body-md text-body-md focus:border-primary transition-all" id="event-name" name="event-name" placeholder="Ex: Aniversário da Júlia" type="text"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Tipo de Evento -->
+<div class="space-y-xs">
+<label class="block font-label-md text-label-md text-primary" for="event-type">
+                                    Tipo de evento
+                                </label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-lowest border border-outline-variant rounded-lg p-md font-body-md text-body-md focus:border-primary transition-all" id="event-type" name="event-type">
+<option disabled="" selected="" value="">Selecione uma opção</option>
+<option value="aniversario">Aniversário</option>
+<option value="casamento">Casamento</option>
+<option value="cha-bebe">Chá de Bebê</option>
+<option value="formatura">Formatura</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
+                                        expand_more
+                                    </span>
+</div>
+</div>
+<!-- Data do Evento -->
+<div class="space-y-xs">
+<label class="block font-label-md text-label-md text-primary" for="event-date">
+                                    Data do evento
+                                </label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-md font-body-md text-body-md focus:border-primary transition-all" id="event-date" name="event-date" type="date"/>
+</div>
+</div>
+</div>
+<!-- Descrição da Lista -->
+<div class="space-y-xs">
+<label class="block font-label-md text-label-md text-primary" for="event-description">
+                                Descrição da lista
+                            </label>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-md font-body-md text-body-md focus:border-primary transition-all resize-none" id="event-description" name="event-description" placeholder="Conte um pouco sobre o evento ou deixe uma mensagem para seus convidados..." rows="4"></textarea>
+</div>
+<!-- Submit Button -->
+<div class="pt-md">
+<button class="w-full md:w-auto min-h-[48px] px-lg bg-primary text-on-primary font-label-md text-label-md rounded-full hover:bg-primary-container hover:shadow-lg active:scale-95 transition-all duration-200" type="submit">
+                                Salvar lista
+                            </button>
+</div>
+</form>
+</div>
+<!-- Helper Info -->
+<div class="mt-md flex items-start gap-sm p-md bg-surface-container-low rounded-xl">
+<span class="material-symbols-outlined text-primary">info</span>
+<p class="font-caption text-caption text-on-surface-variant">
+                        Você poderá adicionar itens e presentes à sua lista logo após salvar estas informações iniciais. Não se preocupe, você pode editar esses detalhes a qualquer momento.
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-low mt-xl border-t border-outline-variant/10">
+<div class="w-full py-lg px-margin flex flex-col md:flex-row justify-between items-center gap-md max-w-[1280px] mx-auto">
+<div class="flex flex-col items-center md:items-start gap-xs">
+<span class="font-headline-md text-headline-md font-semibold text-primary">Mimo Meu</span>
+<p class="font-body-md text-body-md text-on-surface-variant">© 2024 Mimo Meu. Effortlessly organized gifting.</p>
+</div>
+<div class="flex gap-lg">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary underline decoration-primary/30 transition-all" href="#">About</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary underline decoration-primary/30 transition-all" href="#">Privacy</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary underline decoration-primary/30 transition-all" href="#">Support</a>
+</div>
+</div>
+</footer>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 md:hidden bg-surface-container-lowest shadow-[0_-4px_20px_0_rgba(112,90,73,0.08)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant py-2" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">featured_play_list</span>
+<span class="font-label-md text-label-md">My Lists</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant py-2" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-md text-label-md">Activity</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant py-2" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for the form fields
+        const inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                const label = input.previousElementSibling;
+                if (label) {
+                    label.classList.add('translate-x-1');
+                    label.style.transition = 'all 0.2s ease';
+                }
+            });
+            input.addEventListener('blur', () => {
+                const label = input.previousElementSibling;
+                if (label) {
+                    label.classList.remove('translate-x-1');
+                }
+            });
+        });
+
+        // Form submission prevention for demo
+        document.querySelector('form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Salvando...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = '<span class="material-symbols-outlined">check</span> Pronto!';
+                btn.classList.replace('bg-primary', 'bg-tertiary');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.replace('bg-tertiary', 'bg-primary');
+                    btn.disabled = false;
+                }, 2000);
+            }, 1500);
+        });
+    </script>
+</body></html>

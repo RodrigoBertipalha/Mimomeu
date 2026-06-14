@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mimo Meu - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Outfit:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#4a2b39",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#bc91a2",
+                    "background": "#fbf9f5",
+                    "secondary-fixed-dim": "#ddc1ac",
+                    "secondary-container": "#fbddc7",
+                    "surface-tint": "#506447",
+                    "on-primary-fixed-variant": "#394c31",
+                    "tertiary-fixed": "#ffd8e6",
+                    "on-secondary-fixed": "#27180b",
+                    "primary-fixed": "#d2eac5",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#263920",
+                    "secondary": "#705a49",
+                    "on-surface-variant": "#444840",
+                    "surface": "#fbf9f5",
+                    "primary": "#506447",
+                    "surface-container-highest": "#e4e2de",
+                    "on-background": "#1b1c19",
+                    "inverse-surface": "#30312e",
+                    "tertiary-fixed-dim": "#e8bacc",
+                    "on-secondary-fixed-variant": "#564333",
+                    "surface-container": "#efeee9",
+                    "surface-variant": "#e4e2de",
+                    "outline": "#74786f",
+                    "surface-container-low": "#f5f3ef",
+                    "tertiary": "#795463",
+                    "surface-container-high": "#e9e8e4",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-surface": "#1b1c19",
+                    "on-tertiary-fixed-variant": "#5f3d4b",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#b6cdaa",
+                    "primary-container": "#8da382",
+                    "on-secondary-container": "#76604e",
+                    "on-primary-fixed": "#0e2009",
+                    "on-tertiary-fixed": "#2e1220",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#fbddc7",
+                    "outline-variant": "#c4c8bd",
+                    "primary-fixed-dim": "#b6cdaa",
+                    "on-secondary": "#ffffff",
+                    "surface-bright": "#fbf9f5",
+                    "surface-dim": "#dbdad6",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin": "32px",
+                    "gutter": "24px",
+                    "sm": "12px",
+                    "md": "24px",
+                    "xl": "80px",
+                    "base": "8px",
+                    "lg": "48px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "body-md": ["Outfit"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "caption": ["Outfit"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "body-lg": ["Outfit"],
+                    "label-md": ["Outfit"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fbf9f5;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .input-focus-ring:focus {
+            box-shadow: 0 0 0 2px rgba(80, 100, 71, 0.2);
+        }
+        .glass-background {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-body-md text-on-background bg-background">
+<!-- Top Navigation (Simplified for Auth - No BottomNav or SideNav per instructions for transactional pages) -->
+<nav class="w-full py-sm px-margin max-w-[1280px] mx-auto flex justify-between items-center bg-background">
+<div class="font-headline-lg text-headline-lg font-bold text-primary">Mimo Meu</div>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors" href="#">Precisa de ajuda?</a>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow flex items-center justify-center px-4 py-xl relative overflow-hidden">
+<!-- Background Elements for Atmospheric Feel -->
+<div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-secondary-container opacity-30 blur-3xl rounded-full"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-80 h-80 bg-primary-fixed opacity-20 blur-3xl rounded-full"></div>
+<!-- Auth Card -->
+<div class="w-full max-w-[480px] bg-surface-container-lowest rounded-xl shadow-[0_40px_80px_-20px_rgba(112,90,73,0.08)] p-lg md:p-xl relative z-10">
+<!-- Welcome Header -->
+<header class="text-center mb-lg">
+<div class="inline-flex items-center justify-center w-16 h-16 bg-primary-fixed rounded-full mb-md">
+<span class="material-symbols-outlined text-primary text-[32px]">favorite</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-background mb-xs">Bem-vindo de volta</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">O presente perfeito está a apenas um clique.</p>
+</header>
+<!-- Login Form -->
+<form action="#" class="space-y-md">
+<!-- Email Field -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant block" for="email">Email</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[20px]">mail</span>
+<input class="w-full h-12 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-background font-body-md focus:outline-none focus:border-primary input-focus-ring transition-all placeholder:text-outline-variant" id="email" placeholder="nome@exemplo.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-xs">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface-variant" for="password">Senha</label>
+<a class="text-caption font-caption text-primary hover:underline" href="#">Esqueceu a senha?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[20px]">lock</span>
+<input class="w-full h-12 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-background font-body-md focus:outline-none focus:border-primary input-focus-ring transition-all placeholder:text-outline-variant" id="password" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="pt-sm space-y-sm">
+<button class="w-full h-12 bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:bg-on-primary-fixed-variant active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="submit">
+                        Entrar
+                    </button>
+<div class="text-center">
+<span class="font-body-md text-body-md text-on-surface-variant">Não tem uma conta? </span>
+<a class="font-label-md text-label-md text-primary hover:underline decoration-primary/30" href="#">Criar conta</a>
+</div>
+</div>
+</form>
+<!-- Divider -->
+<div class="flex items-center gap-md my-lg">
+<div class="flex-grow h-[1px] bg-outline-variant/30"></div>
+<span class="font-caption text-caption text-outline uppercase tracking-wider">ou</span>
+<div class="flex-grow h-[1px] bg-outline-variant/30"></div>
+</div>
+<!-- Guest Option -->
+<div class="space-y-sm">
+<button class="w-full h-12 bg-secondary-container text-on-secondary-container font-label-md text-label-md rounded-lg hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+                    Continuar como convidado
+                </button>
+<p class="text-center font-caption text-caption text-on-surface-variant max-w-[280px] mx-auto">
+                    Acesso limitado à lista de presentes selecionada.
+                </p>
+</div>
+</div>
+<!-- Decorative Image Context (Asymmetric Layout element) -->
+<div class="hidden lg:block absolute left-[8%] top-[25%] w-64 h-80 rounded-xl overflow-hidden shadow-xl -rotate-6">
+<img class="w-full h-full object-cover" data-alt="A beautifully wrapped luxury gift box with a sage green silk ribbon and a small botanical sprig. The box sits on a soft cream linen surface, illuminated by natural morning light that creates gentle shadows. The overall aesthetic is minimalist and high-end, evoking a sense of thoughtful celebration and organized care in gifting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-Y6WtRMqR9KWyATrYnTwszG9fy6hCIxOGrQJNQd6hKJOpqGv_cRiAJB6n9HXRbScfnE1LlUbgN3ZQugWf-PcYY3lYacwevrwKyVUXERFFWk-S_SznPXz60FW4DycPG47Oz95mETHMEB0ujfGlb6d_vicgSUmfmoQuKobaZ5bmzGbXV6xWPTXl49zLksMfuTDqfmIUJUhXFMFO1MH09E37jFe3gya6XBF-kiWf-r5vpIwLaSPZutIO1s_P0pgRWEy-KC5jNtVk4Dc"/>
+</div>
+<div class="hidden xl:block absolute right-[10%] bottom-[20%] w-72 h-48 rounded-xl overflow-hidden shadow-xl rotate-3">
+<img class="w-full h-full object-cover" data-alt="An organized collection of aesthetic gift tags and elegant gold stationery on a clean beige desk. The composition is balanced and serene, showing the preparation phase of gifting with intentionality and joy. The lighting is soft and warm, highlighting the textures of high-quality paper and the metallic sheen of the gold accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2zFiHViukjWBQS575q-S6Ytdas1D1BU1KIye1cYTXIedzpnrlzP5hbUw8m9PqQ0xmuQZJEVVrImhLKNV7cTg4Lg34CrYtvgRV4ewVgkLqM_2XLk9U8Pog1yLsjpcjW3jJN0k5sA6IhCyAM1I1Nvo0m1bkRjEFf6Cww2LJURmeAglOhzRQQXH_zSxt28VKCuMj0dTEC33JBH9el5MzkAL6nSEXxhrhqAo7cq4JoHxMD-lJgU3S0rE9-LNgrUjtaLaMDcJEYXfw3xg"/>
+</div>
+</main>
+<!-- Footer (Simplified for Auth) -->
+<footer class="w-full py-lg px-margin flex flex-col md:flex-row justify-between items-center gap-md max-w-[1280px] mx-auto bg-background">
+<div class="font-body-md text-body-md text-on-surface-variant">© 2024 Mimo Meu. Organização sem esforço.</div>
+<div class="flex gap-md">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="#">Sobre</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="#">Privacidade</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="#">Termos</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="#">Suporte</a>
+</div>
+</footer>
+<script>
+        // Micro-interaction for input fields
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                const icon = input.previousElementSibling;
+                if (icon) icon.classList.add('text-primary');
+            });
+            input.addEventListener('blur', () => {
+                const icon = input.previousElementSibling;
+                if (icon) icon.classList.remove('text-primary');
+            });
+        });
+
+        // Subtle parallax effect on floating images
+        document.addEventListener('mousemove', (e) => {
+            const moveX = (e.clientX - window.innerWidth / 2) * 0.01;
+            const moveY = (e.clientY - window.innerHeight / 2) * 0.01;
+            
+            const decorImages = document.querySelectorAll('main > div[class*="absolute"]');
+            decorImages.forEach((img, index) => {
+                const speed = (index + 1) * 0.5;
+                img.style.transform = `translate(${moveX * speed}px, ${moveY * speed}px) rotate(${index === 0 ? -6 : 3}deg)`;
+            });
+        });
+    </script>
+</body></html>

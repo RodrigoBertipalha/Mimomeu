@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<html lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Compartilhar Lista - Mimo Meu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Outfit:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- THEME CONFIGURATION -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#4a2b39",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#bc91a2",
+                    "background": "#fbf9f5",
+                    "secondary-fixed-dim": "#ddc1ac",
+                    "secondary-container": "#fbddc7",
+                    "surface-tint": "#506447",
+                    "on-primary-fixed-variant": "#394c31",
+                    "tertiary-fixed": "#ffd8e6",
+                    "on-secondary-fixed": "#27180b",
+                    "primary-fixed": "#d2eac5",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#263920",
+                    "secondary": "#705a49",
+                    "on-surface-variant": "#444840",
+                    "surface": "#fbf9f5",
+                    "primary": "#506447",
+                    "surface-container-highest": "#e4e2de",
+                    "on-background": "#1b1c19",
+                    "inverse-surface": "#30312e",
+                    "tertiary-fixed-dim": "#e8bacc",
+                    "on-secondary-fixed-variant": "#564333",
+                    "surface-container": "#efeee9",
+                    "surface-variant": "#e4e2de",
+                    "outline": "#74786f",
+                    "surface-container-low": "#f5f3ef",
+                    "tertiary": "#795463",
+                    "surface-container-high": "#e9e8e4",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-surface": "#1b1c19",
+                    "on-tertiary-fixed-variant": "#5f3d4b",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#b6cdaa",
+                    "primary-container": "#8da382",
+                    "on-secondary-container": "#76604e",
+                    "on-primary-fixed": "#0e2009",
+                    "on-tertiary-fixed": "#2e1220",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#fbddc7",
+                    "outline-variant": "#c4c8bd",
+                    "primary-fixed-dim": "#b6cdaa",
+                    "on-secondary": "#ffffff",
+                    "surface-bright": "#fbf9f5",
+                    "surface-dim": "#dbdad6",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin": "32px",
+                    "gutter": "24px",
+                    "sm": "12px",
+                    "md": "24px",
+                    "xl": "80px",
+                    "base": "8px",
+                    "lg": "48px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "body-md": ["Outfit"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "caption": ["Outfit"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "body-lg": ["Outfit"],
+                    "label-md": ["Outfit"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .atmospheric-shadow {
+        box-shadow: 0 20px 40px -10px rgba(112, 90, 73, 0.08);
+      }
+      .blur-backdrop {
+        backdrop-filter: blur(8px);
+      }
+      body {
+        background-color: #fbf9f5;
+        overflow-x: hidden;
+      }
+    </style>
+</head>
+<body class="font-body-md text-on-background selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-background sticky top-0 z-50">
+<nav class="flex justify-between items-center w-full px-margin py-sm max-w-[1280px] mx-auto">
+<div class="flex items-center gap-base">
+<span class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed-dim">Mimo Meu</span>
+</div>
+<div class="hidden md:flex items-center gap-lg">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary-container transition-colors duration-200" href="#">Home</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1" href="#">My Lists</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary-container transition-colors duration-200" href="#">Activity</a>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-base rounded-full hover:bg-surface-container-high transition-all text-primary">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+<button class="p-base rounded-full hover:bg-surface-container-high transition-all text-primary">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</button>
+</div>
+</nav>
+</header>
+<main class="min-h-[calc(100vh-180px)] flex flex-col items-center justify-center px-margin py-lg relative overflow-hidden">
+<!-- Background Elements -->
+<div class="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary-container/20 blur-[120px] pointer-events-none"></div>
+<div class="absolute bottom-[-5%] left-[-5%] w-[30%] h-[30%] rounded-full bg-primary-container/10 blur-[100px] pointer-events-none"></div>
+<div class="max-w-[640px] w-full text-center relative z-10">
+<!-- Success Icon/Illustration -->
+<div class="mb-lg inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary-fixed text-primary animate-bounce shadow-lg">
+<span class="material-symbols-outlined !text-[48px]" style="font-variation-settings: 'FILL' 1;">celebration</span>
+</div>
+<!-- Header Content -->
+<h1 class="font-headline-lg text-headline-lg md:text-display-lg md:font-display-lg text-primary mb-md">
+                Sua lista está pronta!
+            </h1>
+<p class="font-body-lg text-body-lg text-secondary max-w-[480px] mx-auto mb-lg">
+                Agora é só enviar para seus convidados e começar a receber mimos inesquecíveis.
+            </p>
+<!-- Share Card -->
+<div class="bg-surface-container-lowest atmospheric-shadow rounded-xl p-md md:p-lg border border-surface-variant/50">
+<div class="text-left mb-sm">
+<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Link da Lista</span>
+</div>
+<!-- Link Box -->
+<div class="flex flex-col md:flex-row items-center gap-sm bg-surface-container rounded-lg p-xs mb-lg border border-outline-variant/30">
+<div class="flex-1 w-full px-md py-sm text-on-surface font-body-md text-left truncate overflow-hidden">
+                        mimomeu.com.br/lista/evento-123
+                    </div>
+<button class="w-full md:w-auto flex items-center justify-center gap-xs px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-primary-container transition-all active:scale-95 group" id="copyBtn">
+<span class="material-symbols-outlined group-active:rotate-12 transition-transform" data-icon="content_copy">content_copy</span>
+                        Copiar link
+                    </button>
+</div>
+<!-- Secondary Share Actions -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<button class="flex items-center justify-center gap-sm px-lg h-[56px] bg-[#25D366] text-white rounded-full font-label-md text-label-md hover:brightness-105 active:scale-95 transition-all shadow-md">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat</span>
+                        Compartilhar no WhatsApp
+                    </button>
+<button class="flex items-center justify-center gap-sm px-lg h-[56px] border-2 border-secondary/20 text-secondary rounded-full font-label-md text-label-md hover:bg-secondary-container/20 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+                        Enviar por E-mail
+                    </button>
+</div>
+</div>
+<!-- Visual Asset Context -->
+<div class="mt-xl grid grid-cols-3 gap-md opacity-40 grayscale pointer-events-none hidden md:grid">
+<img alt="Gift Context" class="w-full h-24 object-cover rounded-xl shadow-sm" data-alt="A beautifully wrapped gift box with a soft green ribbon sitting on a rustic wooden table. The lighting is warm and golden, creating a cozy and welcoming atmosphere. The background is slightly blurred with soft focus on a light-colored, minimalist living room." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcBEOs_meadglMK2QGpz9J5eN5d7UD08xWfs-fylGowhazd4x3Hn27E0w5CeDcEBHwAo3lbeHk4p4kKDdeCLzXVStPe7ZYbdVcvmOSbcnByj-57jZWn7rcWsIkji_4kbKP3AzGLWxBIZ9NgckJaByvh1Cuqq1ItZze7kCJO3Ult54deuW3DEe-FP7PNQBDp3GYZ-jGYC_u7ZbMUtUClHC1G-6LkFPrRtJEex21qSEtbpDnwkst-hHz--FMnpaWU2aNE3k7uDLFiws"/>
+<img alt="Party Context" class="w-full h-24 object-cover rounded-xl shadow-sm" data-alt="A festive celebration scene featuring soft pastel confetti floating in the air. The lighting is bright and ethereal, suggesting a joy-filled daytime event like a baby shower or wedding. The colors are muted and elegant, aligning with a professional, minimal design aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClzU1cGLnZWR_HttHMcbq8Ygv2c5_dq0ELug4SKqTXjTt1h5_kfEI-MfcNaHEBB-JT5_JrgmlgWpk7Gx9h9DwNhQ1n4BqRceEqDy1nNrGZg9DA55QZ_1DC8XZODaohYzD23rx61uZFb64sBIxs_XPWzsBkNQDgaCqBt0-ZLHE-_FusDf5WJBwzsF3pW2nafq_a1peqyHw891NTU8NqKL0YIcYYuxGZKToU7iGdM7j2S6xr7YL52M4_hnX23xvgeiVh6i5vSWctd_k"/>
+<img alt="Detail Context" class="w-full h-24 object-cover rounded-xl shadow-sm" data-alt="A close-up of a high-quality stationery card with an elegant, minimalist design. The paper has a subtle tactile texture, and the lighting highlights the clean edges and high-end print quality. The background is a clean beige surface that blends with the brand palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJDoSwN9ytYwykKk4k6nF8P0G9MOCCuRTl3U89COVh4Ro7BvkzUaqrFJYT11KaTjy-EJZLhnEUDYvt4iE5mCiv4S3nelwr5AMO5C1U4bz6t5CZFDbvbzGJj7yvomJGdapRlpCr1SYMC0c_1-_PNqvn6w_2dcPzyMqMEiF-bV7wIox06r6ZCERsKGvFKHAeR6_29eZhOeqwVYzHHJDpZwnKPL7jK1ueaH9OUI7nsDpidbnRBQW28_YCsVJEGDgzxEXdaL-IeaThoy0"/>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-low mt-xl border-t border-surface-variant/20">
+<div class="w-full py-lg px-margin flex flex-col md:flex-row justify-between items-center gap-md max-w-[1280px] mx-auto">
+<div class="flex flex-col items-center md:items-start gap-xs">
+<span class="font-headline-md text-headline-md font-semibold text-primary">Mimo Meu</span>
+<p class="font-caption text-caption text-on-surface-variant">© 2024 Mimo Meu. Effortlessly organized gifting.</p>
+</div>
+<div class="flex gap-lg">
+<a class="text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all font-body-md text-body-md" href="#">About</a>
+<a class="text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all font-body-md text-body-md" href="#">Privacy</a>
+<a class="text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all font-body-md text-body-md" href="#">Terms</a>
+<a class="text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all font-body-md text-body-md" href="#">Support</a>
+</div>
+</div>
+</footer>
+<!-- BottomNavBar (Mobile Only) -->
+<div class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 md:hidden bg-surface-container-lowest shadow-[0_-4px_20px_0_rgba(112,90,73,0.08)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-all p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="featured_play_list" style="font-variation-settings: 'FILL' 1;">featured_play_list</span>
+<span class="font-label-md text-label-md">My Lists</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-all p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-label-md text-label-md">Activity</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-all p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+        const copyBtn = document.getElementById('copyBtn');
+        copyBtn.addEventListener('click', () => {
+            const originalText = copyBtn.innerHTML;
+            
+            // Simulating copy
+            const dummy = document.createElement('input');
+            document.body.appendChild(dummy);
+            dummy.value = 'mimomeu.com.br/lista/evento-123';
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+
+            // Feedback UI
+            copyBtn.innerHTML = `
+                <span class="material-symbols-outlined" data-icon="check">check</span>
+                Copiado!
+            `;
+            copyBtn.classList.replace('bg-primary', 'bg-secondary');
+            
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+                copyBtn.classList.replace('bg-secondary', 'bg-primary');
+            }, 2000);
+        });
+
+        // Add subtle floating effect to illustrations
+        document.addEventListener('mousemove', (e) => {
+            const amount = 20;
+            const x = (e.clientX / window.innerWidth - 0.5) * amount;
+            const y = (e.clientY / window.innerHeight - 0.5) * amount;
+            
+            const elements = document.querySelectorAll('.animate-bounce');
+            elements.forEach(el => {
+                el.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        });
+    </script>
+</body></html>

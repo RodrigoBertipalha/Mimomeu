@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mimo Meu | Painel do Criador</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Shared Style Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-container": "#4a2b39",
+                      "error": "#ba1a1a",
+                      "on-error": "#ffffff",
+                      "tertiary-container": "#bc91a2",
+                      "background": "#fbf9f5",
+                      "secondary-fixed-dim": "#ddc1ac",
+                      "secondary-container": "#fbddc7",
+                      "surface-tint": "#506447",
+                      "on-primary-fixed-variant": "#394c31",
+                      "tertiary-fixed": "#ffd8e6",
+                      "on-secondary-fixed": "#27180b",
+                      "primary-fixed": "#d2eac5",
+                      "on-primary": "#ffffff",
+                      "on-primary-container": "#263920",
+                      "secondary": "#705a49",
+                      "on-surface-variant": "#444840",
+                      "surface": "#fbf9f5",
+                      "primary": "#506447",
+                      "surface-container-highest": "#e4e2de",
+                      "on-background": "#1b1c19",
+                      "inverse-surface": "#30312e",
+                      "tertiary-fixed-dim": "#e8bacc",
+                      "on-secondary-fixed-variant": "#564333",
+                      "surface-container": "#efeee9",
+                      "surface-variant": "#e4e2de",
+                      "outline": "#74786f",
+                      "surface-container-low": "#f5f3ef",
+                      "tertiary": "#795463",
+                      "surface-container-high": "#e9e8e4",
+                      "inverse-on-surface": "#f2f1ec",
+                      "on-surface": "#1b1c19",
+                      "on-tertiary-fixed-variant": "#5f3d4b",
+                      "on-tertiary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "inverse-primary": "#b6cdaa",
+                      "primary-container": "#8da382",
+                      "on-secondary-container": "#76604e",
+                      "on-primary-fixed": "#0e2009",
+                      "on-tertiary-fixed": "#2e1220",
+                      "error-container": "#ffdad6",
+                      "secondary-fixed": "#fbddc7",
+                      "outline-variant": "#c4c8bd",
+                      "primary-fixed-dim": "#b6cdaa",
+                      "on-secondary": "#ffffff",
+                      "surface-bright": "#fbf9f5",
+                      "surface-dim": "#dbdad6",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin": "32px",
+                      "gutter": "24px",
+                      "sm": "12px",
+                      "md": "24px",
+                      "xl": "80px",
+                      "base": "8px",
+                      "lg": "48px",
+                      "xs": "4px"
+              },
+              "fontFamily": {
+                      "body-md": ["Outfit"],
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "display-lg": ["Plus Jakarta Sans"],
+                      "caption": ["Outfit"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "headline-lg-mobile": ["Plus Jakarta Sans"],
+                      "body-lg": ["Outfit"],
+                      "label-md": ["Outfit"]
+              },
+              "fontSize": {
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: #fbf9f5;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-background">
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-background sticky top-0 z-50">
+<nav class="flex justify-between items-center w-full px-margin py-sm max-w-[1280px] mx-auto">
+<div class="flex items-center gap-lg">
+<span class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed-dim">Mimo Meu</span>
+<div class="hidden md:flex items-center gap-md">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary-container transition-colors duration-200" href="#">Home</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1" href="#">My Lists</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary-container transition-colors duration-200" href="#">Activity</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="hidden md:flex bg-primary text-on-primary px-6 py-2 rounded-full font-label-md text-label-md hover:bg-primary-container active:scale-95 transition-all">
+                    Create List
+                </button>
+<div class="flex gap-sm">
+<span class="material-symbols-outlined text-primary cursor-pointer p-2 hover:bg-surface-container rounded-full transition-all">share</span>
+<span class="material-symbols-outlined text-primary cursor-pointer p-2 hover:bg-surface-container rounded-full transition-all">person</span>
+</div>
+</div>
+</nav>
+</header>
+<main class="max-w-[1280px] mx-auto px-margin py-lg">
+<!-- Summary Section: Bento Style -->
+<section class="mb-xl">
+<div class="flex flex-col gap-sm mb-md">
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Lista de Casamento: Ana &amp; Lucas</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Gerencie os presentes e acompanhe o progresso da sua lista em tempo real.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Main Summary Card -->
+<div class="md:col-span-2 bg-surface-container-lowest rounded-xl p-lg shadow-sm border border-surface-container-high flex flex-col justify-between overflow-hidden relative group">
+<div class="relative z-10">
+<span class="font-label-md text-label-md text-primary uppercase tracking-wider">Resumo Geral</span>
+<div class="mt-md flex items-baseline gap-xs">
+<span class="font-display-lg text-display-lg text-on-surface">15</span>
+<span class="font-headline-md text-headline-md text-on-surface-variant">Presentes Totais</span>
+</div>
+</div>
+<div class="mt-lg relative z-10">
+<div class="flex justify-between items-end mb-xs">
+<span class="font-label-md text-label-md text-secondary">Progresso da Lista</span>
+<span class="font-label-md text-label-md text-primary">33% Concluído</span>
+</div>
+<!-- Custom Gift Progress Bar -->
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 33%"></div>
+</div>
+</div>
+<!-- Decorative element -->
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-700"></div>
+</div>
+<!-- Status Breakdown -->
+<div class="flex flex-col gap-md">
+<div class="bg-surface-container-lowest rounded-xl p-md border border-surface-container-high flex items-center gap-md shadow-sm">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">redeem</span>
+</div>
+<div>
+<span class="font-label-md text-label-md text-on-surface-variant">10 Disponíveis</span>
+<p class="font-caption text-caption text-secondary">Aguardando mimos</p>
+</div>
+</div>
+<div class="bg-secondary-container/30 rounded-xl p-md border border-secondary-container flex items-center gap-md shadow-sm">
+<div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div>
+<span class="font-label-md text-label-md text-on-secondary-container">5 Reservados</span>
+<p class="font-caption text-caption text-on-secondary-fixed-variant">Quase chegando!</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Detailed List Section -->
+<section>
+<div class="flex items-center justify-between mb-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Itens da Lista</h2>
+<div class="flex gap-sm">
+<button class="flex items-center gap-xs px-4 py-2 border border-outline-variant rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filtrar
+                    </button>
+<button class="flex items-center gap-xs px-4 py-2 bg-primary text-on-primary rounded-full font-label-md text-label-md hover:shadow-md transition-all">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        Novo Item
+                    </button>
+</div>
+</div>
+<!-- Table-like List Layout -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-surface-container-high bg-surface-container-low/50">
+<th class="px-md py-md font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Item</th>
+<th class="px-md py-md font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Preço Sugerido</th>
+<th class="px-md py-md font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="px-md py-md font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Ações</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high">
+<!-- Item 1: Reserved -->
+<tr class="hover:bg-secondary-container/10 transition-colors bg-secondary-container/5">
+<td class="px-md py-md">
+<div class="flex items-center gap-md">
+<div class="w-14 h-14 rounded-lg overflow-hidden bg-surface-container flex-shrink-0">
+<img alt="Coffee Maker" class="w-full h-full object-cover" data-alt="A premium, sleek silver espresso machine sitting on a clean white marble countertop. The lighting is soft and natural, coming from a nearby window, highlighting the metallic textures. The overall atmosphere is modern, sophisticated, and calm, fitting a minimalist high-end lifestyle brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDG9FO9WbTvEXviM1JeHU0iGOsbf3GPAwgrVCmc6_Q8mQi4Bch1Y0mULK-1LBU4EAj5BuC1MbvtHXVDeRWVYpP4DfxN1UVLTBOgktuHlKaE_jX6cBHdlcab-2-tqPjz0sVOHwmhBZ3VcH-c41HT5E6SxSfOkKXwsAZUO5lvWov_OJR90VIzrrY-SjQWPFX5-TrnNbumniHAVjHYfIuW2OTX0B9-9vGMhUdsJkmQWjps7ZvhQGv9LrwYBwRgzPID2tEavN6cZv51Iec"/>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Cafeteira Nespresso Vertuo</p>
+<p class="font-caption text-caption text-on-surface-variant">Eletroportáteis</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md font-body-md text-body-md text-on-surface-variant">R$ 1.200,00</td>
+<td class="px-md py-md">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary mr-2"></span>
+                                        Reservado
+                                    </span>
+</td>
+<td class="px-md py-md text-right">
+<div class="flex items-center justify-end gap-sm">
+<button class="p-2 text-secondary hover:bg-secondary/10 rounded-full transition-all" title="Editar">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-full transition-all" title="Remover">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Item 2: Available -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-md py-md">
+<div class="flex items-center gap-md">
+<div class="w-14 h-14 rounded-lg overflow-hidden bg-surface-container flex-shrink-0">
+<img alt="Duvet Set" class="w-full h-full object-cover" data-alt="Luxurious organic linen duvet cover set in a soft beige tone, neatly folded on a minimalist wooden bench. The background is a bright, airy room with soft shadows and a warm, inviting glow. The style is clean, tactile, and nurturing, emphasizing high-quality natural materials and effortless organization." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAD-WZeIGb4Ez_oOS1agX9wJB8eTJaL_CsEM6L0Zh65nFhyMBEqn55dDME2hU2MnUuTfZMxITWCG5D_WEmpkBD8a8TqRPECSyBTVUYf_69ZFYjuZJ4Emv6vIZ1fQZt4Y4kuaQoGbfhzfTuAB01_UpeBz3HYKBr3siAAkBpdZGeonMhR6_vwEPQMFR0bcahnIAbQiIVpUNZx11eR8d-Oew7Ea5kKOf-345eu8KaZO8OeYI6_-rDgy5_shEsPLwAxyn7NO6Ep1UYrJJc"/>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Jogo de Cama Algodão Egípcio</p>
+<p class="font-caption text-caption text-on-surface-variant">Cama &amp; Banho</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md font-body-md text-body-md text-on-surface-variant">R$ 850,00</td>
+<td class="px-md py-md">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-md text-label-md">
+<span class="w-1.5 h-1.5 rounded-full bg-primary mr-2"></span>
+                                        Disponível
+                                    </span>
+</td>
+<td class="px-md py-md text-right">
+<div class="flex items-center justify-end gap-sm">
+<button class="p-2 text-secondary hover:bg-secondary/10 rounded-full transition-all" title="Editar">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-full transition-all" title="Remover">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Item 3: Reserved -->
+<tr class="hover:bg-secondary-container/10 transition-colors bg-secondary-container/5">
+<td class="px-md py-md">
+<div class="flex items-center gap-md">
+<div class="w-14 h-14 rounded-lg overflow-hidden bg-surface-container flex-shrink-0">
+<img alt="Cast Iron Pot" class="w-full h-full object-cover" data-alt="A classic round sage green cast iron dutch oven placed on a rustic wooden dining table. Soft morning light creates gentle highlights on the enamel surface. The scene evokes a feeling of home-cooked warmth, quality craftsmanship, and intentional living. Minimalist kitchen decor in the blurred background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFgx6SELCBIagb3ADliPZ0JEP9DprYEN-qz9f3T3rS8VTP0Qlfa_iKhizImm06TJZPhj9_fAlT1VL_5X_ee6XG3YP1iMMsw3LPOzyUh_0HwUscGrDyz_i5SUt2gyEI2X-HgTCh0y2wV3qgg3tNlSbsBBHOceTOIOgx2AoVQh1zc1LwEvUH96lcv9a9BWIjx-WeLEI5D7FWznICkrZVnkQIhjcOcVAwrDZnQoKxIsrXMy9IQTh46zAsj002xJttUVrgIKwzrJZSHJI"/>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Panela Le Creuset Sage</p>
+<p class="font-caption text-caption text-on-surface-variant">Cozinha</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md font-body-md text-body-md text-on-surface-variant">R$ 1.800,00</td>
+<td class="px-md py-md">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary mr-2"></span>
+                                        Reservado
+                                    </span>
+</td>
+<td class="px-md py-md text-right">
+<div class="flex items-center justify-end gap-sm">
+<button class="p-2 text-secondary hover:bg-secondary/10 rounded-full transition-all" title="Editar">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-full transition-all" title="Remover">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Item 4: Available -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-md py-md">
+<div class="flex items-center gap-md">
+<div class="w-14 h-14 rounded-lg overflow-hidden bg-surface-container flex-shrink-0">
+<img alt="Dinnerware" class="w-full h-full object-cover" data-alt="A set of handcrafted matte white ceramic plates and bowls stacked neatly on a light oak shelf. The lighting is diffused and atmospheric, emphasizing the organic textures and soft edges of the pottery. The aesthetic is clean, organized, and deeply calming, suggesting a curated and thoughtful home environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuARrA71IShe6pX2k0SMNw8UVoBf2UPkmfNUm5IhsIhzgJM-R9k8OOY0D-4J6u4Iki1lNfIUZQT3g9UrYLvv28sTyQpBBpEXqXBkyBzPk1Wyq6mayJmPGH38HOET9rEQTxOvogjmPSSLW5l6kH5FAdgRrp006V11RABO7ds4DFhitVgobbsgGbu_d_z9X4hkjWBUwrVqeP660nF8RKpOZ4BDNfgBxSb5uW-KHnW8NdyaSkfvx9OkTYzrDOLVpSwWhJiEslwq55JQmcU"/>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Aparelho de Jantar Cerâmica</p>
+<p class="font-caption text-caption text-on-surface-variant">Cozinha</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md font-body-md text-body-md text-on-surface-variant">R$ 450,00</td>
+<td class="px-md py-md">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-md text-label-md">
+<span class="w-1.5 h-1.5 rounded-full bg-primary mr-2"></span>
+                                        Disponível
+                                    </span>
+</td>
+<td class="px-md py-md text-right">
+<div class="flex items-center justify-end gap-sm">
+<button class="p-2 text-secondary hover:bg-secondary/10 rounded-full transition-all" title="Editar">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-full transition-all" title="Remover">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-md py-md bg-surface-container-low flex items-center justify-between">
+<span class="font-caption text-caption text-on-surface-variant">Mostrando 4 de 15 presentes</span>
+<div class="flex gap-xs">
+<button class="p-2 border border-outline-variant rounded-lg text-on-surface-variant disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="p-2 border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-low mt-xl border-t border-surface-container-high">
+<div class="w-full py-lg px-margin flex flex-col md:flex-row justify-between items-center gap-md max-w-[1280px] mx-auto">
+<div class="flex flex-col items-center md:items-start gap-xs">
+<span class="font-headline-md text-headline-md font-semibold text-primary">Mimo Meu</span>
+<p class="font-body-md text-body-md text-on-surface-variant">© 2024 Mimo Meu. Effortlessly organized gifting.</p>
+</div>
+<div class="flex gap-lg">
+<a class="text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all font-body-md text-body-md" href="#">About</a>
+<a class="text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all font-body-md text-body-md" href="#">Privacy</a>
+<a class="text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all font-body-md text-body-md" href="#">Terms</a>
+<a class="text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all font-body-md text-body-md" href="#">Support</a>
+</div>
+</div>
+</footer>
+<!-- BottomNavBar (Mobile only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 md:hidden bg-surface-container-lowest dark:bg-surface-container-lowest shadow-lg rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-all p-2 rounded-lg">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 active:scale-90 duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">featured_play_list</span>
+<span class="font-label-md text-label-md">My Lists</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-all p-2 rounded-lg">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-md text-label-md">Activity</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-all p-2 rounded-lg">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</button>
+</nav>
+<!-- Contextual Floating Action Button -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center md:hidden active:scale-95 transition-transform z-40">
+<span class="material-symbols-outlined">add</span>
+</button>
+<script>
+        // Simple interaction for rows
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('click', (e) => {
+                if (!e.target.closest('button')) {
+                    // Logic for row selection or detail view could go here
+                }
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Adicionar Presente - Mimo Meu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Outfit:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#4a2b39",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#bc91a2",
+                        "background": "#fbf9f5",
+                        "secondary-fixed-dim": "#ddc1ac",
+                        "secondary-container": "#fbddc7",
+                        "surface-tint": "#506447",
+                        "on-primary-fixed-variant": "#394c31",
+                        "tertiary-fixed": "#ffd8e6",
+                        "on-secondary-fixed": "#27180b",
+                        "primary-fixed": "#d2eac5",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#263920",
+                        "secondary": "#705a49",
+                        "on-surface-variant": "#444840",
+                        "surface": "#fbf9f5",
+                        "primary": "#506447",
+                        "surface-container-highest": "#e4e2de",
+                        "on-background": "#1b1c19",
+                        "inverse-surface": "#30312e",
+                        "tertiary-fixed-dim": "#e8bacc",
+                        "on-secondary-fixed-variant": "#564333",
+                        "surface-container": "#efeee9",
+                        "surface-variant": "#e4e2de",
+                        "outline": "#74786f",
+                        "surface-container-low": "#f5f3ef",
+                        "tertiary": "#795463",
+                        "surface-container-high": "#e9e8e4",
+                        "inverse-on-surface": "#f2f1ec",
+                        "on-surface": "#1b1c19",
+                        "on-tertiary-fixed-variant": "#5f3d4b",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#b6cdaa",
+                        "primary-container": "#8da382",
+                        "on-secondary-container": "#76604e",
+                        "on-primary-fixed": "#0e2009",
+                        "on-tertiary-fixed": "#2e1220",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#fbddc7",
+                        "outline-variant": "#c4c8bd",
+                        "primary-fixed-dim": "#b6cdaa",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#fbf9f5",
+                        "surface-dim": "#dbdad6",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin": "32px",
+                        "gutter": "24px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "xl": "80px",
+                        "base": "8px",
+                        "lg": "48px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Outfit"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "caption": ["Outfit"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-lg": ["Outfit"],
+                        "label-md": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #fbf9f5;
+            -webkit-font-smoothing: antialiased;
+        }
+        .form-shadow {
+            box-shadow: 0 20px 40px rgba(112, 90, 73, 0.08);
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-background min-h-screen flex flex-col">
+<!-- TopNavBar (Suppressed for focused task) -->
+<header class="w-full bg-background">
+<nav class="flex justify-between items-center w-full px-margin py-sm max-w-[1280px] mx-auto">
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors" onclick="window.history.back()">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<span class="font-headline-lg text-headline-lg font-bold text-primary">Mimo Meu</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">person</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">share</span>
+</div>
+</nav>
+</header>
+<main class="flex-grow flex flex-col items-center justify-start px-margin py-lg lg:py-xl">
+<div class="w-full max-w-2xl">
+<!-- Header Section -->
+<div class="text-center mb-xl">
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-2">O que você gostaria de ganhar?</h1>
+<p class="font-body-md text-on-surface-variant max-w-md mx-auto">Preencha os detalhes abaixo para criar um novo item na sua lista de desejos.</p>
+</div>
+<!-- Form Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md md:p-lg form-shadow border border-surface-container-highest/50">
+<form class="space-y-md" id="giftForm">
+<!-- Image Upload Placeholder -->
+<div class="relative group">
+<label class="font-label-md text-label-md text-primary block mb-xs uppercase tracking-wider">Imagem do Presente</label>
+<div class="w-full h-48 border-2 border-dashed border-outline-variant rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group overflow-hidden" id="imageUpload">
+<div class="text-center space-y-2 p-4" id="uploadPlaceholder">
+<span class="material-symbols-outlined text-outline text-4xl group-hover:text-primary transition-colors">add_a_photo</span>
+<p class="font-body-md text-on-surface-variant">Toque para carregar ou arraste uma foto</p>
+<p class="font-caption text-caption text-outline">JPG, PNG até 5MB</p>
+</div>
+<input accept="image/*" class="hidden" id="fileInput" type="file"/>
+</div>
+</div>
+<!-- Nome do Presente -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-primary block mb-xs uppercase tracking-wider" for="giftName">Nome do presente</label>
+<input class="w-full px-4 py-3 bg-white border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-body-md placeholder:text-outline-variant" id="giftName" placeholder="Ex: Tênis de Corrida" required="" type="text"/>
+</div>
+<!-- Descrição -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-primary block mb-xs uppercase tracking-wider" for="giftDesc">Descrição</label>
+<textarea class="w-full px-4 py-3 bg-white border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-body-md placeholder:text-outline-variant resize-none" id="giftDesc" placeholder="Conte mais sobre por que você quer este presente ou detalhes específicos como tamanho e cor." rows="3"></textarea>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Faixa de preço -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-primary block mb-xs uppercase tracking-wider" for="priceRange">Faixa de preço</label>
+<div class="relative">
+<select class="w-full px-4 py-3 bg-white border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-body-md appearance-none" id="priceRange">
+<option disabled="" selected="" value="">Selecione uma faixa</option>
+<option value="1">Até R$ 50</option>
+<option value="2">R$ 50 - R$ 150</option>
+<option value="3">R$ 150 - R$ 300</option>
+<option value="4">R$ 300 - R$ 600</option>
+<option value="5">Acima de R$ 600</option>
+<option value="6">Não definido</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-outline">expand_more</span>
+</div>
+</div>
+<!-- Link do Produto -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-primary block mb-xs uppercase tracking-wider" for="productLink">Link do produto (URL)</label>
+<div class="relative">
+<input class="w-full pl-11 pr-4 py-3 bg-white border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-body-md placeholder:text-outline-variant" id="productLink" placeholder="https://..." type="url"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[20px]">link</span>
+</div>
+</div>
+</div>
+<!-- Submit Button -->
+<div class="pt-4">
+<button class="w-full h-12 bg-primary text-on-primary font-label-md text-label-md rounded-full hover:bg-primary/90 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2" type="submit">
+<span>Adicionar presente</span>
+<span class="material-symbols-outlined text-[20px]">card_giftcard</span>
+</button>
+</div>
+</form>
+</div>
+<!-- Helpful Tip -->
+<div class="mt-md flex items-start gap-3 p-4 bg-secondary-container/30 rounded-xl">
+<span class="material-symbols-outlined text-on-secondary-container">lightbulb</span>
+<p class="font-caption text-caption text-on-secondary-container">
+<strong>Dica:</strong> Listas com links e fotos são atendidas 40% mais rápido por amigos e familiares. Detalhe bem o seu desejo!
+                </p>
+</div>
+</div>
+</main>
+<!-- Success Message Overlay (Hidden by default) -->
+<div class="fixed inset-0 bg-on-background/40 backdrop-blur-sm z-[100] flex items-center justify-center hidden opacity-0 transition-opacity duration-300" id="successOverlay">
+<div class="bg-surface-container-lowest rounded-xl p-lg max-w-sm w-full mx-margin text-center transform scale-90 transition-transform duration-300">
+<div class="w-16 h-16 bg-primary-container rounded-full flex items-center justify-center mx-auto mb-md">
+<span class="material-symbols-outlined text-on-primary-container text-4xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary mb-2">Presente Adicionado!</h2>
+<p class="font-body-md text-on-surface-variant mb-lg">Seu desejo já foi salvo na sua lista "Meu Natal".</p>
+<button class="w-full h-12 border-2 border-primary text-primary font-label-md text-label-md rounded-full hover:bg-primary/5 transition-all" onclick="closeSuccess()">Ver Minha Lista</button>
+</div>
+</div>
+<!-- Footer -->
+<footer class="w-full py-lg px-margin flex flex-col md:flex-row justify-between items-center gap-md max-w-[1280px] mx-auto mt-auto">
+<div class="flex flex-col items-center md:items-start">
+<span class="font-headline-md text-headline-md font-semibold text-primary">Mimo Meu</span>
+<p class="font-caption text-caption text-on-surface-variant">© 2024 Mimo Meu. Effortlessly organized gifting.</p>
+</div>
+<div class="flex gap-md">
+<a class="font-body-md text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all" href="#">About</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all" href="#">Privacy</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all" href="#">Support</a>
+</div>
+</footer>
+<script>
+        // Image upload handling
+        const uploadArea = document.getElementById('imageUpload');
+        const fileInput = document.getElementById('fileInput');
+        const placeholder = document.getElementById('uploadPlaceholder');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    uploadArea.innerHTML = `<img src="${event.target.result}" class="w-full h-full object-cover" data-alt="A high-quality lifestyle photograph of a curated gift item placed elegantly on a wooden surface with soft warm lighting. The image captures a clean, organized, and premium aesthetic, maintaining the brand's nurturing and minimalist personality with subtle beige and cream tones in the background.">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Drag and drop events
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('bg-primary/5', 'border-primary'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('bg-primary/5', 'border-primary'), false);
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const file = dt.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    uploadArea.innerHTML = `<img src="${event.target.result}" class="w-full h-full object-cover" data-alt="A bright and airy photograph of a beautiful gift package, wrapped in premium recycled paper with a sage green silk ribbon. The setting is a minimalist, modern room with natural morning sunlight streaming in, creating soft shadows and a peaceful, intentional atmosphere aligned with high-end UI design.">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }, false);
+
+        // Form submission animation
+        const form = document.getElementById('giftForm');
+        const successOverlay = document.getElementById('successOverlay');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Simulating loading state
+            const btn = form.querySelector('button[type="submit"]');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span>';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                successOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    successOverlay.classList.remove('opacity-0');
+                    successOverlay.querySelector('div').classList.remove('scale-90');
+                }, 10);
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                form.reset();
+            }, 1000);
+        });
+
+        function closeSuccess() {
+            successOverlay.classList.add('opacity-0');
+            successOverlay.querySelector('div').classList.add('scale-90');
+            setTimeout(() => {
+                successOverlay.classList.add('hidden');
+            }, 300);
+        }
+    </script>
+</body></html>

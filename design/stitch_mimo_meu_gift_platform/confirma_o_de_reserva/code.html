@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mimo Meu | Reserva Confirmada</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Outfit:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#4a2b39",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#bc91a2",
+                    "background": "#fbf9f5",
+                    "secondary-fixed-dim": "#ddc1ac",
+                    "secondary-container": "#fbddc7",
+                    "surface-tint": "#506447",
+                    "on-primary-fixed-variant": "#394c31",
+                    "tertiary-fixed": "#ffd8e6",
+                    "on-secondary-fixed": "#27180b",
+                    "primary-fixed": "#d2eac5",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#263920",
+                    "secondary": "#705a49",
+                    "on-surface-variant": "#444840",
+                    "surface": "#fbf9f5",
+                    "primary": "#506447",
+                    "surface-container-highest": "#e4e2de",
+                    "on-background": "#1b1c19",
+                    "inverse-surface": "#30312e",
+                    "tertiary-fixed-dim": "#e8bacc",
+                    "on-secondary-fixed-variant": "#564333",
+                    "surface-container": "#efeee9",
+                    "surface-variant": "#e4e2de",
+                    "outline": "#74786f",
+                    "surface-container-low": "#f5f3ef",
+                    "tertiary": "#795463",
+                    "surface-container-high": "#e9e8e4",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-surface": "#1b1c19",
+                    "on-tertiary-fixed-variant": "#5f3d4b",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#b6cdaa",
+                    "primary-container": "#8da382",
+                    "on-secondary-container": "#76604e",
+                    "on-primary-fixed": "#0e2009",
+                    "on-tertiary-fixed": "#2e1220",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#fbddc7",
+                    "outline-variant": "#c4c8bd",
+                    "primary-fixed-dim": "#b6cdaa",
+                    "on-secondary": "#ffffff",
+                    "surface-bright": "#fbf9f5",
+                    "surface-dim": "#dbdad6",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin": "32px",
+                    "gutter": "24px",
+                    "sm": "12px",
+                    "md": "24px",
+                    "xl": "80px",
+                    "base": "8px",
+                    "lg": "48px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "body-md": ["Outfit"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "caption": ["Outfit"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "body-lg": ["Outfit"],
+                    "label-md": ["Outfit"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #fbf9f5;
+      }
+      .check-animation {
+        animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      }
+      @keyframes scaleIn {
+        from { transform: scale(0); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+      .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #506447;
+        opacity: 0.6;
+        border-radius: 50%;
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+    </style>
+</head>
+<body class="font-body-md text-on-surface min-h-screen flex flex-col overflow-x-hidden">
+<!-- Top Navigation (Contextually Suppressed labels but brand preserved) -->
+<header class="bg-background">
+<div class="flex justify-between items-center w-full px-margin py-sm max-w-[1280px] mx-auto">
+<span class="font-headline-lg text-headline-lg font-bold text-primary">Mimo Meu</span>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="person">person</span>
+</div>
+</div>
+</header>
+<main class="flex-grow flex items-center justify-center px-margin py-xl relative">
+<!-- Atmospheric Background Elements -->
+<div class="absolute top-1/4 left-10 w-64 h-64 bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="absolute bottom-1/4 right-10 w-80 h-80 bg-secondary/5 rounded-full blur-[120px] pointer-events-none"></div>
+<!-- Success Content Container -->
+<div class="max-w-[480px] w-full z-10">
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_0_rgba(112,90,73,0.08)] p-lg text-center flex flex-col items-center">
+<!-- Animated Checkmark Icon -->
+<div class="w-24 h-24 bg-primary-container rounded-full flex items-center justify-center mb-md check-animation">
+<span class="material-symbols-outlined text-on-primary-container !text-[48px]" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<!-- Message -->
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Reserva confirmada com sucesso!</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">
+                    Você reservou: <span class="font-semibold text-on-surface">Cafeteira Italiana Premium</span>
+</p>
+<!-- Gift Preview Card (Tactile Component) -->
+<div class="w-full bg-surface-container-low rounded-lg p-md mb-lg flex items-center gap-md text-left">
+<div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+<img alt="Product" class="w-full h-full object-cover" data-alt="A high-quality studio photograph of a sleek, stainless steel Moka pot espresso maker sitting on a clean kitchen counter. The lighting is soft and natural, coming from a nearby window, highlighting the reflective metallic surface and the elegant design. The background is a minimalist, warm-toned kitchen with subtle textures of light wood and cream-colored ceramics. The overall mood is sophisticated, organized, and inviting, perfectly aligning with a premium gifting experience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFJHNhM02ENsgny9QSyTJLvS3vGEMfpHR9joyp-efMYdWh4plvpke9wn6d4J9WsvYtbPkJhOQl3RCXl-dnX9X8kK8H9EM-M9FXhdBVZ6ULMNB7SUKJ_5wEhD06BLNHf7yO4b4epAGPdx3ZM4wmiAHqQ3obxalHtJ7xqFUp42KGWyW64nRXbzc6AwQFe7Z_PsrOrM3xmfApBLZnseTMdcpzRqBUFYEDeNx-sabDhI5CFxCxgVLFzGP7Qa1pY7IwEXQaQEYUsGZ-eZk"/>
+</div>
+<div>
+<p class="font-label-md text-label-md text-primary uppercase tracking-widest mb-xs">Presente Reservado</p>
+<p class="font-body-lg text-body-lg font-semibold text-secondary">Chá de Panela da Júlia</p>
+<p class="font-caption text-caption text-on-surface-variant">Reservado em 24 de Outubro, 2024</p>
+</div>
+</div>
+<!-- Action Button -->
+<a class="w-full bg-primary text-on-primary font-label-md text-label-md px-lg py-sm rounded-full h-[48px] flex items-center justify-center hover:opacity-90 transition-all active:scale-95 shadow-md" href="#">
+                    Voltar para lista
+                </a>
+<p class="mt-md font-caption text-caption text-on-surface-variant">
+                    Enviamos um e-mail de confirmação para você com as instruções de entrega.
+                </p>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low">
+<div class="w-full py-lg px-margin flex flex-col md:flex-row justify-between items-center gap-md max-w-[1280px] mx-auto">
+<div class="flex flex-col gap-xs items-center md:items-start">
+<span class="font-headline-md text-headline-md font-semibold text-primary">Mimo Meu</span>
+<p class="font-caption text-caption text-on-surface-variant">© 2024 Mimo Meu. Effortlessly organized gifting.</p>
+</div>
+<div class="flex gap-md">
+<a class="text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all font-body-md text-body-md" href="#">Support</a>
+<a class="text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all font-body-md text-body-md" href="#">Privacy</a>
+<a class="text-on-surface-variant hover:text-primary underline decoration-primary/30 transition-all font-body-md text-body-md" href="#">Terms</a>
+</div>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for celebratory feel
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.body;
+            for (let i = 0; i < 15; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.backgroundColor = i % 2 === 0 ? '#506447' : '#795463';
+                confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                container.appendChild(confetti);
+            }
+        });
+
+        // Keyframe for confetti fall added via script to keep CSS clean
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes fall {
+                to {
+                    transform: translateY(100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body></html>
