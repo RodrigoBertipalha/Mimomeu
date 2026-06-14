@@ -26,8 +26,12 @@ Crie um arquivo `.env` baseado no `.env.example`:
 
 ```bash
 VITE_SUPABASE_URL=https://seu-projeto.supabase.co
-VITE_SUPABASE_ANON_KEY=sua-chave-anon-publica
+VITE_SUPABASE_PUBLISHABLE_KEY=sua-chave-publishable-publica
 ```
+
+No painel novo do Supabase, copie a **Publishable key**. O nome antigo
+`anon key` ainda aparece em alguns tutoriais, mas a chave pública atual é a
+publishable.
 
 ## Fluxo do MVP
 

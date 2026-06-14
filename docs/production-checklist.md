@@ -23,7 +23,7 @@ produção com autenticação, banco remoto e compartilhamento público.
 ## Aplicação
 
 - [x] Instalar `@supabase/supabase-js`.
-- [x] Criar cliente Supabase com variáveis `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`.
+- [x] Criar cliente Supabase com `VITE_SUPABASE_URL` e publishable key.
 - [x] Criar `.env.example`.
 - [x] Configurar `.env` local.
 - [x] Validar conexão local com Supabase.
@@ -42,7 +42,7 @@ produção com autenticação, banco remoto e compartilhamento público.
 
 - [x] Criar repositório no GitHub.
 - [ ] Conectar repositório na Vercel.
-- [ ] Configurar variáveis de ambiente na Vercel.
+- [ ] Configurar variáveis de ambiente na Vercel, sem subir `.env` para o GitHub.
 - [ ] Testar cadastro/login em produção.
 - [ ] Testar criação de lista em produção.
 - [ ] Testar compartilhamento público em janela anônima.

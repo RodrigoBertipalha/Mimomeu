@@ -6,21 +6,25 @@ function firstDefined(...values) {
   return values.find((value) => value && value.trim()) ?? ''
 }
 
+function envValue(env, key) {
+  return env[key] ?? process.env[key]
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const supabaseUrl = firstDefined(
-    env.VITE_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.SUPABASE_URL
+    envValue(env, 'VITE_SUPABASE_URL'),
+    envValue(env, 'NEXT_PUBLIC_SUPABASE_URL'),
+    envValue(env, 'SUPABASE_URL')
   )
   const supabaseAnonKey = firstDefined(
-    env.VITE_SUPABASE_ANON_KEY,
-    env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-    env.SUPABASE_ANON_KEY,
-    env.SUPABASE_PUBLISHABLE_KEY
+    envValue(env, 'VITE_SUPABASE_ANON_KEY'),
+    envValue(env, 'VITE_SUPABASE_PUBLISHABLE_KEY'),
+    envValue(env, 'NEXT_PUBLIC_SUPABASE_ANON_KEY'),
+    envValue(env, 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY'),
+    envValue(env, 'SUPABASE_ANON_KEY'),
+    envValue(env, 'SUPABASE_PUBLISHABLE_KEY')
   )
 
   return {
