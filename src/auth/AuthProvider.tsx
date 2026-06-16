@@ -76,6 +76,54 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         return { needsConfirmation: !data.session }
       },
+      async updateProfile(displayName) {
+        if (!supabase) throw new Error('Supabase não está configurado.')
+
+        const nextDisplayName = displayName.trim()
+        const { error } = await supabase.auth.updateUser({
+          data: {
+            display_name: nextDisplayName,
+          },
+        })
+
+        if (error) throw error
+
+        if (session?.user.id) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .update({ display_name: nextDisplayName })
+            .eq('id', session.user.id)
+
+          if (profileError) throw profileError
+        }
+
+        const { data: sessionData } = await supabase.auth.getSession()
+        setSession(sessionData.session)
+      },
+      async updateEmail(email) {
+        if (!supabase) throw new Error('Supabase não está configurado.')
+
+        const { error } = await supabase.auth.updateUser({
+          email: email.trim(),
+        })
+
+        if (error) throw error
+
+        const { data: sessionData } = await supabase.auth.getSession()
+        setSession(sessionData.session)
+      },
+      async updatePassword(password) {
+        if (!supabase) throw new Error('Supabase não está configurado.')
+
+        const { error } = await supabase.auth.updateUser({
+          password,
+        })
+
+        if (error) throw error
+
+        const { data: sessionData } = await supabase.auth.getSession()
+        setSession(sessionData.session)
+      },
       async signOut() {
         if (!supabase) return
         const { error } = await supabase.auth.signOut()

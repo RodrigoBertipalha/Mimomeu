@@ -1,4 +1,5 @@
 import type { Gift, GiftPriority, Wishlist } from '../types/wishlist'
+import { normalizeWishlistOptions } from './wishlistOptions'
 
 const ACTIVE_WISHLIST_KEY = 'mimo-meu:wishlist'
 const WISHLISTS_KEY = 'mimo-meu:wishlists'
@@ -41,6 +42,7 @@ export function normalizeWishlist(value: Partial<Wishlist>): Wishlist {
     eventType: value.eventType ?? '',
     ownerName: value.ownerName ?? '',
     message: value.message ?? '',
+    options: normalizeWishlistOptions(value.options),
     gifts: Array.isArray(value.gifts)
       ? value.gifts.map((gift) => normalizeGift(gift))
       : [],

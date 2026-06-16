@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase'
 import type { Gift, GiftPriority, ReservationGuest, Wishlist } from '../types/wishlist'
+import { normalizeWishlistOptions } from '../utils/wishlistOptions'
 
 type ReservationRow = {
   id: string
@@ -31,6 +32,8 @@ type WishlistRow = {
   owner_name: string
   message: string
   public_slug: string
+  gift_categories?: string[]
+  price_ranges?: string[]
   created_at: string
   updated_at: string
   gifts?: GiftRow[]
@@ -81,16 +84,25 @@ function mapWishlist(row: WishlistRow | Wishlist): Wishlist {
       eventType: row.event_type ?? '',
       ownerName: row.owner_name ?? '',
       message: row.message ?? '',
+      options: normalizeWishlistOptions({
+        categories: row.gift_categories,
+        priceRanges: row.price_ranges,
+      }),
       gifts: (row.gifts ?? []).map(mapGift),
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     }
   }
 
-  return row
+  return {
+    ...row,
+    options: normalizeWishlistOptions(row.options),
+  }
 }
 
 function wishlistPayload(value: Wishlist, ownerId: string) {
+  const options = normalizeWishlistOptions(value.options)
+
   return {
     owner_id: ownerId,
     title: value.title.trim(),
@@ -98,6 +110,8 @@ function wishlistPayload(value: Wishlist, ownerId: string) {
     event_type: value.eventType || '',
     owner_name: value.ownerName || '',
     message: value.message || '',
+    gift_categories: options.categories,
+    price_ranges: options.priceRanges,
   }
 }
 
@@ -123,6 +137,8 @@ const wishlistSelect = `
   owner_name,
   message,
   public_slug,
+  gift_categories,
+  price_ranges,
   created_at,
   updated_at,
   gifts (
@@ -189,6 +205,7 @@ export async function updateRemoteWishlist(
   value: Omit<Wishlist, 'gifts'>
 ) {
   const client = ensureSupabase()
+  const options = normalizeWishlistOptions(value.options)
   const { data, error } = await client
     .from('wishlists')
     .update({
@@ -197,6 +214,8 @@ export async function updateRemoteWishlist(
       event_type: value.eventType || '',
       owner_name: value.ownerName || '',
       message: value.message || '',
+      gift_categories: options.categories,
+      price_ranges: options.priceRanges,
     })
     .eq('id', listId)
     .select(wishlistSelect)

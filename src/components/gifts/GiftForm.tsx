@@ -1,5 +1,9 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
-import type { Gift, GiftPriority } from '../../types/wishlist'
+import type { Gift, GiftPriority, WishlistOptions } from '../../types/wishlist'
+import {
+  includeCurrentOption,
+  normalizeWishlistOptions,
+} from '../../utils/wishlistOptions'
 import Icon from '../ui/Icon'
 
 type GiftFormProps = {
@@ -8,6 +12,7 @@ type GiftFormProps = {
   submitLabel?: string
   title?: string
   description?: string
+  options?: WishlistOptions
   onCancel?: () => void
 }
 
@@ -54,11 +59,21 @@ function GiftForm({
   submitLabel,
   title,
   description,
+  options,
   onCancel,
 }: GiftFormProps) {
   const [formData, setFormData] = useState(createState(initialValue))
   const [linkError, setLinkError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+  const wishlistOptions = normalizeWishlistOptions(options)
+  const categoryOptions = includeCurrentOption(
+    wishlistOptions.categories,
+    formData.category
+  )
+  const priceRangeOptions = includeCurrentOption(
+    wishlistOptions.priceRanges,
+    formData.priceRange
+  )
 
   function handleChange(field: keyof typeof blankState, value: string | boolean) {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -188,10 +203,11 @@ function GiftForm({
             onChange={(event) => handleChange('priceRange', event.target.value)}
           >
             <option value="">Selecione uma faixa</option>
-            <option value="Até R$ 100">Até R$ 100</option>
-            <option value="R$ 100 - 300">R$ 100 - 300</option>
-            <option value="R$ 300 - 700">R$ 300 - 700</option>
-            <option value="Acima de R$ 700">Acima de R$ 700</option>
+            {priceRangeOptions.map((priceRange) => (
+              <option key={priceRange} value={priceRange}>
+                {priceRange}
+              </option>
+            ))}
           </select>
         </label>
 
@@ -215,12 +231,18 @@ function GiftForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="ui-label">
           Categoria
-          <input
+          <select
             className="ui-field"
-            placeholder="Ex: Cozinha"
             value={formData.category}
             onChange={(event) => handleChange('category', event.target.value)}
-          />
+          >
+            <option value="">Selecione uma categoria</option>
+            {categoryOptions.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label className="ui-label">

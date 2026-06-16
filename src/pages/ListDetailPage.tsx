@@ -3,11 +3,34 @@ import { Link, useParams } from 'react-router-dom'
 import GiftForm from '../components/gifts/GiftForm'
 import GiftList from '../components/gifts/GiftList'
 import ListForm from '../components/lists/ListForm'
+import ListOptionsEditor from '../components/lists/ListOptionsEditor'
 import ShareCard from '../components/share/ShareCard'
 import Icon from '../components/ui/Icon'
 import Modal from '../components/ui/Modal'
 import { useWishlist } from '../hooks/useWishlist'
-import type { Gift } from '../types/wishlist'
+import type { Gift, Wishlist, WishlistOptions } from '../types/wishlist'
+import {
+  createDefaultWishlistOptions,
+  normalizeWishlistOptions,
+} from '../utils/wishlistOptions'
+
+function getListDetails(
+  list: Wishlist,
+  options: WishlistOptions = list.options
+): Omit<Wishlist, 'gifts'> {
+  return {
+    id: list.id,
+    publicSlug: list.publicSlug,
+    title: list.title,
+    eventDate: list.eventDate,
+    eventType: list.eventType,
+    ownerName: list.ownerName,
+    message: list.message,
+    options,
+    createdAt: list.createdAt,
+    updatedAt: list.updatedAt,
+  }
+}
 
 function ListDetailPage() {
   const { listId } = useParams()
@@ -21,9 +44,13 @@ function ListDetailPage() {
   } = useWishlist()
   const [query, setQuery] = useState('')
   const [isEditListOpen, setIsEditListOpen] = useState(false)
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false)
   const [isShareOpen, setIsShareOpen] = useState(false)
   const [isAddGiftOpen, setIsAddGiftOpen] = useState(false)
   const [editingGift, setEditingGift] = useState<Gift | null>(null)
+  const [optionsDraft, setOptionsDraft] = useState<WishlistOptions>(
+    createDefaultWishlistOptions()
+  )
   const [notice, setNotice] = useState('')
 
   const list = listId ? findWishlist(listId) : null
@@ -44,6 +71,12 @@ function ListDetailPage() {
   function showNotice(message: string) {
     setNotice(message)
     setTimeout(() => setNotice(''), 2500)
+  }
+
+  function openOptionsModal() {
+    if (!list) return
+    setOptionsDraft(normalizeWishlistOptions(list.options))
+    setIsOptionsOpen(true)
   }
 
   if (isLoading) {
@@ -106,6 +139,14 @@ function ListDetailPage() {
             onClick={() => setIsEditListOpen(true)}
           >
             Editar lista
+          </button>
+          <button
+            type="button"
+            className="ui-button-secondary justify-center"
+            onClick={openOptionsModal}
+          >
+            <Icon name="filter" className="h-5 w-5" />
+            Opções da lista
           </button>
           <button
             type="button"
@@ -231,20 +272,58 @@ function ListDetailPage() {
             onCancel={() => setIsEditListOpen(false)}
             onSubmit={async (value) => {
               await updateWishlistDetails(list.id, {
-                id: list.id,
-                publicSlug: list.publicSlug,
+                ...getListDetails(list),
                 title: value.title,
                 eventDate: value.eventDate,
                 eventType: value.eventType,
                 ownerName: value.ownerName,
                 message: value.message,
-                createdAt: list.createdAt,
-                updatedAt: list.updatedAt,
               })
               setIsEditListOpen(false)
               showNotice('Lista atualizada.')
             }}
           />
+        </Modal>
+      ) : null}
+
+      {isOptionsOpen ? (
+        <Modal
+          title="Opções da lista"
+          description="Edite as categorias e faixas usadas nos presentes desta lista."
+          onClose={() => setIsOptionsOpen(false)}
+        >
+          <div className="grid gap-5">
+            <ListOptionsEditor
+              value={optionsDraft}
+              onChange={setOptionsDraft}
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                className="ui-button-secondary w-full"
+                onClick={() => setIsOptionsOpen(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="ui-button-primary w-full"
+                onClick={async () => {
+                  await updateWishlistDetails(
+                    list.id,
+                    getListDetails(
+                      list,
+                      normalizeWishlistOptions(optionsDraft)
+                    )
+                  )
+                  setIsOptionsOpen(false)
+                  showNotice('Opções da lista atualizadas.')
+                }}
+              >
+                Salvar opções
+              </button>
+            </div>
+          </div>
         </Modal>
       ) : null}
 
@@ -272,6 +351,7 @@ function ListDetailPage() {
           onClose={() => setIsAddGiftOpen(false)}
         >
           <GiftForm
+            options={list.options}
             submitLabel="Adicionar presente"
             onCancel={() => setIsAddGiftOpen(false)}
             onSubmit={async (gift) => {
@@ -290,6 +370,7 @@ function ListDetailPage() {
           onClose={() => setEditingGift(null)}
         >
           <GiftForm
+            options={list.options}
             initialValue={editingGift}
             submitLabel="Salvar presente"
             onCancel={() => setEditingGift(null)}

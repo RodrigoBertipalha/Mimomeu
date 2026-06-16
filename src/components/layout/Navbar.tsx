@@ -1,17 +1,13 @@
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../../auth/authContext'
+import AccountMenu from '../auth/AccountMenu'
 import Icon from '../ui/Icon'
 import Container from './Container'
 
 function Navbar() {
-  const { user, signOut } = useAuth()
-  const location = useLocation()
+  const { user } = useAuth()
   const next = encodeURIComponent('/list?new=1')
   const createListTo = user ? '/list?new=1' : `/login?next=${next}`
-
-  async function handleSignOut() {
-    await signOut()
-  }
 
   return (
     <header className="sticky top-0 z-20 border-b border-[rgba(217,212,202,0.55)] bg-[rgba(255,253,248,0.9)] backdrop-blur">
@@ -53,26 +49,7 @@ function Navbar() {
               Criar lista
             </Link>
 
-            {user ? (
-              <button
-                type="button"
-                className="ui-icon-button"
-                onClick={handleSignOut}
-                aria-label="Sair"
-                title="Sair"
-              >
-                <Icon name="log-out" />
-              </button>
-            ) : (
-              <Link
-                to={`/login?next=${encodeURIComponent(
-                  `${location.pathname}${location.search}`
-                )}`}
-                className="ui-button-secondary hidden sm:flex"
-              >
-                Entrar
-              </Link>
-            )}
+            <AccountMenu />
 
             <Link
               to="/list"

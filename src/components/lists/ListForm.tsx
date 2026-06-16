@@ -1,5 +1,11 @@
 import { useState, type FormEvent } from 'react'
 import type { Wishlist } from '../../types/wishlist'
+import {
+  createDefaultWishlistOptions,
+  normalizeWishlistOptions,
+} from '../../utils/wishlistOptions'
+import Icon from '../ui/Icon'
+import ListOptionsEditor from './ListOptionsEditor'
 
 type ListFormProps = {
   onSubmit: (value: Wishlist) => void
@@ -9,6 +15,7 @@ type ListFormProps = {
   title?: string
   description?: string
   framed?: boolean
+  showOptionsSetup?: boolean
   onCancel?: () => void
 }
 
@@ -22,6 +29,7 @@ function createInitialState(): Wishlist {
     eventType: '',
     ownerName: '',
     message: '',
+    options: createDefaultWishlistOptions(),
     gifts: [],
     createdAt: now,
     updatedAt: now,
@@ -36,10 +44,19 @@ function ListForm({
   title,
   description,
   framed = true,
+  showOptionsSetup = false,
   onCancel,
 }: ListFormProps) {
   const [formData, setFormData] = useState<Wishlist>(
-    initialValue ?? createInitialState()
+    initialValue
+      ? {
+          ...initialValue,
+          options: normalizeWishlistOptions(initialValue.options),
+        }
+      : createInitialState()
+  )
+  const [optionsMode, setOptionsMode] = useState<'default' | 'custom'>(
+    initialValue ? 'custom' : 'default'
   )
 
   function handleChange(field: keyof Wishlist, value: string) {
@@ -49,9 +66,16 @@ function ListForm({
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!formData.title.trim()) return
-    onSubmit(formData)
+    onSubmit({
+      ...formData,
+      options:
+        showOptionsSetup && optionsMode === 'default'
+          ? createDefaultWishlistOptions()
+          : normalizeWishlistOptions(formData.options),
+    })
     if (resetOnSubmit) {
       setFormData(createInitialState())
+      setOptionsMode('default')
     }
   }
 
@@ -133,6 +157,78 @@ function ListForm({
             onChange={(event) => handleChange('message', event.target.value)}
           />
         </label>
+
+        {showOptionsSetup ? (
+          <section className="grid gap-4">
+            <div className="space-y-1">
+              <h3 className="text-sm font-extrabold text-[var(--color-text)]">
+                Opções da lista
+              </h3>
+              <p className="text-sm leading-6 text-[var(--color-muted)]">
+                Categorias e faixas usadas ao cadastrar presentes.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 rounded-lg bg-[var(--color-bg-soft)] p-1">
+              <button
+                type="button"
+                className={
+                  optionsMode === 'default'
+                    ? 'ui-button-primary h-11'
+                    : 'ui-button-secondary h-11 border-transparent bg-transparent'
+                }
+                onClick={() => setOptionsMode('default')}
+              >
+                Padrão
+              </button>
+              <button
+                type="button"
+                className={
+                  optionsMode === 'custom'
+                    ? 'ui-button-primary h-11'
+                    : 'ui-button-secondary h-11 border-transparent bg-transparent'
+                }
+                onClick={() => setOptionsMode('custom')}
+              >
+                Personalizar
+              </button>
+            </div>
+
+            {optionsMode === 'custom' ? (
+              <ListOptionsEditor
+                value={formData.options}
+                onChange={(options) =>
+                  setFormData((prev) => ({ ...prev, options }))
+                }
+              />
+            ) : (
+              <div className="grid gap-3 rounded-lg border border-[var(--color-line)] bg-[var(--color-bg-soft)] p-4">
+                <div className="flex flex-wrap gap-2">
+                  {createDefaultWishlistOptions().categories.map((category) => (
+                    <span
+                      key={category}
+                      className="ui-badge bg-[var(--color-card)] text-[var(--color-muted)]"
+                    >
+                      {category}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {createDefaultWishlistOptions().priceRanges.map(
+                    (priceRange) => (
+                      <span
+                        key={priceRange}
+                        className="ui-badge bg-[var(--color-card)] text-[var(--color-muted)]"
+                      >
+                        {priceRange}
+                      </span>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+          </section>
+        ) : null}
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -147,6 +243,9 @@ function ListForm({
         ) : null}
         <button type="submit" className="ui-button-primary w-full">
           {submitLabel ?? 'Salvar lista'}
+          {showOptionsSetup ? (
+            <Icon name="arrow-right" className="h-5 w-5" />
+          ) : null}
         </button>
       </div>
     </form>

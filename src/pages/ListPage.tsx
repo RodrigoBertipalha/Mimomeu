@@ -146,6 +146,7 @@ function ListPage() {
         >
           <ListForm
             framed={false}
+            showOptionsSetup
             submitLabel="Criar lista"
             onCancel={closeCreateModal}
             onSubmit={async (value) => {

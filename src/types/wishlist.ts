@@ -15,6 +15,11 @@ export type Gift = {
   reservedContact: string
 }
 
+export type WishlistOptions = {
+  categories: string[]
+  priceRanges: string[]
+}
+
 export type Wishlist = {
   id: string
   publicSlug?: string
@@ -23,6 +28,7 @@ export type Wishlist = {
   eventType: string
   ownerName: string
   message: string
+  options: WishlistOptions
   gifts: Gift[]
   createdAt: string
   updatedAt: string

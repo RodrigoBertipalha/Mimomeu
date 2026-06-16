@@ -16,7 +16,9 @@ produção com autenticação, banco remoto e compartilhamento público.
 - [x] Criar pasta `supabase/functions` com edge function opcional para reserva.
 - [x] Criar projeto no Supabase.
 - [x] Aplicar a migration `supabase/migrations/202606140001_initial_schema.sql`.
+- [ ] Aplicar a migration `supabase/migrations/202606160001_wishlist_options.sql`.
 - [x] Conferir se Auth por e-mail/senha está habilitado.
+- [ ] Desativar confirmação de e-mail no Supabase Auth para o MVP.
 - [ ] Configurar URLs de redirect do Supabase para localhost e domínio final.
 - [ ] Publicar edge function `reserve-gift`, se optar por usar function em vez de RPC direto.
 

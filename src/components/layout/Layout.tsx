@@ -32,9 +32,9 @@ function Layout({ children }: LayoutProps) {
               <span className="text-[var(--color-muted)]">
                 Privacidade
               </span>
-              <span className="text-[var(--color-muted)]">
+              <Link to="/support" className="underline-offset-4 hover:underline">
                 Suporte
-              </span>
+              </Link>
             </nav>
           </div>
         </Container>

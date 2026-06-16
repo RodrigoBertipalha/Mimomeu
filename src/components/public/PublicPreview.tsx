@@ -1,4 +1,5 @@
 import type { Gift, Wishlist } from '../../types/wishlist'
+import { normalizeWishlistOptions } from '../../utils/wishlistOptions'
 import GiftList from '../gifts/GiftList'
 import Icon from '../ui/Icon'
 
@@ -8,9 +9,11 @@ type PublicPreviewProps = {
 }
 
 function PublicPreview({ list, onReserve }: PublicPreviewProps) {
+  const options = normalizeWishlistOptions(list.options)
   const categories = Array.from(
     new Set(list.gifts.map((gift) => gift.category).filter(Boolean))
   )
+  const categoryBadges = categories.length ? categories : options.categories
   const eventName = list.title || 'sua lista'
   const ownerNames = list.ownerName || 'quem está celebrando'
 
@@ -41,16 +44,14 @@ function PublicPreview({ list, onReserve }: PublicPreviewProps) {
           <span className="ui-badge bg-[var(--color-primary-deep)] text-white">
             Todos
           </span>
-          {(categories.length ? categories : ['Cozinha', 'Decoração', 'Casa']).map(
-            (category) => (
-              <span
-                key={category}
-                className="ui-badge bg-[rgba(119,119,116,0.13)] text-[var(--color-muted)]"
-              >
-                {category}
-              </span>
-            )
-          )}
+          {categoryBadges.map((category) => (
+            <span
+              key={category}
+              className="ui-badge bg-[rgba(119,119,116,0.13)] text-[var(--color-muted)]"
+            >
+              {category}
+            </span>
+          ))}
         </div>
 
         <div className="flex items-center gap-3 text-sm font-bold text-[var(--color-secondary-deep)]">

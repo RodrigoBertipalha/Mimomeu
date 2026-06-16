@@ -11,10 +11,11 @@ function AuthPage() {
     signIn,
     signUp,
   } = useAuth()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
   const next = searchParams.get('next') || '/list'
-  const [mode, setMode] = useState<'login' | 'signup'>('login')
+  const modeParam = searchParams.get('mode')
+  const mode: 'login' | 'signup' = modeParam === 'signup' ? 'signup' : 'login'
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -25,6 +26,18 @@ function AuthPage() {
   useEffect(() => {
     if (user) navigate(next, { replace: true })
   }, [navigate, next, user])
+
+  function handleModeChange(nextMode: 'login' | 'signup') {
+    const nextParams = new URLSearchParams(searchParams)
+    if (nextMode === 'signup') {
+      nextParams.set('mode', 'signup')
+    } else {
+      nextParams.delete('mode')
+    }
+    setSearchParams(nextParams)
+    setError('')
+    setMessage('')
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -106,7 +119,7 @@ function AuthPage() {
                 ? 'ui-button-primary h-11'
                 : 'ui-button-secondary h-11 border-transparent bg-transparent'
             }
-            onClick={() => setMode('login')}
+            onClick={() => handleModeChange('login')}
           >
             Entrar
           </button>
@@ -117,7 +130,7 @@ function AuthPage() {
                 ? 'ui-button-primary h-11'
                 : 'ui-button-secondary h-11 border-transparent bg-transparent'
             }
-            onClick={() => setMode('signup')}
+            onClick={() => handleModeChange('signup')}
           >
             Criar conta
           </button>

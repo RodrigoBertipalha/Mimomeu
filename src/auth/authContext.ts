@@ -12,6 +12,9 @@ export type AuthContextValue = {
     password: string,
     displayName: string
   ) => Promise<{ needsConfirmation: boolean }>
+  updateProfile: (displayName: string) => Promise<void>
+  updateEmail: (email: string) => Promise<void>
+  updatePassword: (password: string) => Promise<void>
   signOut: () => Promise<void>
 }
 

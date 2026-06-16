@@ -8,6 +8,7 @@ import GuestListPage from './pages/GuestListPage'
 import HomePage from './pages/HomePage'
 import ListDetailPage from './pages/ListDetailPage'
 import ListPage from './pages/ListPage'
+import SupportPage from './pages/SupportPage'
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/support" element={<SupportPage />} />
             <Route path="/login" element={<AuthPage />} />
             <Route
               path="/list"
