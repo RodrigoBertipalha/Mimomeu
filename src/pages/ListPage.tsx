@@ -120,7 +120,7 @@ function ListPage() {
       ) : null}
 
       {!isLoading && !wishlists.length ? (
-        <section className="rounded-lg border border-dashed border-[var(--color-line)] bg-[rgba(255,253,248,0.82)] p-8 text-center shadow-[var(--shadow-soft)]">
+        <section className="rounded-lg border border-dashed border-[var(--color-line)] bg-[var(--color-empty-bg)] p-8 text-center shadow-[var(--shadow-soft)]">
           <h2 className="text-2xl font-extrabold">
             Nenhuma lista criada ainda
           </h2>

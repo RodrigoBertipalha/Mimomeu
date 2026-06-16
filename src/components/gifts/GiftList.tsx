@@ -25,7 +25,7 @@ function priorityClass(priority: Gift['priority']) {
 function GiftList({ gifts, onReserve, onReleaseReserve, onEdit }: GiftListProps) {
   if (!gifts.length) {
     return (
-      <div className="rounded-lg border border-dashed border-[var(--color-line)] bg-[rgba(255,253,248,0.78)] p-8 text-center shadow-[var(--shadow-soft)]">
+      <div className="rounded-lg border border-dashed border-[var(--color-line)] bg-[var(--color-empty-bg)] p-8 text-center shadow-[var(--shadow-soft)]">
         <p className="text-sm font-bold text-[var(--color-text)]">
           Nenhum presente cadastrado
         </p>

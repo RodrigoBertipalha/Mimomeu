@@ -3,6 +3,7 @@ import { useAuth } from '../../auth/authContext'
 import AccountMenu from '../auth/AccountMenu'
 import Icon from '../ui/Icon'
 import Container from './Container'
+import ThemeToggle from './ThemeToggle'
 
 function Navbar() {
   const { user } = useAuth()
@@ -10,7 +11,7 @@ function Navbar() {
   const createListTo = user ? '/list?new=1' : `/login?next=${next}`
 
   return (
-    <header className="sticky top-0 z-20 border-b border-[rgba(217,212,202,0.55)] bg-[rgba(255,253,248,0.9)] backdrop-blur">
+    <header className="sticky top-0 z-20 border-b border-[var(--color-line)] bg-[var(--color-header-bg)] backdrop-blur-xl">
       <Container>
         <div className="flex h-20 items-center justify-between gap-4">
           <Link
@@ -48,6 +49,8 @@ function Navbar() {
               <Icon name="plus" className="h-4 w-4" />
               Criar lista
             </Link>
+
+            <ThemeToggle />
 
             <AccountMenu />
 

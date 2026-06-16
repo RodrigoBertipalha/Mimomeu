@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chá de Panela da Julia - Mimo Meu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#690005",
+                        "on-secondary": "#53210c",
+                        "primary-fixed-dim": "#becca3",
+                        "surface-tint": "#becca3",
+                        "on-primary": "#293417",
+                        "tertiary-fixed-dim": "#90d792",
+                        "on-surface": "#e2e2e6",
+                        "primary": "#becda4",
+                        "surface-container-high": "#282a2d",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#dae8be",
+                        "secondary-fixed-dim": "#ffb59a",
+                        "on-tertiary-fixed": "#002107",
+                        "on-secondary-container": "#f5a587",
+                        "surface-container": "#1e2023",
+                        "outline-variant": "#45483f",
+                        "surface-variant": "#333538",
+                        "surface-container-highest": "#333538",
+                        "on-primary-fixed": "#141f05",
+                        "inverse-primary": "#566342",
+                        "tertiary-fixed": "#abf4ac",
+                        "on-primary-fixed-variant": "#3f4b2c",
+                        "on-secondary-fixed": "#380d00",
+                        "on-primary-container": "#384425",
+                        "inverse-on-surface": "#2f3034",
+                        "on-surface-variant": "#c6c8bb",
+                        "secondary-container": "#723922",
+                        "tertiary-container": "#77bc7a",
+                        "surface-container-low": "#1a1c1f",
+                        "tertiary": "#91d893",
+                        "on-tertiary-fixed-variant": "#07521d",
+                        "surface-dim": "#111316",
+                        "inverse-surface": "#e2e2e6",
+                        "on-tertiary-container": "#004b18",
+                        "outline": "#909287",
+                        "error": "#ffb4ab",
+                        "primary-container": "#a3b18a",
+                        "surface-bright": "#37393d",
+                        "on-tertiary": "#003911",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-lowest": "#0c0e11",
+                        "secondary-fixed": "#ffdbce",
+                        "secondary": "#ffb59a",
+                        "on-secondary-fixed-variant": "#6f3720",
+                        "surface": "#111316",
+                        "on-background": "#e2e2e6",
+                        "background": "#111316"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "80px",
+                        "base": "8px",
+                        "lg": "48px",
+                        "gutter": "24px",
+                        "md": "24px",
+                        "margin-desktop": "64px",
+                        "xs": "4px",
+                        "margin-mobile": "16px",
+                        "sm": "12px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "label-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        
+        .glass-panel {
+            background: rgba(30, 33, 37, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .gift-card-hover:hover {
+            border-color: theme('colors.primary');
+            box-shadow: 0 0 30px rgba(190, 205, 164, 0.15);
+            transform: translateY(-4px);
+        }
+        
+        .image-gradient-overlay {
+            background: linear-gradient(to top, rgba(18, 20, 23, 0.9) 0%, rgba(18, 20, 23, 0) 50%);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-surface/80 backdrop-blur-xl docked full-width top-0 sticky z-50 shadow-[0_20px_40px_rgba(0,0,0,0.15)] bg-surface/80 border-b border-white/5">
+<div class="flex justify-between items-center px-margin-desktop py-base w-full max-w-7xl mx-auto hidden md:flex">
+<div class="font-headline-md text-headline-md font-bold text-primary">Mimo Meu</div>
+<!-- Navigation hidden for guest view as per relevance check, focusing on canvas -->
+</div>
+<!-- Mobile Nav Placeholder -->
+<div class="flex justify-between items-center px-margin-mobile py-base w-full md:hidden">
+<div class="font-headline-md text-headline-md font-bold text-primary">Mimo Meu</div>
+</div>
+</nav>
+<!-- Main Canvas -->
+<main class="flex-grow w-full max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-lg space-y-xl">
+<!-- Header Section -->
+<header class="space-y-md text-center max-w-3xl mx-auto">
+<h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">
+                Você foi convidado para:<br/>
+<span class="text-primary">Chá de Panela da Julia</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+                Escolha um presente da lista abaixo para celebrar conosco. Cada item foi escolhido com muito carinho.
+            </p>
+</header>
+<!-- Filter/Sort Section -->
+<section class="flex flex-col sm:flex-row justify-between items-center gap-md glass-panel p-sm rounded-xl">
+<div class="flex gap-sm">
+<button class="px-md py-sm rounded-full bg-primary-container text-on-primary-container font-label-lg text-label-lg transition-all hover:opacity-90">
+                    Todos
+                </button>
+<button class="px-md py-sm rounded-full border border-white/10 text-on-surface font-label-lg text-label-lg hover:bg-surface-variant transition-all">
+                    Disponíveis
+                </button>
+<button class="px-md py-sm rounded-full border border-white/10 text-on-surface font-label-lg text-label-lg hover:bg-surface-variant transition-all">
+                    Reservados
+                </button>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Ordenar por</span>
+<button class="flex items-center gap-xs hover:text-primary transition-colors">
+<span class="font-label-lg text-label-lg">Preço</span>
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+</button>
+</div>
+</section>
+<!-- Gift Grid -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-gutter">
+<!-- Available Item 1 -->
+<article class="glass-panel rounded-xl overflow-hidden flex flex-col transition-all duration-300 gift-card-hover group relative">
+<div class="relative aspect-[4/5] bg-surface-variant overflow-hidden">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A high-end, minimalist kitchen mixer in a modern dark-mode aesthetic setting. The appliance is sleek, featuring matte black finishes and subtle brushed steel accents. It sits on a pristine dark marble countertop illuminated by a single, soft, warm spotlight that casts a sophisticated, deep shadow, evoking a luxurious and organized simplicity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbSort5wmEDLZqxPpYajObE13y1mZOmBXcGamElL5QfttotCw62KLz39RjKPy9wU14DC2exP9EuigO7R7WvVHPQLFOeTfJX8bsRXslS8lejhokQxLlQBa6Es2TGXjjtFy3jfIM_cEV0QqlEhTK3G03yieD4QuQwWP0ProkNt4RYVee2GWM3f3njIPcMWeECshzMC1t8g6lsA3j-9MIY8yf7CyaDVB5K7UkZznQmLkTImPlxjgxoDEfU-zyAn2NrIRP3gTEPXGtJLE"/>
+<div class="absolute inset-0 image-gradient-overlay"></div>
+<div class="absolute top-sm right-sm px-sm py-xs bg-primary/10 text-primary font-label-sm text-label-sm rounded-full backdrop-blur-sm border border-primary/20">
+                        Disponível
+                    </div>
+</div>
+<div class="p-md flex flex-col flex-grow justify-between gap-md">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Batedeira Planetária</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Para preparar receitas incríveis e sobremesas especiais para a nova casa.</p>
+</div>
+<div class="flex flex-col gap-sm mt-auto">
+<span class="font-headline-lg text-headline-lg text-primary">R$ 899,00</span>
+<button class="w-full py-sm bg-primary text-on-primary rounded-lg font-label-lg text-label-lg hover:bg-primary-fixed transition-colors">
+                            Reservar presente
+                        </button>
+</div>
+</div>
+</article>
+<!-- Available Item 2 -->
+<article class="glass-panel rounded-xl overflow-hidden flex flex-col transition-all duration-300 gift-card-hover group relative">
+<div class="relative aspect-[4/5] bg-surface-variant overflow-hidden">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A curated set of artisan ceramic plates and bowls stacked neatly. The ceramics feature earthy, muted tones with a matte finish. They are placed on a dark, textured wooden table under a moody, directional light that highlights the subtle imperfections and organic shapes, fitting perfectly into a sophisticated, minimalist dark-mode design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxtjShpJsIxWln8Paekb8yu8uVhcc2BfTTh1V91k5hOygGvHOK0XyHgS15LZl5G2jWGxVo4Lpo0pQFpj66vEAHrXiEqzlkHxbN5k75PE5BntbQ5H5zxNgGjU7drutYkyIzti7-TkcFwbidvctfmfnrrKbkyN7cneeh6teBHMghPCZzT12Cet3pdknUPKX_5TL0urZbl9bZuqh7-Uc-nqWGkO27ZzV1tSKLNB8-vlNrNcD7aR8T2QYIN8VDkppvvd5w7WaZCnx-yXM"/>
+<div class="absolute inset-0 image-gradient-overlay"></div>
+<div class="absolute top-sm right-sm px-sm py-xs bg-primary/10 text-primary font-label-sm text-label-sm rounded-full backdrop-blur-sm border border-primary/20">
+                        Disponível
+                    </div>
+</div>
+<div class="p-md flex flex-col flex-grow justify-between gap-md">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Aparelho de Jantar</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Conjunto completo de cerâmica artesanal para receber os amigos.</p>
+</div>
+<div class="flex flex-col gap-sm mt-auto">
+<span class="font-headline-lg text-headline-lg text-primary">R$ 450,00</span>
+<button class="w-full py-sm bg-primary text-on-primary rounded-lg font-label-lg text-label-lg hover:bg-primary-fixed transition-colors">
+                            Reservar presente
+                        </button>
+</div>
+</div>
+</article>
+<!-- Available Item 3 (Bento-style variation for visual interest) -->
+<article class="glass-panel rounded-xl overflow-hidden flex flex-col transition-all duration-300 gift-card-hover group relative sm:col-span-2 lg:col-span-1 xl:col-span-2 flex-row sm:flex-row">
+<div class="relative w-full sm:w-1/2 aspect-[4/5] sm:aspect-auto bg-surface-variant overflow-hidden">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A luxurious espresso machine displayed prominently on a dark, sleek kitchen counter. The machine has chrome accents reflecting a soft, ambient glow. The background is a blurred, moody dark charcoal color, emphasizing the high-end, organized simplicity and intimate curation aesthetic of the gift registry platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzYGQsS_-Uapg64P6gOb0tYbthzfuJGrhYwtVoc1J3qTV42Q50m8MpafWuXxCWDHfqm7dm-bsBkrvKCqLLDV4cEHa4BRBxlyq6aB7yZ_t1_y9SdDuxcx857d9bZ88AIwNvkmEUN3QUZwVuR0m62YqWCwBgSl2blo8tYO0dWrHMylX7hi2eTD30zFFHmR0ylMCO7NmFTAtjtfN9sQg7ICL0fe95zKVCyvVpxj--byFK_E6hCFmIqEUFCnXTt-mwFhBDkmiK-UkugGM"/>
+<div class="absolute inset-0 image-gradient-overlay sm:bg-gradient-to-r sm:from-transparent sm:to-surface/90"></div>
+<div class="absolute top-sm right-sm px-sm py-xs bg-primary/10 text-primary font-label-sm text-label-sm rounded-full backdrop-blur-sm border border-primary/20 sm:hidden">
+                        Disponível
+                    </div>
+</div>
+<div class="p-md flex flex-col justify-center w-full sm:w-1/2 gap-md relative">
+<div class="hidden sm:block absolute top-md right-md px-sm py-xs bg-primary/10 text-primary font-label-sm text-label-sm rounded-full backdrop-blur-sm border border-primary/20">
+                        Disponível
+                    </div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Máquina de Café Espresso</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3">O presente perfeito para as manhãs do casal. Acompanha kit de cápsulas de degustação.</p>
+</div>
+<div class="flex flex-col gap-sm mt-md">
+<span class="font-headline-lg text-headline-lg text-primary">R$ 1.250,00</span>
+<button class="w-full py-sm bg-primary text-on-primary rounded-lg font-label-lg text-label-lg hover:bg-primary-fixed transition-colors">
+                            Reservar presente
+                        </button>
+</div>
+</div>
+</article>
+<!-- Reserved Item 1 -->
+<article class="glass-panel rounded-xl overflow-hidden flex flex-col relative opacity-60 grayscale-[30%] pointer-events-none">
+<div class="relative aspect-[4/5] bg-surface-variant overflow-hidden">
+<img alt="" class="w-full h-full object-cover" data-alt="A set of premium crystal wine glasses arranged elegantly on a dark velvet surface. The lighting is low and intimate, creating subtle reflections on the glass curves. The overall composition is minimalist, dark-mode friendly, and conveys a sense of high-end curation and celebration." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmTsagJdS6ld9wkjhikR_g0Hy66aFGD4j__lS2esFZIy7cnOnAmGA_iGI88GUTB0BG2hIbblvpBSIhRwp1FSYMkUiWbDfSAhmwd1-CzbvLKRZch8KH9Rla0BsqTdOdv5j2JE_NnCBhqkh7Z-64Pz6Cnes5fYCdCgSmBWfyO_IwU_glvFNIaTFcwUCQjxx9Gi8Dw4DYRS9ZsEHemA4sThKY8N6_N6x1HpF1r-iXLWpcnz75YgmkL4nY_-QiGlR6XdNjy7tz2d6gnIk"/>
+<div class="absolute inset-0 bg-surface/50 backdrop-blur-[2px]"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="flex items-center gap-xs px-md py-sm bg-surface-variant/80 text-on-surface-variant font-label-lg text-label-lg rounded-full border border-white/10 backdrop-blur-md shadow-lg">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+                            Reservado
+                        </div>
+</div>
+</div>
+<div class="p-md flex flex-col flex-grow justify-between gap-md">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Taças de Cristal</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Jogo com 6 taças de cristal para brindar momentos especiais.</p>
+</div>
+<div class="flex flex-col gap-sm mt-auto">
+<span class="font-headline-lg text-headline-lg text-on-surface-variant line-through decoration-white/20">R$ 320,00</span>
+</div>
+</div>
+</article>
+</section>
+<!-- Progress Indicator -->
+<section class="max-w-md mx-auto pt-lg flex flex-col gap-base text-center">
+<div class="flex justify-between items-center text-on-surface-variant font-label-sm text-label-sm">
+<span>Progresso da Lista</span>
+<span>12 de 30 presentes reservados</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[40%] shadow-[0_0_10px_rgba(190,205,164,0.5)]"></div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-white/5 flex flex-col md:flex-row justify-between items-center px-margin-desktop py-lg w-full max-w-7xl mx-auto mt-xl">
+<div class="text-on-surface font-bold mb-md md:mb-0">Mimo Meu</div>
+<div class="text-on-surface-variant font-body-md text-body-md">© 2024 Mimo Meu. All rights reserved.</div>
+<div class="flex gap-md mt-md md:mt-0 font-label-sm text-label-sm text-on-surface-variant">
+<a class="hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">About</a>
+<a class="hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Privacy</a>
+<a class="hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Terms</a>
+<a class="hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Support</a>
+</div>
+</footer>
+</body></html>

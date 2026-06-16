@@ -23,7 +23,7 @@ function ReserveGiftModal({ gift, onCancel, onConfirm }: ReserveGiftModalProps) 
   }
 
   return (
-    <div className="fixed inset-0 z-30 grid place-items-center bg-[rgba(36,39,33,0.28)] px-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-30 grid place-items-center bg-[var(--color-modal-backdrop)] px-4 backdrop-blur-md">
       <section className="ui-panel w-full max-w-xl p-6 sm:p-8">
         <div className="flex items-start justify-between gap-4">
           <div>

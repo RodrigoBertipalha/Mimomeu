@@ -140,9 +140,9 @@ function GuestListPage() {
       ) : null}
 
       {reservedGift ? (
-        <div className="fixed inset-0 z-30 grid place-items-center bg-[rgba(36,39,33,0.28)] px-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-30 grid place-items-center bg-[var(--color-modal-backdrop)] px-4 backdrop-blur-md">
           <section className="ui-panel w-full max-w-xl p-8 text-center">
-            <span className="mx-auto inline-flex h-24 w-24 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-primary-deep)]">
+            <span className="mx-auto inline-flex h-24 w-24 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-primary-contrast)]">
               <Icon name="check" className="h-12 w-12" />
             </span>
             <h2 className="mt-6 text-3xl font-extrabold">

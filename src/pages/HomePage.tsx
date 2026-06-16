@@ -34,7 +34,7 @@ function HomePage() {
         </section>
 
         <aside className="relative mx-auto w-full max-w-[520px]">
-          <div className="ui-photo ui-photo-gift aspect-[1.05/1] rounded-[2rem] border-[12px] border-white p-6 shadow-[0_28px_80px_-48px_rgba(36,39,33,0.8)]">
+          <div className="ui-photo ui-photo-gift aspect-[1.05/1] rounded-[2rem] border-[12px] border-[var(--color-photo-border)] p-6 shadow-[var(--shadow-soft)]">
             <div className="inline-flex items-center gap-3 rounded-lg bg-[var(--color-card)] px-5 py-4 shadow-[var(--shadow-control)]">
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary-deep)]">
                 <Icon name="heart" className="h-5 w-5" />
@@ -47,7 +47,7 @@ function HomePage() {
               </div>
             </div>
 
-            <div className="absolute bottom-8 right-6 w-40 rounded-lg bg-[rgba(255,253,248,0.86)] p-4 shadow-[var(--shadow-control)]">
+            <div className="absolute bottom-8 right-6 w-40 rounded-lg bg-[var(--color-panel-translucent)] p-4 shadow-[var(--shadow-control)] backdrop-blur-sm">
               <div className="flex items-center justify-between text-xs font-bold text-[var(--color-muted)]">
                 <span>Reservados</span>
                 <span>70%</span>

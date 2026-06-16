@@ -132,7 +132,7 @@ function ListDetailPage() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-3 rounded-lg border border-[var(--color-line)] bg-[rgba(255,253,248,0.72)] p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-lg border border-[var(--color-line)] bg-[var(--color-panel-translucent)] p-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="grid gap-2 sm:flex sm:flex-wrap">
             <button
               type="button"
@@ -331,7 +331,7 @@ function ListDetailPage() {
       ) : null}
 
       {isShareOpen ? (
-        <div className="fixed inset-0 z-30 overflow-y-auto bg-[rgba(246,244,239,0.96)] px-4 py-8 backdrop-blur-sm">
+        <div className="fixed inset-0 z-30 overflow-y-auto bg-[var(--color-page-overlay)] px-4 py-8 backdrop-blur-sm">
           <div className="mx-auto grid max-w-5xl gap-4">
             <div className="flex justify-end">
               <button

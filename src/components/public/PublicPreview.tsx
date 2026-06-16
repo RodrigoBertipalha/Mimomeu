@@ -36,12 +36,12 @@ function PublicPreview({ list, onReserve }: PublicPreviewProps) {
           </p>
         </div>
 
-        <div className="ui-photo ui-photo-gift hidden aspect-square rounded-full border-[10px] border-white shadow-[var(--shadow-soft)] lg:block" />
+        <div className="ui-photo ui-photo-gift hidden aspect-square rounded-full border-[10px] border-[var(--color-photo-border)] shadow-[var(--shadow-soft)] lg:block" />
       </header>
 
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div className="flex flex-wrap gap-3">
-          <span className="ui-badge bg-[var(--color-primary-deep)] text-white">
+          <span className="ui-badge bg-[var(--color-primary-deep)] text-[var(--color-primary-contrast)]">
             Todos
           </span>
           {categoryBadges.map((category) => (

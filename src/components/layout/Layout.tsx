@@ -14,7 +14,7 @@ function Layout({ children }: LayoutProps) {
       <main className="flex-1 py-8 sm:py-12">
         <Container>{children}</Container>
       </main>
-      <footer className="border-t border-[var(--color-line)] bg-[rgba(246,244,239,0.72)] py-10">
+      <footer className="border-t border-[var(--color-line)] bg-[var(--color-footer-bg)] py-10">
         <Container>
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <div>

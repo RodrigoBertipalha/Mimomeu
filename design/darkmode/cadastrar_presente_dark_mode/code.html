@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cadastrar Presente - Mimo Meu</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-error": "#690005",
+                        "on-secondary": "#53210c",
+                        "primary-fixed-dim": "#becca3",
+                        "surface-tint": "#becca3",
+                        "on-primary": "#293417",
+                        "tertiary-fixed-dim": "#90d792",
+                        "on-surface": "#e2e2e6",
+                        "primary": "#becda4",
+                        "surface-container-high": "#282a2d",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#dae8be",
+                        "secondary-fixed-dim": "#ffb59a",
+                        "on-tertiary-fixed": "#002107",
+                        "on-secondary-container": "#f5a587",
+                        "surface-container": "#1e2023",
+                        "outline-variant": "#45483f",
+                        "surface-variant": "#333538",
+                        "surface-container-highest": "#333538",
+                        "on-primary-fixed": "#141f05",
+                        "inverse-primary": "#566342",
+                        "tertiary-fixed": "#abf4ac",
+                        "on-primary-fixed-variant": "#3f4b2c",
+                        "on-secondary-fixed": "#380d00",
+                        "on-primary-container": "#384425",
+                        "inverse-on-surface": "#2f3034",
+                        "on-surface-variant": "#c6c8bb",
+                        "secondary-container": "#723922",
+                        "tertiary-container": "#77bc7a",
+                        "surface-container-low": "#1a1c1f",
+                        "tertiary": "#91d893",
+                        "on-tertiary-fixed-variant": "#07521d",
+                        "surface-dim": "#111316",
+                        "inverse-surface": "#e2e2e6",
+                        "on-tertiary-container": "#004b18",
+                        "outline": "#909287",
+                        "error": "#ffb4ab",
+                        "primary-container": "#a3b18a",
+                        "surface-bright": "#37393d",
+                        "on-tertiary": "#003911",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-lowest": "#0c0e11",
+                        "secondary-fixed": "#ffdbce",
+                        "secondary": "#ffb59a",
+                        "on-secondary-fixed-variant": "#6f3720",
+                        "surface": "#111316",
+                        "on-background": "#e2e2e6",
+                        "background": "#111316"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "xl": "80px",
+                        "base": "8px",
+                        "lg": "48px",
+                        "gutter": "24px",
+                        "md": "24px",
+                        "margin-desktop": "64px",
+                        "xs": "4px",
+                        "margin-mobile": "16px",
+                        "sm": "12px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "label-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "600" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "display-lg-mobile": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.01em", fontWeight: "600" }],
+                        "label-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.04em", fontWeight: "500" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                        "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar for preview section */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #333538;
+            border-radius: 10px;
+        }
+        
+        /* Hide default radio buttons */
+        input[type="radio"].peer {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased">
+<!-- TopNavBar -->
+<header class="docked full-width top-0 sticky z-50 bg-surface/80 backdrop-blur-xl border-b border-white/5 shadow-[0_20px_40px_rgba(0,0,0,0.15)]">
+<div class="flex justify-between items-center px-margin-desktop py-base w-full max-w-7xl mx-auto">
+<!-- Brand -->
+<a class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">card_giftcard</span>
+                Mimo Meu
+            </a>
+<!-- Navigation Links (Desktop) -->
+<nav class="hidden md:flex items-center gap-8">
+<a class="font-label-lg text-label-lg text-on-surface-variant font-medium hover:text-on-surface transition-colors" href="#">Home</a>
+<!-- Active Item -->
+<a class="font-label-lg text-label-lg text-primary font-bold border-b-2 border-primary pb-1 flex items-center gap-2" href="#">
+                    My Lists
+                </a>
+<a class="font-label-lg text-label-lg text-on-surface-variant font-medium hover:text-on-surface transition-colors" href="#">Activity</a>
+<a class="font-label-lg text-label-lg text-on-surface-variant font-medium hover:text-on-surface transition-colors" href="#">Profile</a>
+</nav>
+<!-- Trailing Action -->
+<button class="hidden md:flex items-center justify-center bg-surface-container-high border border-white/10 text-primary font-label-lg text-label-lg px-4 py-2 rounded-full hover:bg-surface-variant/50 transition-all duration-300 scale-95 active:scale-90">
+                Create List
+            </button>
+<!-- Mobile Menu Button -->
+<button class="md:hidden text-on-surface p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-lg lg:py-xl grid grid-cols-1 lg:grid-cols-12 gap-gutter lg:gap-12">
+<!-- Left Column: Form Section -->
+<section class="lg:col-span-7 xl:col-span-8 flex flex-col gap-lg">
+<!-- Header -->
+<div class="flex flex-col gap-xs">
+<a class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm hover:text-primary transition-colors w-fit mb-2" href="#">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+                    Voltar para lista "Casamento"
+                </a>
+<h1 class="font-display-lg-mobile md:font-display-lg text-on-surface">Cadastrar Presente</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                    Adicione detalhes sobre o item que você deseja. Imagens serão buscadas automaticamente através do link.
+                </p>
+</div>
+<!-- Form -->
+<form class="bg-surface-container rounded-xl border border-white/5 p-md md:p-lg flex flex-col gap-md shadow-[0_30px_60px_rgba(0,0,0,0.2)]">
+<!-- Input: Nome do presente -->
+<div class="flex flex-col gap-base">
+<label class="font-label-lg text-label-lg text-on-surface" for="gift-name">Nome do presente</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">featured_play_list</span>
+<input class="w-full bg-surface-dim border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary/30 text-on-surface font-body-md text-body-md rounded-lg py-3 pl-12 pr-4 transition-all outline-none placeholder:text-on-surface-variant/50" id="gift-name" placeholder="Ex: Máquina de Café Expresso" type="text"/>
+</div>
+</div>
+<!-- Input: Link do produto -->
+<div class="flex flex-col gap-base">
+<label class="font-label-lg text-label-lg text-on-surface" for="gift-link">Link do produto</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">link</span>
+<input class="w-full bg-surface-dim border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary/30 text-on-surface font-body-md text-body-md rounded-lg py-3 pl-12 pr-4 transition-all outline-none placeholder:text-on-surface-variant/50" id="gift-link" placeholder="https://loja.com.br/produto" type="url"/>
+</div>
+</div>
+<!-- Row: Preço & Desconto -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Faixa de preço -->
+<div class="flex flex-col gap-base">
+<label class="font-label-lg text-label-lg text-on-surface" for="gift-price">Faixa de preço</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">payments</span>
+<select class="w-full bg-surface-dim border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary/30 text-on-surface font-body-md text-body-md rounded-lg py-3 pl-12 pr-10 appearance-none transition-all outline-none cursor-pointer" id="gift-price">
+<option disabled="" selected="" value="">Selecione uma faixa</option>
+<option value="low">Até R$ 100</option>
+<option value="medium">R$ 100 - R$ 500</option>
+<option value="high">R$ 500 - R$ 1000</option>
+<option value="luxury">Acima de R$ 1000</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Toggle: Produto com desconto -->
+<div class="flex flex-col justify-center gap-base md:pt-6">
+<div class="flex items-center justify-between bg-surface-dim border border-outline-variant rounded-lg p-3 px-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary">sell</span>
+<span class="font-label-lg text-label-lg text-on-surface">Produto com desconto</span>
+</div>
+<!-- Toggle Button -->
+<button aria-checked="false" class="w-12 h-6 bg-surface-container-high rounded-full relative cursor-pointer transition-colors duration-300" id="discount-toggle" role="switch" type="button">
+<span class="absolute top-0.5 left-0.5 w-5 h-5 bg-outline-variant rounded-full transition-transform duration-300 shadow-sm" id="discount-knob"></span>
+</button>
+</div>
+</div>
+</div>
+<!-- Input: Descrição -->
+<div class="flex flex-col gap-base">
+<label class="font-label-lg text-label-lg text-on-surface flex justify-between" for="gift-desc">
+                        Descrição
+                        <span class="text-on-surface-variant font-normal">Opcional</span>
+</label>
+<textarea class="w-full bg-surface-dim border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary/30 text-on-surface font-body-md text-body-md rounded-lg p-4 transition-all outline-none placeholder:text-on-surface-variant/50 resize-none" id="gift-desc" placeholder="Detalhes de cor, tamanho ou motivo da escolha..." rows="3"></textarea>
+</div>
+<!-- Selector: Prioridade (Chips) -->
+<div class="flex flex-col gap-base pb-4">
+<label class="font-label-lg text-label-lg text-on-surface">Prioridade</label>
+<div class="flex flex-wrap gap-3">
+<label class="cursor-pointer">
+<input class="peer" name="priority" type="radio" value="low"/>
+<div class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-lg text-label-lg transition-all peer-checked:bg-primary/10 peer-checked:border-primary peer-checked:text-primary hover:bg-surface-variant/50">
+                                Baixa
+                            </div>
+</label>
+<label class="cursor-pointer">
+<input checked="" class="peer" name="priority" type="radio" value="medium"/>
+<div class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-lg text-label-lg transition-all peer-checked:bg-primary/10 peer-checked:border-primary peer-checked:text-primary hover:bg-surface-variant/50 flex items-center gap-1">
+                                Média
+                            </div>
+</label>
+<label class="cursor-pointer">
+<input class="peer" name="priority" type="radio" value="high"/>
+<div class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-lg text-label-lg transition-all peer-checked:bg-secondary/10 peer-checked:border-secondary peer-checked:text-secondary hover:bg-surface-variant/50 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                Alta
+                            </div>
+</label>
+</div>
+</div>
+<!-- Divider -->
+<hr class="border-white/5 my-2"/>
+<!-- Actions -->
+<div class="flex flex-col-reverse md:flex-row justify-end gap-4 mt-2">
+<button class="px-6 py-3 rounded-lg font-label-lg text-label-lg text-on-surface border border-outline-variant hover:bg-surface-variant/30 transition-colors" type="button">
+                        Cancelar
+                    </button>
+<button class="px-8 py-3 rounded-lg font-label-lg text-label-lg bg-primary text-on-primary hover:bg-primary-fixed shadow-[0_0_20px_rgba(190,205,164,0.2)] transition-all flex items-center justify-center gap-2" type="submit">
+<span class="material-symbols-outlined">add</span>
+                        Adicionar presente
+                    </button>
+</div>
+</form>
+</section>
+<!-- Right Column: Sidebar Preview -->
+<aside class="lg:col-span-5 xl:col-span-4 mt-8 lg:mt-0">
+<div class="bg-surface-container-low border border-white/5 rounded-xl p-md sticky top-[100px] flex flex-col gap-md max-h-[819px]">
+<div class="flex items-center justify-between border-b border-white/5 pb-4">
+<h2 class="font-headline-md text-headline-md text-on-surface">Prévia da sua lista</h2>
+<span class="bg-surface-variant text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded-full">3 itens</span>
+</div>
+<!-- List Items (Scrollable) -->
+<div class="flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-2 pb-2">
+<!-- Item 1 -->
+<div class="flex items-center gap-4 p-3 bg-surface border border-white/5 rounded-lg group hover:border-primary/50 transition-colors cursor-default">
+<div class="w-16 h-16 rounded-md overflow-hidden flex-shrink-0 bg-surface-container-high relative">
+<img alt="A beautifully crafted ceramic coffee mug with an artisanal, speckled sage green glaze. Resting on a dark slate surface under soft, moody directional lighting. Minimalist aesthetic, highlighting the texture of the ceramic against deep shadows. Intimate curation vibe." class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="A beautifully crafted ceramic coffee mug with an artisanal, speckled sage green glaze. Resting on a dark slate surface under soft, moody directional lighting. Minimalist aesthetic, highlighting the texture of the ceramic against deep shadows. Intimate curation vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMk3m12dD3ZlRZxC8YB4g2X-yDH5clb0OOSl3pejGTMyi4PZqcS7mL7DeVdG7rRTmUjT9z0g-YBoeV3Y9PGwA6HmGIpVMPCsDNtuh1MJ2WRqFnc4uf9Idt9EFa_bQFxQXaY3GghC0fyIdklJHebAThB29o48XtCBbbiz0f2tAflI4D1dhQdLK-9Y3VGbotWTQfnaTCxkZMjw7ZaYr0SHRozTcODQuiikgYF-oBdK2uA_h2D_pVs0MA8B1piZn8B-Bb8qOXBH_Bmtc"/>
+</div>
+<div class="flex flex-col flex-grow min-w-0">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Conjunto Xícaras Cerâmica</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">R$ 180,00</p>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors p-1" title="Remover">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center gap-4 p-3 bg-surface border border-white/5 rounded-lg group hover:border-primary/50 transition-colors cursor-default">
+<div class="w-16 h-16 rounded-md overflow-hidden flex-shrink-0 bg-surface-container-high relative">
+<img alt="A sleek, modern wireless speaker featuring brushed gunmetal aluminum and premium dark gray acoustic fabric. Positioned in a shadowy, sophisticated environment with subtle cool blue ambient light reflecting off its metallic edges. High-end product photography." class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="A sleek, modern wireless speaker featuring brushed gunmetal aluminum and premium dark gray acoustic fabric. Positioned in a shadowy, sophisticated environment with subtle cool blue ambient light reflecting off its metallic edges. High-end product photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDd4y2jybHRVYAO616xu90saeQNV9waWqksXFUbhMtNWBaDltc5fkfc1U5dvRCxFC8qCmNWrdNuPKSocK99JpkX9j2x9Lp9w7zV16si85KADcSujtKyvBiDWAvQfob0Oz8-9O2PPVp8nLhogrl4gSziFOaBLcHWjNH1CloSixedxH0Cb0YfepnNVxpegHCSfjmjz1IWv7OUwTwySsTG8Xipn7Te22buvuR5sW2cR3FOuGIrbd4ddgSDUv14NqEBXnye6Cb5RlZOr4E"/>
+</div>
+<div class="flex flex-col flex-grow min-w-0">
+<div class="flex items-center gap-2">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Caixa de Som Bluetooth</h3>
+<span class="material-symbols-outlined text-secondary text-[14px]" style="font-variation-settings: 'FILL' 1;" title="Alta Prioridade">star</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">R$ 450,00</p>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors p-1" title="Remover">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+<!-- Item 3 -->
+<div class="flex items-center gap-4 p-3 bg-surface border border-white/5 rounded-lg group hover:border-primary/50 transition-colors cursor-default opacity-60 hover:opacity-100">
+<div class="w-16 h-16 rounded-md overflow-hidden flex-shrink-0 bg-surface-container-high relative">
+<img alt="A luxury leather-bound journal in deep espresso brown, featuring elegant embossed details. Lying flat on a matte black desk next to a minimalist matte black fountain pen. The lighting is low-key, creating rich contrast and highlighting the premium materials." class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0" data-alt="A luxury leather-bound journal in deep espresso brown, featuring elegant embossed details. Lying flat on a matte black desk next to a minimalist matte black fountain pen. The lighting is low-key, creating rich contrast and highlighting the premium materials." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFeZhKIctdCkUTWPpofTexzbFhM-UxTMnYQD7v2_PH0N4xEAYsSh6IbbWEdDqCqD7UNvtbIR0oaUIyjS0z8NXlFk_jLD_z5es0q_PyKFP6g13W9zA9KGqMNCbIuEZmZRd_b-ZZXi1QEu_gF0ai8s7g3D_H_DyOgivSlCN22F0yJo8R8mYC_IkcOlZ1zHgjuRd-UAb1GbPMYW01wpHBM-6zhRV4ARJyLIPeLxLjbWai9OKsOb6SR5Ynqptzz3JUUUrDYJb2OHYW3Q8"/>
+</div>
+<div class="flex flex-col flex-grow min-w-0">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate line-through decoration-on-surface-variant">Caderno Couro Rústico</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+                                Reservado
+                            </p>
+</div>
+</div>
+</div>
+<!-- Contextual Hint -->
+<div class="mt-auto pt-4 border-t border-white/5 text-center">
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">lightbulb</span>
+                        Itens adicionados aparecem aqui em tempo real.
+                    </p>
+</div>
+</div>
+</aside>
+</main>
+<!-- Footer -->
+<footer class="full-width bottom-0 bg-surface-container-lowest border-t border-white/5 flat no shadows mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop py-lg w-full max-w-7xl mx-auto gap-8">
+<div class="flex flex-col items-center md:items-start gap-2">
+<span class="font-headline-md text-headline-md text-on-surface font-bold flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">card_giftcard</span>
+                    Mimo Meu
+                </span>
+<p class="font-body-md text-body-md text-on-surface-variant">© 2024 Mimo Meu. All rights reserved.</p>
+</div>
+<nav class="flex flex-wrap justify-center gap-6">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">About</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Privacy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Terms</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Support</a>
+</nav>
+</div>
+</footer>
+<!-- Interactive Scripts -->
+<script>
+        // Toggle Logic for 'Produto com desconto'
+        const toggleBtn = document.getElementById('discount-toggle');
+        const toggleKnob = document.getElementById('discount-knob');
+        let isDiscounted = false;
+
+        toggleBtn.addEventListener('click', () => {
+            isDiscounted = !isDiscounted;
+            toggleBtn.setAttribute('aria-checked', isDiscounted);
+            
+            if(isDiscounted) {
+                toggleBtn.classList.replace('bg-surface-container-high', 'bg-primary');
+                toggleKnob.classList.replace('bg-outline-variant', 'bg-on-primary');
+                toggleKnob.classList.add('translate-x-6');
+            } else {
+                toggleBtn.classList.replace('bg-primary', 'bg-surface-container-high');
+                toggleKnob.classList.replace('bg-on-primary', 'bg-outline-variant');
+                toggleKnob.classList.remove('translate-x-6');
+            }
+        });
+
+        // Add subtle focus glow effect to active input containers
+        const inputs = document.querySelectorAll('input[type="text"], input[type="url"], textarea, select');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('shadow-[0_0_15px_rgba(190,205,164,0.1)]');
+            });
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('shadow-[0_0_15px_rgba(190,205,164,0.1)]');
+            });
+        });
+    </script>
+</body></html>

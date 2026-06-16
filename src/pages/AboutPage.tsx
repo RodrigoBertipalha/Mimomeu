@@ -32,12 +32,12 @@ function AboutPage() {
         </article>
 
         <div className="grid gap-6">
-          <article className="rounded-lg bg-[var(--color-primary-deep)] p-8 text-white shadow-[var(--shadow-soft)]">
+          <article className="rounded-lg bg-[var(--color-primary-deep)] p-8 text-[var(--color-primary-contrast)] shadow-[var(--shadow-soft)]">
             <Icon name="share" className="h-8 w-8" />
             <h2 className="mt-16 text-2xl font-extrabold">
               Compartilhamento simples
             </h2>
-            <p className="mt-3 text-sm font-medium leading-6 text-white/75">
+            <p className="mt-3 text-sm font-medium leading-6 text-[var(--color-primary-contrast)] opacity-75">
               Um link único para enviar para todos os convidados via WhatsApp ou
               e-mail.
             </p>

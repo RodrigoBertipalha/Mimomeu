@@ -11,9 +11,11 @@ type IconProps = {
     | 'info'
     | 'mail'
     | 'log-out'
+    | 'moon'
     | 'plus'
     | 'search'
     | 'share'
+    | 'sun'
     | 'trash'
     | 'user'
   className?: string
@@ -35,10 +37,14 @@ const paths: Record<IconProps['name'], string> = {
   mail:
     'M4 6h16v12H4V6Zm0 1 8 6 8-6',
   'log-out': 'M15 3h4v18h-4M10 17l5-5-5-5m5 5H3',
+  moon:
+    'M21 14.4A8.2 8.2 0 0 1 9.6 3 7 7 0 1 0 21 14.4Z',
   plus: 'M12 5v14m7-7H5',
   search: 'm21 21-4.3-4.3M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z',
   share:
     'M18 8a3 3 0 1 0-2.8-4M6 14a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm12-2a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM8.7 8.7l6.6-3.4M8.7 15.3l6.6 3.4',
+  sun:
+    'M12 4V2m0 20v-2m8-8h2M2 12h2m14.4-6.4 1.4-1.4M4.2 19.8l1.4-1.4m0-12.8L4.2 4.2m15.6 15.6-1.4-1.4M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z',
   trash:
     'M5 7h14m-9 4v6m4-6v6M9 7V5h6v2m2 0-.8 13H7.8L7 7',
   user:

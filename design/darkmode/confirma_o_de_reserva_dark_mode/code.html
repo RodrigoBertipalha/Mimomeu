@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reserva de Presente - Mimo Meu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error": "#690005",
+                      "on-secondary": "#53210c",
+                      "primary-fixed-dim": "#becca3",
+                      "surface-tint": "#becca3",
+                      "on-primary": "#293417",
+                      "tertiary-fixed-dim": "#90d792",
+                      "on-surface": "#e2e2e6",
+                      "primary": "#becda4",
+                      "surface-container-high": "#282a2d",
+                      "error-container": "#93000a",
+                      "primary-fixed": "#dae8be",
+                      "secondary-fixed-dim": "#ffb59a",
+                      "on-tertiary-fixed": "#002107",
+                      "on-secondary-container": "#f5a587",
+                      "surface-container": "#1e2023",
+                      "outline-variant": "#45483f",
+                      "surface-variant": "#333538",
+                      "surface-container-highest": "#333538",
+                      "on-primary-fixed": "#141f05",
+                      "inverse-primary": "#566342",
+                      "tertiary-fixed": "#abf4ac",
+                      "on-primary-fixed-variant": "#3f4b2c",
+                      "on-secondary-fixed": "#380d00",
+                      "on-primary-container": "#384425",
+                      "inverse-on-surface": "#2f3034",
+                      "on-surface-variant": "#c6c8bb",
+                      "secondary-container": "#723922",
+                      "tertiary-container": "#77bc7a",
+                      "surface-container-low": "#1a1c1f",
+                      "tertiary": "#91d893",
+                      "on-tertiary-fixed-variant": "#07521d",
+                      "surface-dim": "#111316",
+                      "inverse-surface": "#e2e2e6",
+                      "on-tertiary-container": "#004b18",
+                      "outline": "#909287",
+                      "error": "#ffb4ab",
+                      "primary-container": "#a3b18a",
+                      "surface-bright": "#37393d",
+                      "on-tertiary": "#003911",
+                      "on-error-container": "#ffdad6",
+                      "surface-container-lowest": "#0c0e11",
+                      "secondary-fixed": "#ffdbce",
+                      "secondary": "#ffb59a",
+                      "on-secondary-fixed-variant": "#6f3720",
+                      "surface": "#111316",
+                      "on-background": "#e2e2e6",
+                      "background": "#111316"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "80px",
+                      "base": "8px",
+                      "lg": "48px",
+                      "gutter": "24px",
+                      "md": "24px",
+                      "margin-desktop": "64px",
+                      "xs": "4px",
+                      "margin-mobile": "16px",
+                      "sm": "12px"
+              },
+              "fontFamily": {
+                      "headline-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "display-lg-mobile": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "label-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "label-sm": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "display-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-md": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-lg": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.04em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .glass-panel {
+            background: rgba(30, 33, 37, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .deep-glow {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 40px rgba(190, 205, 164, 0.05);
+        }
+        
+        /* Transition classes for smooth state changes */
+        #confirmation-state {
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+        #success-state {
+            transition: opacity 0.5s ease-in, transform 0.5s ease-in;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+        }
+        
+        .state-hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            position: absolute !important;
+            visibility: hidden !important;
+            transform: scale(0.95) !important;
+        }
+        
+        .state-visible {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            visibility: visible !important;
+            transform: scale(1) !important;
+        }
+
+        /* Ambient background glow */
+        .ambient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at 50% -20%, rgba(190, 205, 164, 0.08), transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+      </style>
+</head>
+<body class="bg-background text-on-surface font-sans min-h-screen flex flex-col items-center justify-center relative overflow-x-hidden selection:bg-primary/30 selection:text-primary-fixed">
+<div class="ambient-bg"></div>
+<!-- Top Navigation (Suppressed for Transactional/Linear Intent) -->
+<!-- Content Canvas -->
+<main class="w-full max-w-[600px] px-margin-mobile md:px-0 relative z-10 py-lg">
+<!-- State 1: Confirmation Form -->
+<div class="state-visible glass-panel rounded-xl deep-glow overflow-hidden relative" id="confirmation-state">
+<!-- Subtle top accent line -->
+<div class="h-1 w-full bg-gradient-to-r from-transparent via-primary/50 to-transparent absolute top-0 left-0"></div>
+<div class="p-md md:p-lg">
+<!-- Header -->
+<div class="mb-lg text-center">
+<span class="material-symbols-outlined text-primary text-4xl mb-sm" style="font-variation-settings: 'FILL' 0;">card_giftcard</span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-base">Reserva de Presente</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Confirme seus dados para garantir este mimo.</p>
+</div>
+<!-- Gift Summary Card (Inner Bento) -->
+<div class="bg-surface-container-low rounded-lg p-sm mb-lg flex items-center gap-md border border-white/5">
+<div class="w-20 h-24 rounded-md overflow-hidden flex-shrink-0 relative bg-surface-container-high">
+<img alt="Gift image placeholder" class="w-full h-full object-cover" data-alt="A beautifully crafted ceramic espresso cup and saucer set resting on a dark slate surface. The ceramic has a matte, earthy texture in a muted charcoal color, contrasting with a delicate gold rim. Soft, directional light highlights the rim and creates elegant, long shadows, emphasizing a premium, artisanal mood perfect for a sophisticated dark mode gift interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMbDlFudzEkQXm7_E7CP_CtJHxxWzwFYR_dAlo0kJkVt-fFpegkUoNAy7CRC6LQzl0FuU800fosoGfy9p899Ou3BRBLpBlQvJRyTgRhH0pSK754lB8pIOHop2rfx-PvkaSbY5FsVJB14vPHWganxgnenR3hQUe5NtE2VH3pAQBKHEd5YdPMEEtDY238bqv6WFhwbxitBB8RKDRKWNhGzruC4N3wUsaCX7KOkXWZ9vExEcor3uAT2rlJSKDZ6IjH5EDndfgji7PbwY"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-label-lg text-label-lg text-on-surface mb-xs">Jogo de Xícaras Artesanais</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-sm">R$ 240,00</p>
+<div class="inline-flex items-center gap-1 bg-primary/10 px-2 py-1 rounded text-primary">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-sm text-label-sm">Disponível</span>
+</div>
+</div>
+</div>
+<!-- Form -->
+<form class="flex flex-col gap-md" id="reservation-form">
+<!-- Name Input -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-lg text-label-lg text-on-surface" for="user-name">Seu nome</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">person</span>
+<input class="w-full bg-surface-container border border-outline-variant rounded-lg pl-[44px] pr-sm py-sm font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-on-surface-variant/50" id="user-name" name="name" placeholder="Como o presenteado te conhece?" required="" type="text"/>
+</div>
+</div>
+<!-- Contact Input -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-lg text-label-lg text-on-surface" for="user-contact">Telefone ou e-mail <span class="text-on-surface-variant font-normal">(opcional)</span></label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">mail</span>
+<input class="w-full bg-surface-container border border-outline-variant rounded-lg pl-[44px] pr-sm py-sm font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-on-surface-variant/50" id="user-contact" name="contact" placeholder="Para enviarmos o comprovante" type="text"/>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="mt-md flex flex-col-reverse sm:flex-row items-center gap-sm sm:justify-end border-t border-white/5 pt-md">
+<button class="w-full sm:w-auto px-gutter py-sm font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors" type="button">
+                            Cancelar
+                        </button>
+<button class="w-full sm:w-auto px-gutter py-sm rounded-lg bg-primary text-on-primary font-label-lg text-label-lg hover:bg-primary-fixed transition-colors flex justify-center items-center gap-2 group" id="confirm-btn" type="submit">
+<span>Confirmar reserva</span>
+<span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+<!-- State 2: Success State (Initially Hidden) -->
+<div class="state-hidden glass-panel rounded-xl deep-glow overflow-hidden relative text-center" id="success-state">
+<!-- Celebration ambient glow -->
+<div class="absolute inset-0 bg-primary/5 z-0"></div>
+<div class="p-md md:p-xl relative z-10 flex flex-col items-center">
+<!-- Animated Checkmark Container -->
+<div class="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-lg relative">
+<div class="absolute inset-0 rounded-full border border-primary/30 animate-ping" style="animation-duration: 3s;"></div>
+<span class="material-symbols-outlined text-primary text-[48px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-base">Reserva concluída<br/>com sucesso!</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg max-w-[400px]">
+                    Agradecemos o seu carinho. O item foi reservado e uma confirmação foi enviada para o seu contato (se fornecido).
+                </p>
+<!-- Next Action -->
+<button class="px-lg py-sm rounded-lg border border-outline-variant hover:border-primary hover:bg-primary/5 text-on-surface font-label-lg text-label-lg transition-all flex items-center gap-2" onclick="location.reload()" type="button">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+<span>Voltar para a lista</span>
+</button>
+</div>
+</div>
+</main>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('reservation-form');
+            const confirmBtn = document.getElementById('confirm-btn');
+            const confirmationState = document.getElementById('confirmation-state');
+            const successState = document.getElementById('success-state');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Simulate loading state on button
+                const originalBtnText = confirmBtn.innerHTML;
+                confirmBtn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span><span>Processando...</span>`;
+                confirmBtn.disabled = true;
+                confirmBtn.classList.add('opacity-80', 'cursor-not-allowed');
+
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Transition to success state
+                    confirmationState.classList.remove('state-visible');
+                    confirmationState.classList.add('state-hidden');
+                    
+                    setTimeout(() => {
+                        successState.classList.remove('state-hidden');
+                        successState.classList.add('state-visible');
+                    }, 400); // Wait for fade out
+                    
+                }, 1200);
+            });
+        });
+    </script>
+</body></html>

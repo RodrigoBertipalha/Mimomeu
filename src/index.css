@@ -25,8 +25,56 @@
     --color-tertiary-soft: #f0dce4;
     --color-danger: #c72323;
     --color-danger-soft: #f5dede;
+    --color-primary-contrast: #fffdf8;
+    --color-primary-hover: #4e3d30;
+    --color-header-bg: rgba(255, 253, 248, 0.9);
+    --color-footer-bg: rgba(246, 244, 239, 0.72);
+    --color-panel-translucent: rgba(255, 253, 248, 0.72);
+    --color-empty-bg: rgba(255, 253, 248, 0.78);
+    --color-page-overlay: rgba(246, 244, 239, 0.96);
+    --color-modal-backdrop: rgba(36, 39, 33, 0.28);
+    --color-photo-border: rgba(255, 253, 248, 0.7);
+    --app-background:
+      linear-gradient(180deg, rgba(255, 253, 248, 0.98) 0%, rgba(246, 244, 239, 0.98) 54%, rgba(236, 233, 226, 0.95) 100%),
+      var(--color-bg);
     --shadow-soft: 0 18px 38px -32px rgba(36, 39, 33, 0.55);
     --shadow-control: 0 8px 18px -16px rgba(36, 39, 33, 0.6);
+  }
+
+  :root[data-theme='dark'] {
+    --color-bg: #111316;
+    --color-bg-soft: #1a1c1f;
+    --color-text: #e2e2e6;
+    --color-muted: #c6c8bb;
+    --color-subtle: #909287;
+    --color-line: rgba(255, 255, 255, 0.08);
+    --color-card: #1e2023;
+    --color-card-soft: #111316;
+    --color-primary: #becda4;
+    --color-primary-deep: #becda4;
+    --color-primary-soft: rgba(190, 205, 164, 0.12);
+    --color-secondary: #ffb59a;
+    --color-secondary-deep: #ffb59a;
+    --color-secondary-soft: rgba(255, 181, 154, 0.12);
+    --color-tertiary: #91d893;
+    --color-tertiary-deep: #91d893;
+    --color-tertiary-soft: rgba(145, 216, 147, 0.12);
+    --color-danger: #ffb4ab;
+    --color-danger-soft: rgba(147, 0, 10, 0.28);
+    --color-primary-contrast: #293417;
+    --color-primary-hover: #dae8be;
+    --color-header-bg: rgba(17, 19, 22, 0.84);
+    --color-footer-bg: rgba(12, 14, 17, 0.84);
+    --color-panel-translucent: rgba(30, 32, 35, 0.72);
+    --color-empty-bg: rgba(30, 32, 35, 0.72);
+    --color-page-overlay: rgba(17, 19, 22, 0.96);
+    --color-modal-backdrop: rgba(5, 7, 9, 0.58);
+    --color-photo-border: rgba(255, 255, 255, 0.08);
+    --app-background:
+      linear-gradient(180deg, rgba(17, 19, 22, 0.98) 0%, rgba(17, 19, 22, 0.98) 58%, rgba(12, 14, 17, 0.98) 100%),
+      var(--color-bg);
+    --shadow-soft: 0 30px 60px -42px rgba(0, 0, 0, 0.9);
+    --shadow-control: 0 14px 30px -24px rgba(0, 0, 0, 0.9);
   }
 
   html {
@@ -35,9 +83,7 @@
 
   body {
     @apply min-h-screen text-[var(--color-text)] antialiased;
-    background:
-      linear-gradient(180deg, rgba(255, 253, 248, 0.98) 0%, rgba(246, 244, 239, 0.98) 54%, rgba(236, 233, 226, 0.95) 100%),
-      var(--color-bg);
+    background: var(--app-background);
   }
 
   h1,
@@ -70,7 +116,7 @@
   }
 
   .ui-button-primary {
-    @apply inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[var(--color-primary-deep)] px-5 text-sm font-bold text-white shadow-[var(--shadow-control)] transition hover:bg-[var(--color-secondary-deep)] focus:outline-none focus:ring-4 focus:ring-[rgba(141,163,130,0.22)];
+    @apply inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[var(--color-primary-deep)] px-5 text-sm font-bold text-[var(--color-primary-contrast)] shadow-[var(--shadow-control)] transition hover:bg-[var(--color-primary-hover)] focus:outline-none focus:ring-4 focus:ring-[rgba(141,163,130,0.22)];
   }
 
   .ui-button-secondary {
@@ -118,7 +164,7 @@
   }
 
   .ui-photo {
-    @apply overflow-hidden rounded-lg border border-[rgba(255,253,248,0.7)] bg-[var(--color-card-soft)] shadow-[var(--shadow-control)];
+    @apply overflow-hidden rounded-lg border border-[var(--color-photo-border)] bg-[var(--color-card-soft)] shadow-[var(--shadow-control)];
   }
 
   .ui-photo-gift {
