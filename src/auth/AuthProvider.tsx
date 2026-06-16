@@ -58,6 +58,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         if (error) throw error
       },
+      async signInWithGoogle(redirectPath = '/list') {
+        if (!supabase) throw new Error('Supabase não está configurado.')
+
+        const redirectUrl = new URL('/login', window.location.origin)
+        redirectUrl.searchParams.set('next', redirectPath)
+
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: redirectUrl.toString(),
+          },
+        })
+
+        if (error) throw error
+      },
       async signUp(email, password, displayName) {
         if (!supabase) throw new Error('Supabase não está configurado.')
 

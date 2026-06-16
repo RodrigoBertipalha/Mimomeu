@@ -9,6 +9,7 @@ function AuthPage() {
     isConfigured,
     isLoading,
     signIn,
+    signInWithGoogle,
     signUp,
   } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -22,6 +23,7 @@ function AuthPage() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false)
 
   useEffect(() => {
     if (user) navigate(next, { replace: true })
@@ -67,6 +69,23 @@ function AuthPage() {
       )
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setError('')
+    setMessage('')
+    setIsGoogleSubmitting(true)
+
+    try {
+      await signInWithGoogle(next)
+    } catch (submitError) {
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : 'Não foi possível entrar com Google. Tente novamente.'
+      )
+      setIsGoogleSubmitting(false)
     }
   }
 
@@ -134,6 +153,24 @@ function AuthPage() {
           >
             Criar conta
           </button>
+        </div>
+
+        <button
+          type="button"
+          className="ui-button-secondary h-12 justify-center"
+          onClick={handleGoogleSignIn}
+          disabled={isSubmitting || isGoogleSubmitting}
+        >
+          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-card)] text-sm font-extrabold text-[var(--color-primary-deep)] shadow-[var(--shadow-control)]">
+            G
+          </span>
+          {isGoogleSubmitting ? 'Abrindo Google...' : 'Continuar com Google'}
+        </button>
+
+        <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.12em] text-[var(--color-subtle)]">
+          <span className="h-px flex-1 bg-[var(--color-line)]" />
+          ou
+          <span className="h-px flex-1 bg-[var(--color-line)]" />
         </div>
 
         {mode === 'signup' ? (

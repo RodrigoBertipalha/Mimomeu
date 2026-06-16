@@ -13,14 +13,21 @@ produção com autenticação, banco remoto e compartilhamento público.
 ## Supabase
 
 - [x] Criar pasta `supabase/migrations` com schema, RLS, triggers e funções SQL.
-- [x] Criar pasta `supabase/functions` com edge function opcional para reserva.
+- [x] Criar pasta `supabase/functions` com Edge Function opcional para reserva.
 - [x] Criar projeto no Supabase.
 - [x] Aplicar a migration `supabase/migrations/202606140001_initial_schema.sql`.
-- [ ] Aplicar a migration `supabase/migrations/202606160001_wishlist_options.sql`.
+- [x] Aplicar a migration `supabase/migrations/202606160001_wishlist_options.sql`.
 - [x] Conferir se Auth por e-mail/senha está habilitado.
-- [ ] Desativar confirmação de e-mail no Supabase Auth para o MVP.
-- [ ] Configurar URLs de redirect do Supabase para localhost e domínio final.
-- [ ] Publicar edge function `reserve-gift`, se optar por usar function em vez de RPC direto.
+- [x] Desativar confirmação de e-mail no Supabase Auth para o MVP.
+- [x] Configurar URLs de redirect do Supabase para localhost e domínio final.
+- [x] Configurar provider Google no Supabase Auth e credenciais no Google Cloud.
+- [ ] Publicar Edge Function `reserve-gift`, se optar por usar function em vez de RPC direto.
+
+## Decisão Sobre Edge Function
+
+- [x] Manter RPC direto como caminho atual de reserva no MVP.
+- [ ] Reavaliar Edge Function quando precisar de rate limit, captcha,
+  notificação, integração externa ou logs mais completos.
 
 ## Aplicação
 
@@ -31,6 +38,7 @@ produção com autenticação, banco remoto e compartilhamento público.
 - [x] Validar conexão local com Supabase.
 - [x] Criar camada de autenticação.
 - [x] Criar tela de login/cadastro.
+- [x] Adicionar login com Google na tela de autenticação.
 - [x] Proteger rotas de gestão de listas.
 - [x] Migrar operações de listas/presentes para Supabase quando houver sessão.
 - [x] Manter fallback local para desenvolvimento sem Supabase configurado.
@@ -46,6 +54,7 @@ produção com autenticação, banco remoto e compartilhamento público.
 - [ ] Conectar repositório na Vercel.
 - [ ] Configurar variáveis de ambiente na Vercel, sem subir `.env` para o GitHub.
 - [ ] Testar cadastro/login em produção.
+- [ ] Testar login com Google em produção.
 - [ ] Testar criação de lista em produção.
 - [ ] Testar compartilhamento público em janela anônima.
 - [ ] Testar reserva de presente em janela anônima.
@@ -57,3 +66,6 @@ produção com autenticação, banco remoto e compartilhamento público.
 - [ ] Criar política de privacidade.
 - [ ] Criar termos simples de uso.
 - [ ] Adicionar observabilidade básica.
+- [ ] Adicionar filtros e ordenação na visão do convidado.
+- [ ] Adicionar preview lateral ao cadastrar presente.
+- [ ] Adicionar histórico de atividade da lista.

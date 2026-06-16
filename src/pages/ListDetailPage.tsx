@@ -141,14 +141,6 @@ function ListDetailPage() {
             >
               Editar lista
             </button>
-            <button
-              type="button"
-              className="ui-button-secondary h-10 justify-center rounded-md px-4 text-xs"
-              onClick={openOptionsModal}
-            >
-              <Icon name="filter" className="h-4 w-4" />
-              Opções
-            </button>
             <Link
               to={list.publicSlug ? `/g/${list.publicSlug}` : `/list/${list.id}/guest`}
               className="ui-button-secondary h-10 justify-center rounded-md px-4 text-xs"
@@ -234,7 +226,7 @@ function ListDetailPage() {
             <h2 className="mt-1 text-3xl font-extrabold">Itens da lista</h2>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-[minmax(220px,320px)_auto]">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,320px)_auto_auto]">
             <label className="relative">
               <Icon
                 name="search"
@@ -247,6 +239,14 @@ function ListDetailPage() {
                 onChange={(event) => setQuery(event.target.value)}
               />
             </label>
+            <button
+              type="button"
+              className="ui-button-secondary border-[var(--color-primary-deep)] bg-[var(--color-primary-soft)] text-[var(--color-primary-deep)]"
+              onClick={openOptionsModal}
+            >
+              <Icon name="filter" className="h-5 w-5" />
+              Opções
+            </button>
             <button
               type="button"
               className="ui-button-primary"

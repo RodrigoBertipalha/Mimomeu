@@ -7,6 +7,7 @@ export type AuthContextValue = {
   isLoading: boolean
   isConfigured: boolean
   signIn: (email: string, password: string) => Promise<void>
+  signInWithGoogle: (redirectPath?: string) => Promise<void>
   signUp: (
     email: string,
     password: string,
