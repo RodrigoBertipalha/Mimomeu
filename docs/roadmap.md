@@ -9,14 +9,20 @@ sentido para o produto.
 2. Se quiser criar ou gerenciar listas, entra com e-mail/senha ou Google.
 3. Em **Minhas listas**, cria uma nova lista ou escolhe uma lista existente.
 4. Ao abrir uma lista, vê o resumo geral com reservados, disponíveis e progresso.
-5. Na mesma tela, pesquisa, adiciona ou edita presentes.
+5. Na mesma tela, pesquisa, adiciona ou edita presentes com preview lateral.
 6. O botão **Editar lista** abre um modal para alterar os dados do evento.
 7. O botão **Opções** abre categorias e faixas de preço usadas nos presentes.
 8. O botão **Compartilhar** abre um modal com link público, WhatsApp e e-mail.
 9. O botão **Ver como convidado** abre a tela pública da lista.
-10. Convidados acessam `/g/:publicSlug` sem login.
-11. Convidados reservam presentes disponíveis informando nome e contato opcional.
-12. A reserva atualiza o status do presente para **Reservado**.
+10. O histórico da lista mostra criação/edição de presentes, reservas e
+    liberações.
+11. Convidados acessam `/g/:publicSlug` sem login.
+12. Convidados filtram e ordenam presentes por categoria, faixa, status e
+    prioridade.
+13. Convidados reservam presentes disponíveis informando nome e contato opcional.
+14. A reserva atualiza o status do presente para **Reservado**.
+15. A página de suporte coleta mensagens em formulário próprio com limite de
+    caracteres.
 
 ## Rotas
 
@@ -42,6 +48,8 @@ exceção da Edge Function opcional de reserva.
 - Row Level Security para restringir gestão ao dono da lista.
 - Funções SQL/RPC para leitura pública e reserva sem login.
 - Migration de opções de lista aplicada.
+- Migration `202606160002_activity_and_support.sql` criada para histórico e
+  suporte; precisa ser aplicada no Supabase antes dos testes finais em produção.
 
 O `localStorage` permanece apenas como fallback de desenvolvimento quando as
 variáveis do Supabase não estiverem configuradas.
@@ -82,29 +90,33 @@ Opções práticas:
 - Adicionar presentes por modal.
 - Editar presentes por modal.
 - Pesquisar presentes dentro da lista aberta.
+- Preview lateral ao adicionar ou editar presente.
 - Exibir status, prioridade, desconto, faixa de preço e link do presente.
+- Liberar reserva pela gestão da lista.
+- Exibir histórico de atividade da lista.
 - Abrir modal de compartilhamento na lista escolhida.
 - Copiar/compartilhar link público da visão do convidado.
 - Acessar visão do convidado em tela separada.
+- Filtrar e ordenar presentes na visão do convidado.
 - Reservar presente sem login com nome e contato opcional.
 - Bloquear nova reserva para presente já reservado.
 - Login/cadastro por e-mail e senha.
 - Login com Google no app.
 - Menu de conta com logout, dados do usuário e edição de conta.
 - Dark mode com alternância no header.
-- Página de suporte com contato, relato de problema e sugestão.
+- Página de suporte com formulário em tela, limite de caracteres e fallback
+  local quando o Supabase não está configurado.
 - Manter a Home focada no fluxo operacional de criação e acesso às listas.
 - Concentrar os blocos institucionais na página **Sobre**.
 
-## Ideias Dos Protótipos
+## Ideias Dos Protótipos Ainda Abertas
 
-- Filtros e ordenação na visão do convidado por categoria, preço e status.
-- Preview lateral ao adicionar presente, com imagem, preço, prioridade e link.
-- Histórico de atividade da lista: presente criado/editado, reserva feita e
-  reserva cancelada.
 - Estados mais claros durante a reserva: processando, confirmado e erro.
 - Melhorar a tela de gerenciamento com atalhos para presentes recentes e
   reservas recentes.
+- Criar uma forma simples de consultar mensagens de suporte recebidas.
+- Levar imagens de presentes para Supabase Storage quando o app sair do uso
+  experimental.
 
 ## Fora do escopo do MVP
 
@@ -117,10 +129,18 @@ Opções práticas:
 
 ## Próximos passos recomendados
 
-- Conectar o repositório na Vercel.
-- Configurar `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` na Vercel.
-- Testar cadastro, login, login Google, criação de lista e compartilhamento em
-  produção.
+- Aplicar `supabase/migrations/202606160002_activity_and_support.sql` no
+  Supabase.
+- Testar em produção: suporte, histórico, criação/edição de presente, reserva
+  pública e liberação de reserva.
+- Definir domínio final e revisar URLs de redirect do Supabase/Google.
 - Manter RPC direto para reserva por enquanto e reavaliar Edge Function quando
   houver notificação, captcha ou integração externa.
 - Decidir se imagens dos presentes passam para Supabase Storage.
+
+## Melhor frente agora
+
+A melhor frente é fechar a estabilização de produção: aplicar a nova migration,
+rodar um teste completo em ambiente publicado e resolver domínio/redirects. Depois
+disso, vale atacar Storage para imagens, páginas legais simples e observabilidade
+básica.

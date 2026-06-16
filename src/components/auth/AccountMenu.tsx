@@ -318,11 +318,17 @@ function AccountMenu() {
 
             <form className="grid gap-3" onSubmit={handleProfileSubmit}>
               <label className="ui-label">
-                Nome exibido
+                <span className="flex items-center justify-between gap-3">
+                  Nome exibido
+                  <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+                    Obrigatório
+                  </span>
+                </span>
                 <input
                   className="ui-field"
                   value={displayName}
                   onChange={(event) => setDisplayName(event.target.value)}
+                  required
                 />
               </label>
               <button
@@ -336,12 +342,18 @@ function AccountMenu() {
 
             <form className="grid gap-3" onSubmit={handleEmailSubmit}>
               <label className="ui-label">
-                Trocar e-mail
+                <span className="flex items-center justify-between gap-3">
+                  Trocar e-mail
+                  <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+                    Obrigatório
+                  </span>
+                </span>
                 <input
                   type="email"
                   className="ui-field"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
+                  required
                 />
               </label>
               <button
@@ -356,17 +368,28 @@ function AccountMenu() {
             <form className="grid gap-3" onSubmit={handlePasswordSubmit}>
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className="ui-label">
-                  Nova senha
+                  <span className="flex items-center justify-between gap-3">
+                    Nova senha
+                    <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+                      Obrigatório
+                    </span>
+                  </span>
                   <input
                     type="password"
                     className="ui-field"
                     minLength={6}
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
+                    required
                   />
                 </label>
                 <label className="ui-label">
-                  Confirmar senha
+                  <span className="flex items-center justify-between gap-3">
+                    Confirmar senha
+                    <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+                      Obrigatório
+                    </span>
+                  </span>
                   <input
                     type="password"
                     className="ui-field"
@@ -375,6 +398,7 @@ function AccountMenu() {
                     onChange={(event) =>
                       setPasswordConfirmation(event.target.value)
                     }
+                    required
                   />
                 </label>
               </div>

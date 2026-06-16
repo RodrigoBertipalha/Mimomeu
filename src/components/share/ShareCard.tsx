@@ -13,6 +13,7 @@ type ShareCardProps = {
 
 function ShareCard({ list }: ShareCardProps) {
   const [copied, setCopied] = useState(false)
+  const [copyError, setCopyError] = useState('')
   const shareUrl = getShareUrl(list)
   const whatsappLink = getWhatsappLink(list)
   const mailLink = `mailto:?subject=${encodeURIComponent(
@@ -23,9 +24,11 @@ function ShareCard({ list }: ShareCardProps) {
     try {
       await navigator.clipboard.writeText(shareUrl)
       setCopied(true)
+      setCopyError('')
       setTimeout(() => setCopied(false), 2000)
     } catch {
       setCopied(false)
+      setCopyError('Não foi possível copiar automaticamente. Selecione o link e copie manualmente.')
     }
   }
 
@@ -63,6 +66,18 @@ function ShareCard({ list }: ShareCardProps) {
               <Icon name="copy" className="h-5 w-5" />
               {copied ? 'Link copiado' : 'Copiar link'}
             </button>
+          </div>
+          <div aria-live="polite">
+            {copied ? (
+              <p className="mt-3 rounded-md bg-[var(--color-primary-soft)] px-4 py-3 text-sm font-bold text-[var(--color-primary-deep)]">
+                Link copiado.
+              </p>
+            ) : null}
+            {copyError ? (
+              <p className="mt-3 rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
+                {copyError}
+              </p>
+            ) : null}
           </div>
         </label>
 

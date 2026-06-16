@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import ListForm from '../components/lists/ListForm'
 import Icon from '../components/ui/Icon'
@@ -9,12 +10,16 @@ function ListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
   const isCreateOpen = searchParams.get('new') === '1'
+  const [isCreating, setIsCreating] = useState(false)
+  const [createError, setCreateError] = useState('')
 
   function openCreateModal() {
+    setCreateError('')
     setSearchParams({ new: '1' })
   }
 
   function closeCreateModal() {
+    setCreateError('')
     setSearchParams({})
   }
 
@@ -112,6 +117,9 @@ function ListPage() {
                       />
                     </div>
                   </div>
+                  <p className="mt-4 text-sm font-extrabold text-[var(--color-primary-deep)]">
+                    Abrir lista
+                  </p>
                 </Link>
               )
             })}
@@ -144,15 +152,35 @@ function ListPage() {
           description="Informe os dados básicos do evento. Os presentes entram depois, dentro da lista."
           onClose={closeCreateModal}
         >
+          {createError ? (
+            <p className="mb-5 rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
+              {createError}
+            </p>
+          ) : null}
           <ListForm
             framed={false}
             showOptionsSetup
-            submitLabel="Criar lista"
+            submitLabel={isCreating ? 'Criando lista...' : 'Criar lista'}
+            submitDisabled={isCreating}
             onCancel={closeCreateModal}
             onSubmit={async (value) => {
-              const created = await createWishlist(value)
-              closeCreateModal()
-              navigate(`/list/${created.id}`)
+              setIsCreating(true)
+              setCreateError('')
+              try {
+                const created = await createWishlist(value)
+                closeCreateModal()
+                navigate(`/list/${created.id}`, {
+                  state: { notice: 'Lista criada.' },
+                })
+              } catch (submitError) {
+                setCreateError(
+                  submitError instanceof Error
+                    ? submitError.message
+                    : 'Não foi possível criar a lista. Tente novamente.'
+                )
+              } finally {
+                setIsCreating(false)
+              }
             }}
           />
         </Modal>

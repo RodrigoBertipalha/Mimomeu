@@ -4,17 +4,27 @@ import Icon from '../ui/Icon'
 
 type ReserveGiftModalProps = {
   gift: Gift
+  isSubmitting?: boolean
   onCancel: () => void
   onConfirm: (guest: ReservationGuest) => void
 }
 
-function ReserveGiftModal({ gift, onCancel, onConfirm }: ReserveGiftModalProps) {
+function ReserveGiftModal({
+  gift,
+  isSubmitting = false,
+  onCancel,
+  onConfirm,
+}: ReserveGiftModalProps) {
   const [name, setName] = useState('')
   const [contact, setContact] = useState('')
+  const [formError, setFormError] = useState('')
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!name.trim()) return
+    if (!name.trim()) {
+      setFormError('Informe seu nome para confirmar a reserva.')
+      return
+    }
 
     onConfirm({
       name: name.trim(),
@@ -38,11 +48,11 @@ function ReserveGiftModal({ gift, onCancel, onConfirm }: ReserveGiftModalProps) 
           </div>
           <button
             type="button"
-            className="ui-icon-button"
+            className="ui-button-secondary h-10 px-4"
             onClick={onCancel}
-            aria-label="Cancelar reserva"
+            disabled={isSubmitting}
           >
-            <Icon name="arrow-left" />
+            Fechar
           </button>
         </div>
 
@@ -70,18 +80,31 @@ function ReserveGiftModal({ gift, onCancel, onConfirm }: ReserveGiftModalProps) 
 
         <form className="mt-6 grid gap-4" onSubmit={handleSubmit}>
           <label className="ui-label">
-            Seu nome
+            <span className="flex items-center justify-between gap-3">
+              Seu nome
+              <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+                Obrigatório
+              </span>
+            </span>
             <input
               className="ui-field"
               placeholder="Ex: Mariana Silva"
               value={name}
-              onChange={(event) => setName(event.target.value)}
+              onChange={(event) => {
+                setName(event.target.value)
+                setFormError('')
+              }}
               required
             />
           </label>
 
           <label className="ui-label">
-            Telefone ou e-mail
+            <span className="flex items-center justify-between gap-3">
+              Telefone ou e-mail
+              <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
+                Opcional
+              </span>
+            </span>
             <input
               className="ui-field"
               placeholder="Opcional"
@@ -90,16 +113,27 @@ function ReserveGiftModal({ gift, onCancel, onConfirm }: ReserveGiftModalProps) 
             />
           </label>
 
+          {formError ? (
+            <p className="rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
+              {formError}
+            </p>
+          ) : null}
+
           <div className="mt-2 grid gap-3 sm:grid-cols-2">
             <button
               type="button"
               className="ui-button-secondary"
               onClick={onCancel}
+              disabled={isSubmitting}
             >
               Cancelar
             </button>
-            <button type="submit" className="ui-button-primary">
-              Confirmar reserva
+            <button
+              type="submit"
+              className="ui-button-primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Confirmando...' : 'Confirmar reserva'}
             </button>
           </div>
         </form>

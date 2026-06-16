@@ -16,6 +16,7 @@ type ListFormProps = {
   description?: string
   framed?: boolean
   showOptionsSetup?: boolean
+  submitDisabled?: boolean
   onCancel?: () => void
 }
 
@@ -31,6 +32,7 @@ function createInitialState(): Wishlist {
     message: '',
     options: createDefaultWishlistOptions(),
     gifts: [],
+    activity: [],
     createdAt: now,
     updatedAt: now,
   }
@@ -45,6 +47,7 @@ function ListForm({
   description,
   framed = true,
   showOptionsSetup = false,
+  submitDisabled = false,
   onCancel,
 }: ListFormProps) {
   const [formData, setFormData] = useState<Wishlist>(
@@ -58,14 +61,25 @@ function ListForm({
   const [optionsMode, setOptionsMode] = useState<'default' | 'custom'>(
     initialValue ? 'custom' : 'default'
   )
+  const [formError, setFormError] = useState('')
 
   function handleChange(field: keyof Wishlist, value: string) {
     setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormError('')
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!formData.title.trim()) return
+    if (!formData.title.trim()) {
+      setFormError('Informe o nome do evento para salvar a lista.')
+      return
+    }
+
+    if (!formData.eventType) {
+      setFormError('Escolha o tipo de evento.')
+      return
+    }
+
     onSubmit({
       ...formData,
       options:
@@ -97,7 +111,12 @@ function ListForm({
 
       <div className="grid gap-5">
         <label className="ui-label">
-          Nome do evento
+          <span className="flex items-center justify-between gap-3">
+            Nome do evento
+            <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+              Obrigatório
+            </span>
+          </span>
           <input
             className="ui-field"
             placeholder="Ex: Aniversário da Júlia"
@@ -109,7 +128,12 @@ function ListForm({
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="ui-label">
-            Tipo de evento
+            <span className="flex items-center justify-between gap-3">
+              Tipo de evento
+              <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+                Obrigatório
+              </span>
+            </span>
             <select
               className="ui-field"
               value={formData.eventType}
@@ -128,7 +152,12 @@ function ListForm({
           </label>
 
           <label className="ui-label">
-            Data do evento
+            <span className="flex items-center justify-between gap-3">
+              Data do evento
+              <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
+                Opcional
+              </span>
+            </span>
             <input
               type="date"
               className="ui-field"
@@ -139,7 +168,12 @@ function ListForm({
         </div>
 
         <label className="ui-label">
-          Responsável
+          <span className="flex items-center justify-between gap-3">
+            Responsável
+            <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
+              Opcional
+            </span>
+          </span>
           <input
             className="ui-field"
             placeholder="Seu nome"
@@ -149,7 +183,12 @@ function ListForm({
         </label>
 
         <label className="ui-label">
-          Descrição da lista
+          <span className="flex items-center justify-between gap-3">
+            Descrição da lista
+            <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
+              Opcional
+            </span>
+          </span>
           <textarea
             className="ui-field min-h-[136px] resize-y"
             placeholder="Conte um pouco sobre o evento ou deixe uma mensagem para seus convidados..."
@@ -231,6 +270,12 @@ function ListForm({
         ) : null}
       </div>
 
+      {formError ? (
+        <p className="rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
+          {formError}
+        </p>
+      ) : null}
+
       <div className="grid gap-3 sm:grid-cols-2">
         {onCancel ? (
           <button
@@ -241,7 +286,11 @@ function ListForm({
             Cancelar
           </button>
         ) : null}
-        <button type="submit" className="ui-button-primary w-full">
+        <button
+          type="submit"
+          className="ui-button-primary w-full"
+          disabled={submitDisabled}
+        >
           {submitLabel ?? 'Salvar lista'}
           {showOptionsSetup ? (
             <Icon name="arrow-right" className="h-5 w-5" />

@@ -16,6 +16,7 @@ function GuestListPage() {
   const [error, setError] = useState('')
   const [pendingGift, setPendingGift] = useState<Gift | null>(null)
   const [reservedGift, setReservedGift] = useState<Gift | null>(null)
+  const [isReserving, setIsReserving] = useState(false)
 
   const publicKey = publicSlug ?? listId ?? ''
 
@@ -59,23 +60,36 @@ function GuestListPage() {
   async function handleReserveConfirm(guest: ReservationGuest) {
     if (!pendingGift) return
 
-    const success = await reservePublicGift(publicKey, pendingGift.id, guest)
-    if (!success) {
+    setIsReserving(true)
+    setError('')
+
+    try {
+      const success = await reservePublicGift(publicKey, pendingGift.id, guest)
+      if (!success) {
+        setPendingGift(null)
+        setError('Este presente já foi reservado.')
+        return
+      }
+
+      setReservedGift({
+        ...pendingGift,
+        reserved: true,
+        reservedBy: guest.name,
+        reservedContact: guest.contact,
+      })
       setPendingGift(null)
-      setError('Este presente já foi reservado.')
-      return
+
+      const updated = await loadPublicWishlist(publicKey)
+      setList(updated)
+    } catch (reserveError) {
+      setError(
+        reserveError instanceof Error
+          ? reserveError.message
+          : 'Não foi possível confirmar a reserva. Tente novamente.'
+      )
+    } finally {
+      setIsReserving(false)
     }
-
-    setReservedGift({
-      ...pendingGift,
-      reserved: true,
-      reservedBy: guest.name,
-      reservedContact: guest.contact,
-    })
-    setPendingGift(null)
-
-    const updated = await loadPublicWishlist(publicKey)
-    setList(updated)
   }
 
   if (isLoading) {
@@ -134,6 +148,7 @@ function GuestListPage() {
       {pendingGift ? (
         <ReserveGiftModal
           gift={pendingGift}
+          isSubmitting={isReserving}
           onCancel={() => setPendingGift(null)}
           onConfirm={handleReserveConfirm}
         />

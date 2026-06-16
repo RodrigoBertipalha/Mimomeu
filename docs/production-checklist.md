@@ -17,6 +17,8 @@ produção com autenticação, banco remoto e compartilhamento público.
 - [x] Criar projeto no Supabase.
 - [x] Aplicar a migration `supabase/migrations/202606140001_initial_schema.sql`.
 - [x] Aplicar a migration `supabase/migrations/202606160001_wishlist_options.sql`.
+- [x] Criar a migration `supabase/migrations/202606160002_activity_and_support.sql`.
+- [ ] Aplicar a migration `supabase/migrations/202606160002_activity_and_support.sql`.
 - [x] Conferir se Auth por e-mail/senha está habilitado.
 - [x] Desativar confirmação de e-mail no Supabase Auth para o MVP.
 - [x] Configurar URLs de redirect do Supabase para localhost e domínio final.
@@ -44,6 +46,10 @@ produção com autenticação, banco remoto e compartilhamento público.
 - [x] Manter fallback local para desenvolvimento sem Supabase configurado.
 - [x] Criar rota pública `/g/:publicSlug`.
 - [x] Ajustar compartilhamento para usar link público.
+- [x] Adicionar filtros e ordenação na visão do convidado.
+- [x] Adicionar preview lateral ao cadastrar presente.
+- [x] Adicionar histórico de atividade da lista.
+- [x] Adicionar formulário de suporte em tela com limite de caracteres.
 - [x] Validar `npm run build`.
 - [x] Validar `npm run lint`.
 - [x] Validar `npm audit --omit=dev`.
@@ -51,13 +57,14 @@ produção com autenticação, banco remoto e compartilhamento público.
 ## Deploy
 
 - [x] Criar repositório no GitHub.
-- [ ] Conectar repositório na Vercel.
-- [ ] Configurar variáveis de ambiente na Vercel, sem subir `.env` para o GitHub.
-- [ ] Testar cadastro/login em produção.
-- [ ] Testar login com Google em produção.
-- [ ] Testar criação de lista em produção.
-- [ ] Testar compartilhamento público em janela anônima.
-- [ ] Testar reserva de presente em janela anônima.
+- [x] Conectar repositório na Vercel.
+- [x] Configurar variáveis de ambiente na Vercel, sem subir `.env` para o GitHub.
+- [x] Testar cadastro/login em produção.
+- [x] Testar login com Google em produção.
+- [x] Testar criação de lista em produção.
+- [x] Testar compartilhamento público em janela anônima.
+- [x] Testar reserva de presente em janela anônima.
+  `202606160002_activity_and_support.sql`.
 - [ ] Definir domínio final.
 
 ## Pós-MVP
@@ -66,6 +73,6 @@ produção com autenticação, banco remoto e compartilhamento público.
 - [ ] Criar política de privacidade.
 - [ ] Criar termos simples de uso.
 - [ ] Adicionar observabilidade básica.
-- [ ] Adicionar filtros e ordenação na visão do convidado.
-- [ ] Adicionar preview lateral ao cadastrar presente.
-- [ ] Adicionar histórico de atividade da lista.
+- [ ] Criar uma forma simples de consultar mensagens de suporte recebidas.
+- [ ] Melhorar estados da reserva: processando, confirmado e erro.
+- [ ] Adicionar atalhos para presentes recentes e reservas recentes.

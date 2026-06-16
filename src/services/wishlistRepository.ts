@@ -1,5 +1,12 @@
 import { supabase } from '../lib/supabase'
-import type { Gift, GiftPriority, ReservationGuest, Wishlist } from '../types/wishlist'
+import type {
+  Gift,
+  GiftPriority,
+  ReservationGuest,
+  Wishlist,
+  WishlistActivity,
+} from '../types/wishlist'
+import { normalizeWishlistActivity } from '../utils/activity'
 import { normalizeWishlistOptions } from '../utils/wishlistOptions'
 
 type RepositoryError = {
@@ -39,6 +46,7 @@ type WishlistRow = {
   public_slug: string
   gift_categories?: string[]
   price_ranges?: string[]
+  activity_log?: WishlistActivity[]
   created_at: string
   updated_at: string
   gifts?: GiftRow[]
@@ -53,17 +61,43 @@ function ensureSupabase() {
 }
 
 let supportsWishlistOptions = true
+let supportsWishlistActivity = true
 
 function isMissingWishlistOptionsError(error: unknown) {
   const repositoryError = error as RepositoryError
   const message = repositoryError.message?.toLowerCase() ?? ''
 
   return (
-    repositoryError.code === '42703' ||
-    repositoryError.code === 'PGRST204' ||
     message.includes('gift_categories') ||
     message.includes('price_ranges')
   )
+}
+
+function isMissingWishlistActivityError(error: unknown) {
+  const repositoryError = error as RepositoryError
+  const message = repositoryError.message?.toLowerCase() ?? ''
+
+  return message.includes('activity_log')
+}
+
+function rememberMissingWishlistColumns(error: unknown) {
+  const repositoryError = error as RepositoryError
+  const missingOptions = isMissingWishlistOptionsError(error)
+  const missingActivity = isMissingWishlistActivityError(error)
+  const unknownMissingColumn =
+    (repositoryError.code === '42703' || repositoryError.code === 'PGRST204') &&
+    !missingOptions &&
+    !missingActivity
+
+  if (missingOptions || unknownMissingColumn) {
+    supportsWishlistOptions = false
+  }
+
+  if (missingActivity || unknownMissingColumn) {
+    supportsWishlistActivity = false
+  }
+
+  return missingOptions || missingActivity || unknownMissingColumn
 }
 
 function normalizePriority(value: string): GiftPriority {
@@ -87,6 +121,9 @@ function mapGift(row: GiftRow | Gift): Gift {
       reserved: Boolean(reservation),
       reservedBy: reservation?.guest_name ?? '',
       reservedContact: reservation?.guest_contact ?? '',
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      reservedAt: reservation?.created_at ?? '',
     }
   }
 
@@ -108,6 +145,7 @@ function mapWishlist(row: WishlistRow | Wishlist): Wishlist {
         priceRanges: row.price_ranges,
       }),
       gifts: (row.gifts ?? []).map(mapGift),
+      activity: normalizeWishlistActivity(row.activity_log),
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     }
@@ -116,15 +154,18 @@ function mapWishlist(row: WishlistRow | Wishlist): Wishlist {
   return {
     ...row,
     options: normalizeWishlistOptions(row.options),
+    activity: normalizeWishlistActivity(row.activity),
   }
 }
 
 function wishlistPayload(
   value: Wishlist,
   ownerId: string,
-  includeOptions = supportsWishlistOptions
+  includeOptions = supportsWishlistOptions,
+  includeActivity = supportsWishlistActivity
 ) {
   const options = normalizeWishlistOptions(value.options)
+  const activity = normalizeWishlistActivity(value.activity)
   const payload = {
     owner_id: ownerId,
     title: value.title.trim(),
@@ -139,15 +180,21 @@ function wishlistPayload(
         ...payload,
         gift_categories: options.categories,
         price_ranges: options.priceRanges,
+        ...(includeActivity ? { activity_log: activity } : {}),
       }
-    : payload
+    : {
+        ...payload,
+        ...(includeActivity ? { activity_log: activity } : {}),
+      }
 }
 
 function wishlistDetailsPayload(
   value: Omit<Wishlist, 'gifts'>,
-  includeOptions = supportsWishlistOptions
+  includeOptions = supportsWishlistOptions,
+  includeActivity = supportsWishlistActivity
 ) {
   const options = normalizeWishlistOptions(value.options)
+  const activity = normalizeWishlistActivity(value.activity)
   const payload = {
     title: value.title.trim(),
     event_date: value.eventDate || null,
@@ -161,8 +208,12 @@ function wishlistDetailsPayload(
         ...payload,
         gift_categories: options.categories,
         price_ranges: options.priceRanges,
+        ...(includeActivity ? { activity_log: activity } : {}),
       }
-    : payload
+    : {
+        ...payload,
+        ...(includeActivity ? { activity_log: activity } : {}),
+      }
 }
 
 function giftPayload(value: Gift, wishlistId: string) {
@@ -179,40 +230,18 @@ function giftPayload(value: Gift, wishlistId: string) {
   }
 }
 
-const wishlistSelect = `
-  id,
-  title,
-  event_date,
-  event_type,
-  owner_name,
-  message,
-  public_slug,
+function createWishlistSelect(includeOptions: boolean, includeActivity: boolean) {
+  const optionFields = includeOptions
+    ? `
   gift_categories,
-  price_ranges,
-  created_at,
-  updated_at,
-  gifts (
-    id,
-    name,
-    product_url,
-    note,
-    category,
-    price_range,
-    image_url,
-    has_discount,
-    priority,
-    created_at,
-    updated_at,
-    reservations (
-      id,
-      guest_name,
-      guest_contact,
-      created_at
-    )
-  )
-`
+  price_ranges,`
+    : ''
+  const activityField = includeActivity
+    ? `
+  activity_log,`
+    : ''
 
-const legacyWishlistSelect = `
+  return `
   id,
   title,
   event_date,
@@ -220,6 +249,8 @@ const legacyWishlistSelect = `
   owner_name,
   message,
   public_slug,
+  ${optionFields}
+  ${activityField}
   created_at,
   updated_at,
   gifts (
@@ -242,9 +273,10 @@ const legacyWishlistSelect = `
     )
   )
 `
+}
 
 function getWishlistSelect() {
-  return supportsWishlistOptions ? wishlistSelect : legacyWishlistSelect
+  return createWishlistSelect(supportsWishlistOptions, supportsWishlistActivity)
 }
 
 export async function fetchWishlists() {
@@ -254,11 +286,10 @@ export async function fetchWishlists() {
     .select(getWishlistSelect())
     .order('created_at', { ascending: false })
 
-  if (error && supportsWishlistOptions && isMissingWishlistOptionsError(error)) {
-    supportsWishlistOptions = false
+  if (error && rememberMissingWishlistColumns(error)) {
     const fallback = await client
       .from('wishlists')
-      .select(legacyWishlistSelect)
+      .select(getWishlistSelect())
       .order('created_at', { ascending: false })
 
     data = fallback.data
@@ -278,11 +309,10 @@ export async function fetchWishlist(listId: string) {
     .eq('id', listId)
     .single()
 
-  if (error && supportsWishlistOptions && isMissingWishlistOptionsError(error)) {
-    supportsWishlistOptions = false
+  if (error && rememberMissingWishlistColumns(error)) {
     const fallback = await client
       .from('wishlists')
-      .select(legacyWishlistSelect)
+      .select(getWishlistSelect())
       .eq('id', listId)
       .single()
 
@@ -303,12 +333,18 @@ export async function createRemoteWishlist(value: Wishlist, ownerId: string) {
     .select(getWishlistSelect())
     .single()
 
-  if (error && supportsWishlistOptions && isMissingWishlistOptionsError(error)) {
-    supportsWishlistOptions = false
+  if (error && rememberMissingWishlistColumns(error)) {
     const fallback = await client
       .from('wishlists')
-      .insert(wishlistPayload(value, ownerId, false))
-      .select(legacyWishlistSelect)
+      .insert(
+        wishlistPayload(
+          value,
+          ownerId,
+          supportsWishlistOptions,
+          supportsWishlistActivity
+        )
+      )
+      .select(getWishlistSelect())
       .single()
 
     data = fallback.data
@@ -332,13 +368,18 @@ export async function updateRemoteWishlist(
     .select(getWishlistSelect())
     .single()
 
-  if (error && supportsWishlistOptions && isMissingWishlistOptionsError(error)) {
-    supportsWishlistOptions = false
+  if (error && rememberMissingWishlistColumns(error)) {
     const fallback = await client
       .from('wishlists')
-      .update(wishlistDetailsPayload(value, false))
+      .update(
+        wishlistDetailsPayload(
+          value,
+          supportsWishlistOptions,
+          supportsWishlistActivity
+        )
+      )
       .eq('id', listId)
-      .select(legacyWishlistSelect)
+      .select(getWishlistSelect())
       .single()
 
     data = fallback.data
@@ -348,6 +389,27 @@ export async function updateRemoteWishlist(
   if (error) throw error
 
   return mapWishlist(data as WishlistRow)
+}
+
+export async function updateRemoteWishlistActivity(
+  listId: string,
+  activity: WishlistActivity[]
+) {
+  if (!supportsWishlistActivity) return false
+
+  const client = ensureSupabase()
+  const { error } = await client
+    .from('wishlists')
+    .update({ activity_log: normalizeWishlistActivity(activity) })
+    .eq('id', listId)
+
+  if (error && rememberMissingWishlistColumns(error)) {
+    return false
+  }
+
+  if (error) throw error
+
+  return true
 }
 
 export async function addRemoteGift(listId: string, gift: Gift) {

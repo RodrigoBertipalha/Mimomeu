@@ -1,4 +1,5 @@
 import type { Gift, GiftPriority, Wishlist } from '../types/wishlist'
+import { normalizeWishlistActivity } from './activity'
 import { normalizeWishlistOptions } from './wishlistOptions'
 
 const ACTIVE_WISHLIST_KEY = 'mimo-meu:wishlist'
@@ -28,6 +29,9 @@ function normalizeGift(value: Partial<Gift>): Gift {
     reserved: Boolean(value.reserved),
     reservedBy: value.reservedBy ?? '',
     reservedContact: value.reservedContact ?? '',
+    createdAt: value.createdAt,
+    updatedAt: value.updatedAt,
+    reservedAt: value.reservedAt,
   }
 }
 
@@ -46,6 +50,7 @@ export function normalizeWishlist(value: Partial<Wishlist>): Wishlist {
     gifts: Array.isArray(value.gifts)
       ? value.gifts.map((gift) => normalizeGift(gift))
       : [],
+    activity: normalizeWishlistActivity(value.activity),
     createdAt: value.createdAt ?? now,
     updatedAt: value.updatedAt ?? now,
   }

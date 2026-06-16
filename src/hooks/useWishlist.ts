@@ -10,8 +10,18 @@ import {
   reserveRemotePublicGift,
   updateRemoteGift,
   updateRemoteWishlist,
+  updateRemoteWishlistActivity,
 } from '../services/wishlistRepository'
-import type { Gift, ReservationGuest, Wishlist } from '../types/wishlist'
+import type {
+  Gift,
+  ReservationGuest,
+  Wishlist,
+  WishlistActivityType,
+} from '../types/wishlist'
+import {
+  appendWishlistActivity,
+  createWishlistActivity,
+} from '../utils/activity'
 import {
   clearWishlist,
   getWishlist,
@@ -82,6 +92,26 @@ export function useWishlist() {
     }
   }, [shouldUseLocal, shouldUseRemote, user?.id])
 
+  function appendActivityToDetails(
+    details: Omit<Wishlist, 'gifts'>,
+    type?: WishlistActivityType
+  ) {
+    if (!type) return details
+
+    const listForActivity: Wishlist = {
+      ...details,
+      gifts: [],
+    }
+
+    return {
+      ...details,
+      activity: appendWishlistActivity(
+        listForActivity,
+        createWishlistActivity(type, { listTitle: details.title })
+      ).activity,
+    }
+  }
+
   function persistLocal(value: Wishlist) {
     const saved = saveWishlist(value)
     setWishlist(saved)
@@ -109,8 +139,19 @@ export function useWishlist() {
   }
 
   async function createWishlist(value: Wishlist) {
+    const normalizedValue = normalizeWishlist(value)
+    const nextValue = normalizedValue.activity.length
+      ? normalizedValue
+      : appendWishlistActivity(
+          normalizedValue,
+          createWishlistActivity('list_created', {
+            listTitle: normalizedValue.title,
+            now: normalizedValue.createdAt,
+          })
+        )
+
     if (shouldUseRemote && user) {
-      const created = await createRemoteWishlist(value, user.id)
+      const created = await createRemoteWishlist(nextValue, user.id)
       setWishlist(created)
       await refresh()
       return created
@@ -120,7 +161,6 @@ export function useWishlist() {
       throw new Error('Faça login para criar listas.')
     }
 
-    const nextValue = normalizeWishlist({ ...value, gifts: value.gifts ?? [] })
     return persistLocal(nextValue)
   }
 
@@ -177,10 +217,13 @@ export function useWishlist() {
 
   async function updateWishlistDetails(
     listId: string,
-    details: Omit<Wishlist, 'gifts'>
+    details: Omit<Wishlist, 'gifts'>,
+    activityType?: WishlistActivityType
   ) {
+    const nextDetails = appendActivityToDetails(details, activityType)
+
     if (shouldUseRemote) {
-      const updated = await updateRemoteWishlist(listId, details)
+      const updated = await updateRemoteWishlist(listId, nextDetails)
       setWishlist(updated)
       await refresh()
       return updated
@@ -191,15 +234,34 @@ export function useWishlist() {
     const current = findWishlist(listId)
     if (!current) return null
 
-    return persistLocal({ ...details, gifts: current.gifts })
+    return persistLocal({ ...nextDetails, gifts: current.gifts })
   }
 
   async function addGift(listId: string, gift: Gift) {
+    const now = new Date().toISOString()
+    const giftWithDates: Gift = {
+      ...gift,
+      createdAt: gift.createdAt ?? now,
+      updatedAt: now,
+    }
+
     if (shouldUseRemote) {
-      const updated = await addRemoteGift(listId, gift)
-      setWishlist(updated)
+      const updated = await addRemoteGift(listId, giftWithDates)
+      const savedGift =
+        updated.gifts.find((item) => item.name === giftWithDates.name) ??
+        giftWithDates
+      const withActivity = appendWishlistActivity(
+        updated,
+        createWishlistActivity('gift_added', {
+          gift: savedGift,
+          now,
+        })
+      )
+
+      await updateRemoteWishlistActivity(listId, withActivity.activity)
+      setWishlist(withActivity)
       await refresh()
-      return updated
+      return withActivity
     }
 
     if (!shouldUseLocal) return null
@@ -207,29 +269,65 @@ export function useWishlist() {
     const current = findWishlist(listId)
     if (!current) return null
 
-    return persistLocal({
-      ...current,
-      gifts: [...current.gifts, gift],
-    })
+    return persistLocal(
+      appendWishlistActivity(
+        {
+          ...current,
+          gifts: [...current.gifts, giftWithDates],
+        },
+        createWishlistActivity('gift_added', {
+          gift: giftWithDates,
+          now,
+        })
+      )
+    )
   }
 
   async function updateGift(listId: string, gift: Gift) {
+    const now = new Date().toISOString()
+    const current = findWishlist(listId)
+    const originalGift = current?.gifts.find((item) => item.id === gift.id)
+    const giftWithDates: Gift = {
+      ...gift,
+      createdAt: gift.createdAt ?? originalGift?.createdAt ?? now,
+      updatedAt: now,
+      reservedAt: gift.reservedAt ?? originalGift?.reservedAt ?? '',
+    }
+
     if (shouldUseRemote) {
-      const updated = await updateRemoteGift(listId, gift)
-      setWishlist(updated)
+      const updated = await updateRemoteGift(listId, giftWithDates)
+      const withActivity = appendWishlistActivity(
+        updated,
+        createWishlistActivity('gift_updated', {
+          gift: giftWithDates,
+          now,
+        })
+      )
+
+      await updateRemoteWishlistActivity(listId, withActivity.activity)
+      setWishlist(withActivity)
       await refresh()
-      return updated
+      return withActivity
     }
 
     if (!shouldUseLocal) return null
 
-    const current = findWishlist(listId)
     if (!current) return null
 
-    return persistLocal({
-      ...current,
-      gifts: current.gifts.map((item) => (item.id === gift.id ? gift : item)),
-    })
+    return persistLocal(
+      appendWishlistActivity(
+        {
+          ...current,
+          gifts: current.gifts.map((item) =>
+            item.id === gift.id ? giftWithDates : item
+          ),
+        },
+        createWishlistActivity('gift_updated', {
+          gift: giftWithDates,
+          now,
+        })
+      )
+    )
   }
 
   const reserveGift = useCallback(async (
@@ -243,23 +341,38 @@ export function useWishlist() {
     if (!current) return false
 
     let reserved = false
+    let reservedGift: Gift | null = null
+    const now = new Date().toISOString()
     const nextValue: Wishlist = {
       ...current,
       gifts: current.gifts.map((gift) => {
         if (gift.id !== giftId || gift.reserved) return gift
 
         reserved = true
-        return {
+        reservedGift = {
           ...gift,
           reserved: true,
           reservedBy: guest.name,
           reservedContact: guest.contact,
+          reservedAt: now,
+          updatedAt: now,
         }
+
+        return reservedGift
       }),
     }
 
     if (!reserved) return false
-    persistLocal(nextValue)
+    persistLocal(
+      appendWishlistActivity(
+        nextValue,
+        createWishlistActivity('gift_reserved', {
+          actor: guest.name,
+          gift: reservedGift ?? undefined,
+          now,
+        })
+      )
+    )
     return true
   }, [findWishlist, shouldUseLocal])
 
@@ -276,31 +389,53 @@ export function useWishlist() {
   }, [canUsePublicRemote, reserveGift])
 
   async function releaseGiftReservation(listId: string, giftId: string) {
+    const current = findWishlist(listId)
+    const releasedGift = current?.gifts.find((gift) => gift.id === giftId)
+    const now = new Date().toISOString()
+
     if (shouldUseRemote) {
       const updated = await releaseRemoteGiftReservation(listId, giftId)
-      setWishlist(updated)
+      const withActivity = appendWishlistActivity(
+        updated,
+        createWishlistActivity('reservation_released', {
+          gift: releasedGift ?? updated.gifts.find((gift) => gift.id === giftId),
+          now,
+        })
+      )
+
+      await updateRemoteWishlistActivity(listId, withActivity.activity)
+      setWishlist(withActivity)
       await refresh()
-      return updated
+      return withActivity
     }
 
     if (!shouldUseLocal) return null
 
-    const current = findWishlist(listId)
     if (!current) return null
 
-    return persistLocal({
-      ...current,
-      gifts: current.gifts.map((gift) =>
-        gift.id === giftId
-          ? {
-              ...gift,
-              reserved: false,
-              reservedBy: '',
-              reservedContact: '',
-            }
-          : gift
-      ),
-    })
+    return persistLocal(
+      appendWishlistActivity(
+        {
+          ...current,
+          gifts: current.gifts.map((gift) =>
+            gift.id === giftId
+              ? {
+                  ...gift,
+                  reserved: false,
+                  reservedBy: '',
+                  reservedContact: '',
+                  reservedAt: '',
+                  updatedAt: now,
+                }
+              : gift
+          ),
+        },
+        createWishlistActivity('reservation_released', {
+          gift: releasedGift,
+          now,
+        })
+      )
+    )
   }
 
   function resetWishlist() {

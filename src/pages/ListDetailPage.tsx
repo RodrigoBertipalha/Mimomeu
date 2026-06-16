@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import GiftForm from '../components/gifts/GiftForm'
 import GiftList from '../components/gifts/GiftList'
+import ActivityTimeline from '../components/lists/ActivityTimeline'
 import ListForm from '../components/lists/ListForm'
 import ListOptionsEditor from '../components/lists/ListOptionsEditor'
 import ShareCard from '../components/share/ShareCard'
@@ -27,6 +28,7 @@ function getListDetails(
     ownerName: list.ownerName,
     message: list.message,
     options,
+    activity: list.activity,
     createdAt: list.createdAt,
     updatedAt: list.updatedAt,
   }
@@ -34,11 +36,14 @@ function getListDetails(
 
 function ListDetailPage() {
   const { listId } = useParams()
+  const location = useLocation()
+  const navigate = useNavigate()
   const {
     findWishlist,
     updateWishlistDetails,
     addGift,
     updateGift,
+    releaseGiftReservation,
     isLoading,
     error,
   } = useWishlist()
@@ -51,9 +56,20 @@ function ListDetailPage() {
   const [optionsDraft, setOptionsDraft] = useState<WishlistOptions>(
     createDefaultWishlistOptions()
   )
-  const [notice, setNotice] = useState('')
+  const routeNotice = (location.state as { notice?: string } | null)?.notice
+  const [notice, setNotice] = useState(routeNotice ?? '')
+  const [actionError, setActionError] = useState('')
 
   const list = listId ? findWishlist(listId) : null
+
+  useEffect(() => {
+    if (!routeNotice) return
+
+    navigate(location.pathname, { replace: true, state: null })
+    const timeout = window.setTimeout(() => setNotice(''), 2500)
+
+    return () => window.clearTimeout(timeout)
+  }, [location.pathname, navigate, routeNotice])
 
   const filteredGifts = useMemo(() => {
     if (!list) return []
@@ -69,12 +85,21 @@ function ListDetailPage() {
   }, [list, query])
 
   function showNotice(message: string) {
+    setActionError('')
     setNotice(message)
     setTimeout(() => setNotice(''), 2500)
   }
 
+  function showActionError(fallback: string, submitError: unknown) {
+    setNotice('')
+    setActionError(
+      submitError instanceof Error ? submitError.message : fallback
+    )
+  }
+
   function openOptionsModal() {
     if (!list) return
+    setActionError('')
     setOptionsDraft(normalizeWishlistOptions(list.options))
     setIsOptionsOpen(true)
   }
@@ -137,7 +162,10 @@ function ListDetailPage() {
             <button
               type="button"
               className="ui-button-secondary h-10 justify-center rounded-md px-4 text-xs"
-              onClick={() => setIsEditListOpen(true)}
+              onClick={() => {
+                setActionError('')
+                setIsEditListOpen(true)
+              }}
             >
               Editar lista
             </button>
@@ -170,6 +198,12 @@ function ListDetailPage() {
       {error ? (
         <p className="rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
           {error}
+        </p>
+      ) : null}
+
+      {actionError ? (
+        <p className="rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
+          {actionError}
         </p>
       ) : null}
 
@@ -250,7 +284,10 @@ function ListDetailPage() {
             <button
               type="button"
               className="ui-button-primary"
-              onClick={() => setIsAddGiftOpen(true)}
+              onClick={() => {
+                setActionError('')
+                setIsAddGiftOpen(true)
+              }}
             >
               <Icon name="plus" className="h-5 w-5" />
               Adicionar presente
@@ -258,15 +295,42 @@ function ListDetailPage() {
           </div>
         </div>
 
-        <GiftList gifts={filteredGifts} onEdit={setEditingGift} />
+        <GiftList
+          gifts={filteredGifts}
+          onEdit={(gift) => {
+            setActionError('')
+            setEditingGift(gift)
+          }}
+          onReleaseReserve={async (gift) => {
+            try {
+              await releaseGiftReservation(list.id, gift.id)
+              showNotice('Reserva liberada.')
+            } catch (submitError) {
+              showActionError(
+                'Não foi possível liberar a reserva. Tente novamente.',
+                submitError
+              )
+            }
+          }}
+        />
       </section>
+
+      <ActivityTimeline activity={list.activity} createdAt={list.createdAt} />
 
       {isEditListOpen ? (
         <Modal
           title="Editar lista"
           description="Atualize os dados principais do evento."
-          onClose={() => setIsEditListOpen(false)}
+          onClose={() => {
+            setActionError('')
+            setIsEditListOpen(false)
+          }}
         >
+          {actionError ? (
+            <p className="mb-5 rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
+              {actionError}
+            </p>
+          ) : null}
           <ListForm
             framed={false}
             initialValue={list}
@@ -274,16 +338,27 @@ function ListDetailPage() {
             submitLabel="Salvar alterações"
             onCancel={() => setIsEditListOpen(false)}
             onSubmit={async (value) => {
-              await updateWishlistDetails(list.id, {
-                ...getListDetails(list),
-                title: value.title,
-                eventDate: value.eventDate,
-                eventType: value.eventType,
-                ownerName: value.ownerName,
-                message: value.message,
-              })
-              setIsEditListOpen(false)
-              showNotice('Lista atualizada.')
+              try {
+                await updateWishlistDetails(
+                  list.id,
+                  {
+                    ...getListDetails(list),
+                    title: value.title,
+                    eventDate: value.eventDate,
+                    eventType: value.eventType,
+                    ownerName: value.ownerName,
+                    message: value.message,
+                  },
+                  'list_updated'
+                )
+                setIsEditListOpen(false)
+                showNotice('Lista atualizada.')
+              } catch (submitError) {
+                showActionError(
+                  'Não foi possível atualizar a lista. Tente novamente.',
+                  submitError
+                )
+              }
             }}
           />
         </Modal>
@@ -293,9 +368,17 @@ function ListDetailPage() {
         <Modal
           title="Opções da lista"
           description="Edite as categorias e faixas usadas nos presentes desta lista."
-          onClose={() => setIsOptionsOpen(false)}
+          onClose={() => {
+            setActionError('')
+            setIsOptionsOpen(false)
+          }}
         >
           <div className="grid gap-5">
+            {actionError ? (
+              <p className="rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
+                {actionError}
+              </p>
+            ) : null}
             <ListOptionsEditor
               value={optionsDraft}
               onChange={setOptionsDraft}
@@ -304,7 +387,10 @@ function ListDetailPage() {
               <button
                 type="button"
                 className="ui-button-secondary w-full"
-                onClick={() => setIsOptionsOpen(false)}
+                onClick={() => {
+                  setActionError('')
+                  setIsOptionsOpen(false)
+                }}
               >
                 Cancelar
               </button>
@@ -312,15 +398,23 @@ function ListDetailPage() {
                 type="button"
                 className="ui-button-primary w-full"
                 onClick={async () => {
-                  await updateWishlistDetails(
-                    list.id,
-                    getListDetails(
-                      list,
-                      normalizeWishlistOptions(optionsDraft)
+                  try {
+                    await updateWishlistDetails(
+                      list.id,
+                      getListDetails(
+                        list,
+                        normalizeWishlistOptions(optionsDraft)
+                      ),
+                      'options_updated'
                     )
-                  )
-                  setIsOptionsOpen(false)
-                  showNotice('Opções da lista atualizadas.')
+                    setIsOptionsOpen(false)
+                    showNotice('Opções da lista atualizadas.')
+                  } catch (submitError) {
+                    showActionError(
+                      'Não foi possível salvar as opções. Tente novamente.',
+                      submitError
+                    )
+                  }
                 }}
               >
                 Salvar opções
@@ -351,16 +445,39 @@ function ListDetailPage() {
         <Modal
           title="Adicionar presente"
           description="Cadastre um novo item para esta lista."
-          onClose={() => setIsAddGiftOpen(false)}
+          onClose={() => {
+            setActionError('')
+            setIsAddGiftOpen(false)
+          }}
+          size="wide"
         >
+          {actionError ? (
+            <p className="mb-5 rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
+              {actionError}
+            </p>
+          ) : null}
           <GiftForm
             options={list.options}
+            previewGifts={list.gifts}
+            listPreviewTitle="Prévia da sua lista"
+            draftKey={`mimo-meu:gift-draft:${list.id}`}
+            allowDraftSave
             submitLabel="Adicionar presente"
-            onCancel={() => setIsAddGiftOpen(false)}
-            onSubmit={async (gift) => {
-              await addGift(list.id, gift)
+            onCancel={() => {
+              setActionError('')
               setIsAddGiftOpen(false)
-              showNotice('Presente adicionado.')
+            }}
+            onSubmit={async (gift) => {
+              try {
+                await addGift(list.id, gift)
+                setIsAddGiftOpen(false)
+                showNotice('Presente adicionado.')
+              } catch (submitError) {
+                showActionError(
+                  'Não foi possível adicionar o presente. Tente novamente.',
+                  submitError
+                )
+              }
             }}
           />
         </Modal>
@@ -370,17 +487,38 @@ function ListDetailPage() {
         <Modal
           title="Editar presente"
           description="Atualize nome, descrição, preço, prioridade ou link."
-          onClose={() => setEditingGift(null)}
+          onClose={() => {
+            setActionError('')
+            setEditingGift(null)
+          }}
+          size="wide"
         >
+          {actionError ? (
+            <p className="mb-5 rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
+              {actionError}
+            </p>
+          ) : null}
           <GiftForm
             options={list.options}
+            previewGifts={list.gifts}
+            listPreviewTitle="Prévia da sua lista"
             initialValue={editingGift}
             submitLabel="Salvar presente"
-            onCancel={() => setEditingGift(null)}
-            onSubmit={async (gift) => {
-              await updateGift(list.id, gift)
+            onCancel={() => {
+              setActionError('')
               setEditingGift(null)
-              showNotice('Presente atualizado.')
+            }}
+            onSubmit={async (gift) => {
+              try {
+                await updateGift(list.id, gift)
+                setEditingGift(null)
+                showNotice('Presente atualizado.')
+              } catch (submitError) {
+                showActionError(
+                  'Não foi possível salvar o presente. Tente novamente.',
+                  submitError
+                )
+              }
             }}
           />
         </Modal>

@@ -175,7 +175,12 @@ function AuthPage() {
 
         {mode === 'signup' ? (
           <label className="ui-label">
-            Nome
+            <span className="flex items-center justify-between gap-3">
+              Nome
+              <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+                Obrigatório
+              </span>
+            </span>
             <input
               className="ui-field"
               placeholder="Seu nome"
@@ -187,7 +192,12 @@ function AuthPage() {
         ) : null}
 
         <label className="ui-label">
-          E-mail
+          <span className="flex items-center justify-between gap-3">
+            E-mail
+            <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+              Obrigatório
+            </span>
+          </span>
           <input
             type="email"
             className="ui-field"
@@ -199,7 +209,12 @@ function AuthPage() {
         </label>
 
         <label className="ui-label">
-          Senha
+          <span className="flex items-center justify-between gap-3">
+            Senha
+            <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+              Obrigatório
+            </span>
+          </span>
           <input
             type="password"
             className="ui-field"

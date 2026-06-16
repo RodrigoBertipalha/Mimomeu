@@ -6,47 +6,68 @@ type GiftListProps = {
   onReserve?: (gift: Gift) => void
   onReleaseReserve?: (gift: Gift) => void
   onEdit?: (gift: Gift) => void
+  emptyTitle?: string
+  emptyDescription?: string
 }
 
 const photoClasses = ['ui-photo-gift', 'ui-photo-table', 'ui-photo-kitchen']
 
 function priorityClass(priority: Gift['priority']) {
   if (priority === 'Alta') {
-    return 'bg-[var(--color-tertiary-soft)] text-[var(--color-tertiary-deep)]'
+    return 'border-[rgba(255,181,154,0.38)] bg-[rgba(255,181,154,0.14)] text-[var(--color-secondary-deep)]'
   }
 
   if (priority === 'Média') {
-    return 'bg-[var(--color-secondary-soft)] text-[var(--color-secondary-deep)]'
+    return 'border-[rgba(190,205,164,0.34)] bg-[rgba(190,205,164,0.13)] text-[var(--color-primary-deep)]'
   }
 
-  return 'bg-[rgba(119,119,116,0.13)] text-[var(--color-muted)]'
+  return 'border-[rgba(255,255,255,0.16)] bg-[rgba(17,19,22,0.46)] text-[var(--color-muted)]'
 }
 
-function GiftList({ gifts, onReserve, onReleaseReserve, onEdit }: GiftListProps) {
+function GiftList({
+  gifts,
+  onReserve,
+  onReleaseReserve,
+  onEdit,
+  emptyTitle,
+  emptyDescription,
+}: GiftListProps) {
   if (!gifts.length) {
     return (
       <div className="rounded-lg border border-dashed border-[var(--color-line)] bg-[var(--color-empty-bg)] p-8 text-center shadow-[var(--shadow-soft)]">
         <p className="text-sm font-bold text-[var(--color-text)]">
-          Nenhum presente cadastrado
+          {emptyTitle ?? 'Nenhum presente cadastrado'}
         </p>
         <p className="mt-1 text-sm text-[var(--color-muted)]">
-          Quando você adicionar itens, eles aparecem aqui.
+          {emptyDescription ??
+            'Quando você adicionar itens, eles aparecem aqui.'}
         </p>
       </div>
     )
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+    <div
+      className={
+        onEdit
+          ? 'grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'
+          : 'grid gap-6 sm:grid-cols-2 xl:grid-cols-3'
+      }
+    >
       {gifts.map((gift, index) => {
         const photoClass = photoClasses[index % photoClasses.length]
+        const photoContainerClass = onEdit
+          ? `relative aspect-[4/5] overflow-hidden ${photoClass}`
+          : `ui-photo relative aspect-[1.15/1] ${photoClass}`
+        const badgeBase =
+          'inline-flex min-h-8 items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-bold backdrop-blur-md'
 
         return (
           <article
             key={gift.id}
             className={
               onEdit
-                ? 'ui-panel cursor-pointer overflow-hidden p-3 transition hover:-translate-y-0.5 hover:border-[var(--color-primary-deep)]'
+                ? 'ui-panel cursor-pointer overflow-hidden transition duration-300 hover:-translate-y-0.5 hover:border-[var(--color-primary-deep)]'
                 : 'ui-panel overflow-hidden p-3'
             }
             role={onEdit ? 'button' : undefined}
@@ -63,12 +84,16 @@ function GiftList({ gifts, onReserve, onReleaseReserve, onEdit }: GiftListProps)
                 : undefined
             }
           >
-            <div className={`ui-photo relative aspect-[1.15/1] ${photoClass}`}>
+            <div className={photoContainerClass}>
               {gift.imageUrl ? (
                 <img
                   src={gift.imageUrl}
                   alt=""
-                  className="h-full w-full object-cover"
+                  className={
+                    gift.reserved && onEdit
+                      ? 'h-full w-full object-cover opacity-60 grayscale-[30%] transition duration-700 hover:scale-105'
+                      : 'h-full w-full object-cover transition duration-700 hover:scale-105'
+                  }
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-[var(--color-primary-deep)]">
@@ -76,19 +101,58 @@ function GiftList({ gifts, onReserve, onReleaseReserve, onEdit }: GiftListProps)
                 </div>
               )}
 
-              <span
-                className={
-                  gift.reserved
-                    ? 'ui-badge absolute left-3 top-3 bg-[var(--color-tertiary-soft)] text-[var(--color-tertiary-deep)]'
-                    : 'ui-badge absolute left-3 top-3 bg-[var(--color-primary-soft)] text-[var(--color-primary-deep)]'
-                }
-              >
-                <span className="mr-1 h-2 w-2 rounded-full bg-current" />
-                {gift.reserved ? 'Reservado' : 'Disponível'}
-              </span>
+              {onEdit ? (
+                <button
+                  type="button"
+                  className="absolute right-3 top-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-[rgba(17,19,22,0.74)] text-[var(--color-muted)] backdrop-blur-md transition hover:bg-[rgba(17,19,22,0.9)] hover:text-[var(--color-primary-deep)] focus:outline-none focus:ring-4 focus:ring-[rgba(141,163,130,0.2)]"
+                  aria-label={`Editar ${gift.name}`}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    onEdit(gift)
+                  }}
+                >
+                  <Icon name="edit" className="h-5 w-5" />
+                </button>
+              ) : null}
+
+              {gift.reserved && onEdit ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-[rgba(17,19,22,0.16)]">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(51,53,56,0.72)] px-4 py-2 text-sm font-bold text-[var(--color-muted)] backdrop-blur-md">
+                    <Icon name="lock" className="h-4 w-4" />
+                    Reservado
+                  </span>
+                </div>
+              ) : null}
+
+              <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
+                <span
+                  className={
+                    gift.reserved
+                      ? `${badgeBase} border-[rgba(255,255,255,0.14)] bg-[rgba(51,53,56,0.58)] text-[var(--color-muted)]`
+                      : `${badgeBase} border-[rgba(190,205,164,0.34)] bg-[rgba(190,205,164,0.13)] text-[var(--color-primary-deep)]`
+                  }
+                >
+                  {gift.reserved ? 'Reservado' : 'Disponível'}
+                </span>
+                {gift.priority ? (
+                  <span className={`${badgeBase} ${priorityClass(gift.priority)}`}>
+                    {gift.priority === 'Alta' ? (
+                      <Icon name="star" className="h-3.5 w-3.5" />
+                    ) : null}
+                    {gift.priority} prioridade
+                  </span>
+                ) : null}
+                {gift.hasDiscount ? (
+                  <span
+                    className={`${badgeBase} border-[rgba(190,205,164,0.34)] bg-[rgba(190,205,164,0.13)] text-[var(--color-primary-deep)]`}
+                  >
+                    Com desconto
+                  </span>
+                ) : null}
+              </div>
             </div>
 
-            <div className="px-2 pb-2 pt-4">
+            <div className={onEdit ? 'p-5' : 'px-2 pb-2 pt-4'}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <h3 className="break-words text-lg font-extrabold">
@@ -101,19 +165,6 @@ function GiftList({ gifts, onReserve, onReleaseReserve, onEdit }: GiftListProps)
                 <span className="shrink-0 text-xs font-medium text-[var(--color-muted)]">
                   Qtd: 1
                 </span>
-              </div>
-
-              <div className="mt-3 flex flex-wrap gap-2">
-                {gift.priority ? (
-                  <span className={`ui-badge ${priorityClass(gift.priority)}`}>
-                    Prioridade {gift.priority}
-                  </span>
-                ) : null}
-                {gift.hasDiscount ? (
-                  <span className="ui-badge bg-[var(--color-primary-soft)] text-[var(--color-primary-deep)]">
-                    Com desconto
-                  </span>
-                ) : null}
               </div>
 
               {gift.note ? (
@@ -143,19 +194,6 @@ function GiftList({ gifts, onReserve, onReleaseReserve, onEdit }: GiftListProps)
               ) : null}
 
               <div className="mt-5 grid gap-2">
-                {onEdit ? (
-                  <button
-                    type="button"
-                    className="ui-button-secondary w-full"
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      onEdit(gift)
-                    }}
-                  >
-                    Editar presente
-                  </button>
-                ) : null}
-
                 {onReserve ? (
                   <button
                     type="button"
