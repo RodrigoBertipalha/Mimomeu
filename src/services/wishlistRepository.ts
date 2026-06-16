@@ -2,6 +2,11 @@ import { supabase } from '../lib/supabase'
 import type { Gift, GiftPriority, ReservationGuest, Wishlist } from '../types/wishlist'
 import { normalizeWishlistOptions } from '../utils/wishlistOptions'
 
+type RepositoryError = {
+  code?: string
+  message?: string
+}
+
 type ReservationRow = {
   id: string
   guest_name: string
@@ -45,6 +50,20 @@ function ensureSupabase() {
   }
 
   return supabase
+}
+
+let supportsWishlistOptions = true
+
+function isMissingWishlistOptionsError(error: unknown) {
+  const repositoryError = error as RepositoryError
+  const message = repositoryError.message?.toLowerCase() ?? ''
+
+  return (
+    repositoryError.code === '42703' ||
+    repositoryError.code === 'PGRST204' ||
+    message.includes('gift_categories') ||
+    message.includes('price_ranges')
+  )
 }
 
 function normalizePriority(value: string): GiftPriority {
@@ -100,19 +119,50 @@ function mapWishlist(row: WishlistRow | Wishlist): Wishlist {
   }
 }
 
-function wishlistPayload(value: Wishlist, ownerId: string) {
+function wishlistPayload(
+  value: Wishlist,
+  ownerId: string,
+  includeOptions = supportsWishlistOptions
+) {
   const options = normalizeWishlistOptions(value.options)
-
-  return {
+  const payload = {
     owner_id: ownerId,
     title: value.title.trim(),
     event_date: value.eventDate || null,
     event_type: value.eventType || '',
     owner_name: value.ownerName || '',
     message: value.message || '',
-    gift_categories: options.categories,
-    price_ranges: options.priceRanges,
   }
+
+  return includeOptions
+    ? {
+        ...payload,
+        gift_categories: options.categories,
+        price_ranges: options.priceRanges,
+      }
+    : payload
+}
+
+function wishlistDetailsPayload(
+  value: Omit<Wishlist, 'gifts'>,
+  includeOptions = supportsWishlistOptions
+) {
+  const options = normalizeWishlistOptions(value.options)
+  const payload = {
+    title: value.title.trim(),
+    event_date: value.eventDate || null,
+    event_type: value.eventType || '',
+    owner_name: value.ownerName || '',
+    message: value.message || '',
+  }
+
+  return includeOptions
+    ? {
+        ...payload,
+        gift_categories: options.categories,
+        price_ranges: options.priceRanges,
+      }
+    : payload
 }
 
 function giftPayload(value: Gift, wishlistId: string) {
@@ -162,12 +212,58 @@ const wishlistSelect = `
   )
 `
 
+const legacyWishlistSelect = `
+  id,
+  title,
+  event_date,
+  event_type,
+  owner_name,
+  message,
+  public_slug,
+  created_at,
+  updated_at,
+  gifts (
+    id,
+    name,
+    product_url,
+    note,
+    category,
+    price_range,
+    image_url,
+    has_discount,
+    priority,
+    created_at,
+    updated_at,
+    reservations (
+      id,
+      guest_name,
+      guest_contact,
+      created_at
+    )
+  )
+`
+
+function getWishlistSelect() {
+  return supportsWishlistOptions ? wishlistSelect : legacyWishlistSelect
+}
+
 export async function fetchWishlists() {
   const client = ensureSupabase()
-  const { data, error } = await client
+  let { data, error } = await client
     .from('wishlists')
-    .select(wishlistSelect)
+    .select(getWishlistSelect())
     .order('created_at', { ascending: false })
+
+  if (error && supportsWishlistOptions && isMissingWishlistOptionsError(error)) {
+    supportsWishlistOptions = false
+    const fallback = await client
+      .from('wishlists')
+      .select(legacyWishlistSelect)
+      .order('created_at', { ascending: false })
+
+    data = fallback.data
+    error = fallback.error
+  }
 
   if (error) throw error
 
@@ -176,11 +272,23 @@ export async function fetchWishlists() {
 
 export async function fetchWishlist(listId: string) {
   const client = ensureSupabase()
-  const { data, error } = await client
+  let { data, error } = await client
     .from('wishlists')
-    .select(wishlistSelect)
+    .select(getWishlistSelect())
     .eq('id', listId)
     .single()
+
+  if (error && supportsWishlistOptions && isMissingWishlistOptionsError(error)) {
+    supportsWishlistOptions = false
+    const fallback = await client
+      .from('wishlists')
+      .select(legacyWishlistSelect)
+      .eq('id', listId)
+      .single()
+
+    data = fallback.data
+    error = fallback.error
+  }
 
   if (error) throw error
 
@@ -189,11 +297,23 @@ export async function fetchWishlist(listId: string) {
 
 export async function createRemoteWishlist(value: Wishlist, ownerId: string) {
   const client = ensureSupabase()
-  const { data, error } = await client
+  let { data, error } = await client
     .from('wishlists')
     .insert(wishlistPayload(value, ownerId))
-    .select(wishlistSelect)
+    .select(getWishlistSelect())
     .single()
+
+  if (error && supportsWishlistOptions && isMissingWishlistOptionsError(error)) {
+    supportsWishlistOptions = false
+    const fallback = await client
+      .from('wishlists')
+      .insert(wishlistPayload(value, ownerId, false))
+      .select(legacyWishlistSelect)
+      .single()
+
+    data = fallback.data
+    error = fallback.error
+  }
 
   if (error) throw error
 
@@ -205,21 +325,25 @@ export async function updateRemoteWishlist(
   value: Omit<Wishlist, 'gifts'>
 ) {
   const client = ensureSupabase()
-  const options = normalizeWishlistOptions(value.options)
-  const { data, error } = await client
+  let { data, error } = await client
     .from('wishlists')
-    .update({
-      title: value.title.trim(),
-      event_date: value.eventDate || null,
-      event_type: value.eventType || '',
-      owner_name: value.ownerName || '',
-      message: value.message || '',
-      gift_categories: options.categories,
-      price_ranges: options.priceRanges,
-    })
+    .update(wishlistDetailsPayload(value))
     .eq('id', listId)
-    .select(wishlistSelect)
+    .select(getWishlistSelect())
     .single()
+
+  if (error && supportsWishlistOptions && isMissingWishlistOptionsError(error)) {
+    supportsWishlistOptions = false
+    const fallback = await client
+      .from('wishlists')
+      .update(wishlistDetailsPayload(value, false))
+      .eq('id', listId)
+      .select(legacyWishlistSelect)
+      .single()
+
+    data = fallback.data
+    error = fallback.error
+  }
 
   if (error) throw error
 

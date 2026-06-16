@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
 type ModalProps = {
   title: string
@@ -8,8 +9,8 @@ type ModalProps = {
 }
 
 function Modal({ title, description, children, onClose }: ModalProps) {
-  return (
-    <div className="fixed inset-0 z-30 grid place-items-center overflow-y-auto bg-[rgba(36,39,33,0.28)] px-4 py-8 backdrop-blur-sm">
+  return createPortal(
+    <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-[rgba(36,39,33,0.28)] px-4 py-8 backdrop-blur-sm">
       <section className="ui-panel w-full max-w-3xl p-5 sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -31,7 +32,8 @@ function Modal({ title, description, children, onClose }: ModalProps) {
 
         <div className="mt-5">{children}</div>
       </section>
-    </div>
+    </div>,
+    document.body
   )
 }
 
