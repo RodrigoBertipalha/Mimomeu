@@ -113,7 +113,7 @@ function ListDetailPage() {
 
   return (
     <section className="grid gap-10">
-      <header className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+      <header className="grid gap-5">
         <div>
           <Link to="/list" className="ui-link inline-flex items-center gap-2">
             <Icon name="arrow-left" className="h-4 w-4" />
@@ -132,37 +132,40 @@ function ListDetailPage() {
           </p>
         </div>
 
-        <div className="grid gap-3 sm:min-w-72">
+        <div className="flex flex-col gap-3 rounded-lg border border-[var(--color-line)] bg-[rgba(255,253,248,0.72)] p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="grid gap-2 sm:flex sm:flex-wrap">
+            <button
+              type="button"
+              className="ui-button-secondary h-10 justify-center rounded-md px-4 text-xs"
+              onClick={() => setIsEditListOpen(true)}
+            >
+              Editar lista
+            </button>
+            <button
+              type="button"
+              className="ui-button-secondary h-10 justify-center rounded-md px-4 text-xs"
+              onClick={openOptionsModal}
+            >
+              <Icon name="filter" className="h-4 w-4" />
+              Opções
+            </button>
+            <Link
+              to={list.publicSlug ? `/g/${list.publicSlug}` : `/list/${list.id}/guest`}
+              className="ui-button-secondary h-10 justify-center rounded-md px-4 text-xs"
+            >
+              <Icon name="heart" className="h-4 w-4" />
+              Ver convidado
+            </Link>
+          </div>
+
           <button
             type="button"
-            className="ui-button-secondary justify-center"
-            onClick={() => setIsEditListOpen(true)}
-          >
-            Editar lista
-          </button>
-          <button
-            type="button"
-            className="ui-button-secondary justify-center"
-            onClick={openOptionsModal}
-          >
-            <Icon name="filter" className="h-5 w-5" />
-            Opções da lista
-          </button>
-          <button
-            type="button"
-            className="ui-button-primary justify-center"
+            className="ui-button-primary h-10 justify-center rounded-md px-5 text-xs sm:min-w-40"
             onClick={() => setIsShareOpen(true)}
           >
-            <Icon name="share" className="h-5 w-5" />
+            <Icon name="share" className="h-4 w-4" />
             Compartilhar
           </button>
-          <Link
-            to={list.publicSlug ? `/g/${list.publicSlug}` : `/list/${list.id}/guest`}
-            className="ui-button-secondary justify-center"
-          >
-            <Icon name="heart" className="h-5 w-5" />
-            Ver como convidado
-          </Link>
         </div>
       </header>
 
