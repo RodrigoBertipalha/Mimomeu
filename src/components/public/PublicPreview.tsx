@@ -1,6 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import type { Gift, Wishlist } from '../../types/wishlist'
-import { normalizeWishlistOptions } from '../../utils/wishlistOptions'
+import { isGiftFullyReserved } from '../../utils/gifts'
+import {
+  getListTypeConfig,
+  normalizeWishlistKind,
+} from '../../utils/listTypes'
+import {
+  normalizeWishlistOptions,
+  usesWishlistCategories,
+  usesWishlistPriceRanges,
+} from '../../utils/wishlistOptions'
 import GiftList from '../gifts/GiftList'
 import Icon from '../ui/Icon'
 
@@ -42,77 +51,83 @@ function rankByOption(value: string, options: string[]) {
 }
 
 function PublicPreview({ list, onReserve }: PublicPreviewProps) {
+  const listKind = normalizeWishlistKind(list.listKind)
+  const config = getListTypeConfig(listKind)
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [priceFilter, setPriceFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
-  const [sortMode, setSortMode] = useState<SortMode>('priority')
-  const options = useMemo(
-    () => normalizeWishlistOptions(list.options),
-    [list.options]
+  const [sortMode, setSortMode] = useState<SortMode>(
+    listKind === 'potluck' ? 'available' : 'priority'
   )
-  const categoryOptions = useMemo(
-    () =>
-      uniqueClean([
-        ...list.gifts.map((gift) => gift.category),
-        ...options.categories,
-      ]),
-    [list.gifts, options.categories]
-  )
-  const priceRangeOptions = useMemo(
-    () =>
-      uniqueClean([
-        ...options.priceRanges,
-        ...list.gifts.map((gift) => gift.priceRange),
-      ]),
-    [list.gifts, options.priceRanges]
-  )
-  const filteredGifts = useMemo(() => {
-    return [...list.gifts]
-      .filter((gift) => {
-        const matchesCategory =
-          categoryFilter === 'all' || gift.category === categoryFilter
-        const matchesPrice =
-          priceFilter === 'all' || gift.priceRange === priceFilter
-        const matchesStatus =
-          statusFilter === 'all' ||
-          (statusFilter === 'available' && !gift.reserved) ||
-          (statusFilter === 'reserved' && gift.reserved)
+  const options = normalizeWishlistOptions(list.options, listKind)
+  const showCategories = usesWishlistCategories(options)
+  const showPriceRanges = usesWishlistPriceRanges(options)
+  const effectiveSortMode =
+    !showPriceRanges && sortMode === 'price' ? 'available' : sortMode
+  const categoryOptions = uniqueClean([
+    ...list.gifts.map((gift) => gift.category),
+    ...options.categories,
+  ])
+  const priceRangeOptions = uniqueClean([
+    ...options.priceRanges,
+    ...list.gifts.map((gift) => gift.priceRange),
+  ])
+  const filteredGifts = [...list.gifts]
+    .filter((gift) => {
+      const isFull = isGiftFullyReserved(gift)
+      const matchesCategory =
+        !showCategories ||
+        categoryFilter === 'all' ||
+        gift.category === categoryFilter
+      const matchesPrice =
+        !showPriceRanges ||
+        priceFilter === 'all' ||
+        gift.priceRange === priceFilter
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'available' && !isFull) ||
+        (statusFilter === 'reserved' && isFull)
 
-        return matchesCategory && matchesPrice && matchesStatus
-      })
-      .sort((a, b) => {
-        if (sortMode === 'available') {
-          return (
-            Number(a.reserved) - Number(b.reserved) ||
-            priorityOrder[b.priority] - priorityOrder[a.priority] ||
-            a.name.localeCompare(b.name, 'pt-BR')
-          )
-        }
-
-        if (sortMode === 'price') {
-          return (
-            rankByOption(a.priceRange, priceRangeOptions) -
-              rankByOption(b.priceRange, priceRangeOptions) ||
-            priorityOrder[b.priority] - priorityOrder[a.priority] ||
-            a.name.localeCompare(b.name, 'pt-BR')
-          )
-        }
-
-        if (sortMode === 'name') {
-          return a.name.localeCompare(b.name, 'pt-BR')
-        }
-
+      return matchesCategory && matchesPrice && matchesStatus
+    })
+    .sort((a, b) => {
+      if (effectiveSortMode === 'available') {
         return (
+          Number(isGiftFullyReserved(a)) - Number(isGiftFullyReserved(b)) ||
           priorityOrder[b.priority] - priorityOrder[a.priority] ||
-          Number(a.reserved) - Number(b.reserved) ||
           a.name.localeCompare(b.name, 'pt-BR')
         )
-      })
-  }, [categoryFilter, list.gifts, priceFilter, priceRangeOptions, sortMode, statusFilter])
+      }
+
+      if (effectiveSortMode === 'price') {
+        return (
+          rankByOption(a.priceRange, priceRangeOptions) -
+            rankByOption(b.priceRange, priceRangeOptions) ||
+          priorityOrder[b.priority] - priorityOrder[a.priority] ||
+          a.name.localeCompare(b.name, 'pt-BR')
+        )
+      }
+
+      if (effectiveSortMode === 'name') {
+        return a.name.localeCompare(b.name, 'pt-BR')
+      }
+
+      return (
+        priorityOrder[b.priority] - priorityOrder[a.priority] ||
+        Number(isGiftFullyReserved(a)) - Number(isGiftFullyReserved(b)) ||
+        a.name.localeCompare(b.name, 'pt-BR')
+      )
+    })
   const hasActiveFilters =
-    categoryFilter !== 'all' || priceFilter !== 'all' || statusFilter !== 'all'
+    (showCategories && categoryFilter !== 'all') ||
+    (showPriceRanges && priceFilter !== 'all') ||
+    statusFilter !== 'all'
   const eventName = list.title || 'sua lista'
-  const ownerNames = list.ownerName || 'quem está celebrando'
+  const ownerNames = list.ownerName || 'quem está organizando'
+  const publicDescription = config.publicDescription.replace(
+    '{ownerNames}',
+    ownerNames
+  )
 
   function clearFilters() {
     setCategoryFilter('all')
@@ -122,7 +137,7 @@ function PublicPreview({ list, onReserve }: PublicPreviewProps) {
 
   return (
     <section className="grid gap-8">
-      <header className="grid items-start gap-8 lg:grid-cols-[1fr_180px]">
+      <header className="grid items-start gap-8">
         <div>
           <span className="ui-badge bg-[var(--color-secondary-soft)] text-[var(--color-secondary-deep)]">
             Convite especial
@@ -134,47 +149,48 @@ function PublicPreview({ list, onReserve }: PublicPreviewProps) {
             </span>
           </h2>
           <p className="mt-5 max-w-3xl text-base leading-7 text-[var(--color-muted)]">
-            Estamos muito felizes em compartilhar esse momento com você. Escolha
-            um presente da lista de {ownerNames} para celebrar com carinho.
+            {publicDescription}
           </p>
         </div>
-
-        <div className="ui-photo ui-photo-gift hidden aspect-square rounded-full border-[10px] border-[var(--color-photo-border)] shadow-[var(--shadow-soft)] lg:block" />
       </header>
 
       <div className="rounded-lg border border-[var(--color-line)] bg-[var(--color-panel-translucent)] p-4">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_1.1fr_auto]">
-          <label className="ui-label">
-            Categoria
-            <select
-              className="ui-field"
-              value={categoryFilter}
-              onChange={(event) => setCategoryFilter(event.target.value)}
-            >
-              <option value="all">Todas</option>
-              {categoryOptions.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </label>
+          {showCategories ? (
+            <label className="ui-label">
+              Categoria
+              <select
+                className="ui-field"
+                value={categoryFilter}
+                onChange={(event) => setCategoryFilter(event.target.value)}
+              >
+                <option value="all">Todas</option>
+                {categoryOptions.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
 
-          <label className="ui-label">
-            Faixa
-            <select
-              className="ui-field"
-              value={priceFilter}
-              onChange={(event) => setPriceFilter(event.target.value)}
-            >
-              <option value="all">Todas</option>
-              {priceRangeOptions.map((priceRange) => (
-                <option key={priceRange} value={priceRange}>
-                  {priceRange}
-                </option>
-              ))}
-            </select>
-          </label>
+          {showPriceRanges ? (
+            <label className="ui-label">
+              Faixa
+              <select
+                className="ui-field"
+                value={priceFilter}
+                onChange={(event) => setPriceFilter(event.target.value)}
+              >
+                <option value="all">Todas</option>
+                {priceRangeOptions.map((priceRange) => (
+                  <option key={priceRange} value={priceRange}>
+                    {priceRange}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
 
           <label className="ui-label">
             Status
@@ -186,8 +202,8 @@ function PublicPreview({ list, onReserve }: PublicPreviewProps) {
               }
             >
               <option value="all">Todos</option>
-              <option value="available">Disponíveis</option>
-              <option value="reserved">Reservados</option>
+              <option value="available">{config.availableLabel}</option>
+              <option value="reserved">{config.reservedLabel}</option>
             </select>
           </label>
 
@@ -195,12 +211,18 @@ function PublicPreview({ list, onReserve }: PublicPreviewProps) {
             Ordenar
             <select
               className="ui-field"
-              value={sortMode}
+              value={effectiveSortMode}
               onChange={(event) => setSortMode(event.target.value as SortMode)}
             >
-              <option value="priority">Mais desejados</option>
-              <option value="available">Disponíveis primeiro</option>
-              <option value="price">Menor faixa de preço</option>
+              {config.showPriority ? (
+                <option value="priority">Mais desejados</option>
+              ) : null}
+              <option value="available">
+                {listKind === 'potluck' ? 'Em aberto primeiro' : 'Disponíveis primeiro'}
+              </option>
+              {showPriceRanges ? (
+                <option value="price">Menor faixa de preço</option>
+              ) : null}
               <option value="name">Nome A-Z</option>
             </select>
           </label>
@@ -219,22 +241,25 @@ function PublicPreview({ list, onReserve }: PublicPreviewProps) {
         </div>
 
         <p className="mt-3 text-sm font-semibold text-[var(--color-muted)]">
-          {filteredGifts.length} de {list.gifts.length} presentes exibidos
+          {filteredGifts.length} de {list.gifts.length} {config.itemPlural} exibidos
         </p>
       </div>
 
       <GiftList
         gifts={filteredGifts}
+        listKind={listKind}
+        showCategories={showCategories}
+        showPriceRange={showPriceRanges}
         onReserve={onReserve}
         emptyTitle={
           list.gifts.length
-            ? 'Nenhum presente encontrado'
-            : 'Nenhum presente cadastrado'
+            ? `Nenhum ${config.itemSingular} encontrado`
+            : `Nenhum ${config.itemSingular} cadastrado`
         }
         emptyDescription={
           list.gifts.length
             ? 'Ajuste os filtros para ver outras opções da lista.'
-            : 'Quando a lista tiver presentes, eles aparecem aqui.'
+            : `Quando a lista tiver ${config.itemPlural}, eles aparecem aqui.`
         }
       />
     </section>

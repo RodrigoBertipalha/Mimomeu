@@ -19,6 +19,10 @@ produção com autenticação, banco remoto e compartilhamento público.
 - [x] Aplicar a migration `supabase/migrations/202606160001_wishlist_options.sql`.
 - [x] Criar a migration `supabase/migrations/202606160002_activity_and_support.sql`.
 - [ ] Aplicar a migration `supabase/migrations/202606160002_activity_and_support.sql`.
+- [x] Criar a migration `supabase/migrations/202606180001_list_kinds_and_potluck.sql`.
+- [ ] Aplicar a migration `supabase/migrations/202606180001_list_kinds_and_potluck.sql`.
+- [x] Criar a migration `supabase/migrations/202606180002_financial_gifts.sql`.
+- [ ] Aplicar a migration `supabase/migrations/202606180002_financial_gifts.sql`.
 - [x] Conferir se Auth por e-mail/senha está habilitado.
 - [x] Desativar confirmação de e-mail no Supabase Auth para o MVP.
 - [x] Configurar URLs de redirect do Supabase para localhost e domínio final.
@@ -49,6 +53,8 @@ produção com autenticação, banco remoto e compartilhamento público.
 - [x] Adicionar filtros e ordenação na visão do convidado.
 - [x] Adicionar preview lateral ao cadastrar presente.
 - [x] Adicionar histórico de atividade da lista.
+- [x] Adicionar tipo de lista para confraternização com múltiplas reservas por item.
+- [x] Adicionar presentes financeiros com meta, valor cheio e contribuição em grupo.
 - [x] Adicionar formulário de suporte em tela com limite de caracteres.
 - [x] Validar `npm run build`.
 - [x] Validar `npm run lint`.
@@ -64,7 +70,7 @@ produção com autenticação, banco remoto e compartilhamento público.
 - [x] Testar criação de lista em produção.
 - [x] Testar compartilhamento público em janela anônima.
 - [x] Testar reserva de presente em janela anônima.
-  `202606160002_activity_and_support.sql`.
+- [ ] Testar contribuição em presente financeiro em janela anônima.
 - [ ] Definir domínio final.
 
 ## Pós-MVP

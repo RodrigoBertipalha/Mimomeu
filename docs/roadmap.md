@@ -8,20 +8,30 @@ sentido para o produto.
 1. A pessoa acessa a Home.
 2. Se quiser criar ou gerenciar listas, entra com e-mail/senha ou Google.
 3. Em **Minhas listas**, cria uma nova lista ou escolhe uma lista existente.
-4. Ao abrir uma lista, vê o resumo geral com reservados, disponíveis e progresso.
-5. Na mesma tela, pesquisa, adiciona ou edita presentes com preview lateral.
-6. O botão **Editar lista** abre um modal para alterar os dados do evento.
-7. O botão **Opções** abre categorias e faixas de preço usadas nos presentes.
-8. O botão **Compartilhar** abre um modal com link público, WhatsApp e e-mail.
-9. O botão **Ver como convidado** abre a tela pública da lista.
-10. O histórico da lista mostra criação/edição de presentes, reservas e
+4. Ao criar uma lista, escolhe o tipo: lista de presentes ou confraternização.
+5. Ao abrir uma lista, vê o resumo geral com reservados, disponíveis e progresso.
+6. Na mesma tela, pesquisa, adiciona ou edita presentes/itens com preview lateral.
+7. O botão **Editar lista** abre um modal para alterar os dados do evento.
+8. O botão **Opções** abre categorias e faixas de preço da lista, permitindo
+   ligar/desligar cada grupo conforme a necessidade.
+9. O botão **Compartilhar** abre um modal com link público, WhatsApp e e-mail.
+10. O botão **Ver como convidado** abre a tela pública da lista.
+11. O histórico da lista mostra criação/edição de presentes, reservas e
     liberações.
-11. Convidados acessam `/g/:publicSlug` sem login.
-12. Convidados filtram e ordenam presentes por categoria, faixa, status e
+12. Convidados acessam `/g/:publicSlug` sem login.
+13. Convidados filtram e ordenam presentes por categoria, faixa, status e
     prioridade.
-13. Convidados reservam presentes disponíveis informando nome e contato opcional.
-14. A reserva atualiza o status do presente para **Reservado**.
-15. A página de suporte coleta mensagens em formulário próprio com limite de
+14. Em listas de confraternização, convidados reservam vagas de itens para levar
+    até atingir o total configurado pelo administrador.
+15. Em listas de presentes, administradores podem cadastrar presentes comuns ou
+    financeiros com meta, valor cheio ou contribuição em grupo.
+16. Convidados reservam presentes/itens disponíveis informando nome e contato
+    opcional.
+17. Convidados contribuem em presentes financeiros informando nome, contato
+    opcional e valor combinado.
+18. A reserva atualiza o status para **Reservado**, **Completo** ou **Meta
+    completa**.
+19. A página de suporte coleta mensagens em formulário próprio com limite de
     caracteres.
 
 ## Rotas
@@ -50,6 +60,10 @@ exceção da Edge Function opcional de reserva.
 - Migration de opções de lista aplicada.
 - Migration `202606160002_activity_and_support.sql` criada para histórico e
   suporte; precisa ser aplicada no Supabase antes dos testes finais em produção.
+- Migration `202606180001_list_kinds_and_potluck.sql` criada para tipos de lista,
+  quantidade por item e múltiplas reservas por item em confraternizações.
+- Migration `202606180002_financial_gifts.sql` criada para presentes financeiros,
+  metas e contribuições registradas por reserva.
 
 O `localStorage` permanece apenas como fallback de desenvolvimento quando as
 variáveis do Supabase não estiverem configuradas.
@@ -85,10 +99,18 @@ Opções práticas:
 - Listar listas do usuário autenticado.
 - Abrir uma lista específica por clique.
 - Editar dados da lista por modal.
+- Escolher tipo da lista na criação: presentes ou confraternização.
 - Editar categorias e faixas de preço por lista.
+- Ligar ou desligar categorias e faixas de preço por lista.
+- Usar categorias específicas e esconder preço/link/prioridade em listas de
+  confraternização.
 - Exibir resumo por lista: reservados, disponíveis e progresso.
 - Adicionar presentes por modal.
 - Editar presentes por modal.
+- Adicionar presente financeiro com meta obrigatória e modo de contribuição por
+  valor cheio ou em grupo.
+- Registrar contribuições em presentes financeiros até completar a meta.
+- Adicionar itens de confraternização com total de reservas por item.
 - Pesquisar presentes dentro da lista aberta.
 - Preview lateral ao adicionar ou editar presente.
 - Exibir status, prioridade, desconto, faixa de preço e link do presente.
@@ -99,7 +121,11 @@ Opções práticas:
 - Acessar visão do convidado em tela separada.
 - Filtrar e ordenar presentes na visão do convidado.
 - Reservar presente sem login com nome e contato opcional.
+- Permitir múltiplas reservas no mesmo item de confraternização até atingir o
+  total configurado.
 - Bloquear nova reserva para presente já reservado.
+- Bloquear nova reserva de item de confraternização quando o total configurado
+  for atingido.
 - Login/cadastro por e-mail e senha.
 - Login com Google no app.
 - Menu de conta com logout, dados do usuário e edição de conta.
@@ -125,12 +151,15 @@ Opções práticas:
 - Backend próprio complexo.
 - Painel administrativo avançado.
 - Notificações por e-mail/SMS.
-- Controle financeiro.
+- Controle financeiro real, carteira, cobrança ou repasse.
 
 ## Próximos passos recomendados
 
 - Aplicar `supabase/migrations/202606160002_activity_and_support.sql` no
   Supabase.
+- Aplicar `supabase/migrations/202606180001_list_kinds_and_potluck.sql` no
+  Supabase.
+- Aplicar `supabase/migrations/202606180002_financial_gifts.sql` no Supabase.
 - Testar em produção: suporte, histórico, criação/edição de presente, reserva
   pública e liberação de reserva.
 - Definir domínio final e revisar URLs de redirect do Supabase/Google.
@@ -140,7 +169,7 @@ Opções práticas:
 
 ## Melhor frente agora
 
-A melhor frente é fechar a estabilização de produção: aplicar a nova migration,
+A melhor frente é fechar a estabilização de produção: aplicar as novas migrations,
 rodar um teste completo em ambiente publicado e resolver domínio/redirects. Depois
 disso, vale atacar Storage para imagens, páginas legais simples e observabilidade
 básica.

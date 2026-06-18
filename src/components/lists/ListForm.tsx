@@ -1,5 +1,9 @@
 import { useState, type FormEvent } from 'react'
-import type { Wishlist } from '../../types/wishlist'
+import type { Wishlist, WishlistKind } from '../../types/wishlist'
+import {
+  getListTypeConfig,
+  normalizeWishlistKind,
+} from '../../utils/listTypes'
 import {
   createDefaultWishlistOptions,
   normalizeWishlistOptions,
@@ -25,12 +29,13 @@ function createInitialState(): Wishlist {
 
   return {
     id: '',
+    listKind: 'gift',
     title: '',
     eventDate: '',
     eventType: '',
     ownerName: '',
     message: '',
-    options: createDefaultWishlistOptions(),
+    options: createDefaultWishlistOptions('gift'),
     gifts: [],
     activity: [],
     createdAt: now,
@@ -54,12 +59,13 @@ function ListForm({
     initialValue
       ? {
           ...initialValue,
-          options: normalizeWishlistOptions(initialValue.options),
+          listKind: normalizeWishlistKind(initialValue.listKind),
+          options: normalizeWishlistOptions(
+            initialValue.options,
+            initialValue.listKind
+          ),
         }
       : createInitialState()
-  )
-  const [optionsMode, setOptionsMode] = useState<'default' | 'custom'>(
-    initialValue ? 'custom' : 'default'
   )
   const [formError, setFormError] = useState('')
 
@@ -68,30 +74,46 @@ function ListForm({
     setFormError('')
   }
 
+  function handleKindChange(value: WishlistKind) {
+    const listKind = normalizeWishlistKind(value)
+    const config = getListTypeConfig(listKind)
+
+    setFormData((prev) => ({
+      ...prev,
+      listKind,
+      eventType: config.defaultEventType,
+      options: createDefaultWishlistOptions(listKind),
+    }))
+    setFormError('')
+  }
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const listKind = normalizeWishlistKind(formData.listKind)
+    const config = getListTypeConfig(listKind)
+
     if (!formData.title.trim()) {
       setFormError('Informe o nome do evento para salvar a lista.')
       return
     }
 
     if (!formData.eventType) {
-      setFormError('Escolha o tipo de evento.')
+      setFormError(`Escolha ${config.eventLabel.toLowerCase()}.`)
       return
     }
 
     onSubmit({
       ...formData,
-      options:
-        showOptionsSetup && optionsMode === 'default'
-          ? createDefaultWishlistOptions()
-          : normalizeWishlistOptions(formData.options),
+      listKind,
+      options: normalizeWishlistOptions(formData.options, listKind),
     })
     if (resetOnSubmit) {
       setFormData(createInitialState())
-      setOptionsMode('default')
     }
   }
+
+  const listKind = normalizeWishlistKind(formData.listKind)
+  const config = getListTypeConfig(listKind)
 
   return (
     <form
@@ -112,6 +134,29 @@ function ListForm({
       <div className="grid gap-5">
         <label className="ui-label">
           <span className="flex items-center justify-between gap-3">
+            Tipo da lista
+            <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+              Obrigatório
+            </span>
+          </span>
+          <select
+            className="ui-field"
+            value={listKind}
+            onChange={(event) =>
+              handleKindChange(event.target.value as WishlistKind)
+            }
+            required
+          >
+            <option value="gift">Lista de presentes</option>
+            <option value="potluck">Confraternização</option>
+          </select>
+          <span className="text-xs font-semibold text-[var(--color-muted)]">
+            {config.description}
+          </span>
+        </label>
+
+        <label className="ui-label">
+          <span className="flex items-center justify-between gap-3">
             Nome do evento
             <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
               Obrigatório
@@ -129,7 +174,7 @@ function ListForm({
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="ui-label">
             <span className="flex items-center justify-between gap-3">
-              Tipo de evento
+              {config.eventLabel}
               <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
                 Obrigatório
               </span>
@@ -140,14 +185,12 @@ function ListForm({
               onChange={(event) => handleChange('eventType', event.target.value)}
               required
             >
-              <option value="">Selecione uma opção</option>
-              <option value="Aniversário">Aniversário</option>
-              <option value="Casamento">Casamento</option>
-              <option value="Chá de bebê">Chá de bebê</option>
-              <option value="Formatura">Formatura</option>
-              <option value="Confraternização">Confraternização</option>
-              <option value="Casa nova">Casa nova</option>
-              <option value="Outro">Outro</option>
+              <option value="">{config.eventPlaceholder}</option>
+              {config.eventTypes.map((eventType) => (
+                <option key={eventType} value={eventType}>
+                  {eventType}
+                </option>
+              ))}
             </select>
           </label>
 
@@ -201,71 +244,20 @@ function ListForm({
           <section className="grid gap-4">
             <div className="space-y-1">
               <h3 className="text-sm font-extrabold text-[var(--color-text)]">
-                Opções da lista
+                {config.optionsTitle}
               </h3>
               <p className="text-sm leading-6 text-[var(--color-muted)]">
-                Categorias e faixas usadas ao cadastrar presentes.
+                {config.optionsDescription}
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 rounded-lg bg-[var(--color-bg-soft)] p-1">
-              <button
-                type="button"
-                className={
-                  optionsMode === 'default'
-                    ? 'ui-button-primary h-11'
-                    : 'ui-button-secondary h-11 border-transparent bg-transparent'
-                }
-                onClick={() => setOptionsMode('default')}
-              >
-                Padrão
-              </button>
-              <button
-                type="button"
-                className={
-                  optionsMode === 'custom'
-                    ? 'ui-button-primary h-11'
-                    : 'ui-button-secondary h-11 border-transparent bg-transparent'
-                }
-                onClick={() => setOptionsMode('custom')}
-              >
-                Personalizar
-              </button>
-            </div>
-
-            {optionsMode === 'custom' ? (
-              <ListOptionsEditor
-                value={formData.options}
-                onChange={(options) =>
-                  setFormData((prev) => ({ ...prev, options }))
-                }
-              />
-            ) : (
-              <div className="grid gap-3 rounded-lg border border-[var(--color-line)] bg-[var(--color-bg-soft)] p-4">
-                <div className="flex flex-wrap gap-2">
-                  {createDefaultWishlistOptions().categories.map((category) => (
-                    <span
-                      key={category}
-                      className="ui-badge bg-[var(--color-card)] text-[var(--color-muted)]"
-                    >
-                      {category}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {createDefaultWishlistOptions().priceRanges.map(
-                    (priceRange) => (
-                      <span
-                        key={priceRange}
-                        className="ui-badge bg-[var(--color-card)] text-[var(--color-muted)]"
-                      >
-                        {priceRange}
-                      </span>
-                    )
-                  )}
-                </div>
-              </div>
-            )}
+            <ListOptionsEditor
+              value={formData.options}
+              listKind={listKind}
+              onChange={(options) =>
+                setFormData((prev) => ({ ...prev, options }))
+              }
+            />
           </section>
         ) : null}
       </div>

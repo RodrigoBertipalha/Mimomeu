@@ -1,6 +1,7 @@
-import type { WishlistOptions } from '../types/wishlist'
+import type { WishlistKind, WishlistOptions } from '../types/wishlist'
+import { normalizeWishlistKind } from './listTypes'
 
-export const DEFAULT_WISHLIST_OPTIONS: WishlistOptions = {
+const DEFAULT_GIFT_OPTIONS: WishlistOptions = {
   categories: ['Cozinha', 'Decoração', 'Casa'],
   priceRanges: [
     'Até R$ 100',
@@ -8,6 +9,26 @@ export const DEFAULT_WISHLIST_OPTIONS: WishlistOptions = {
     'R$ 300 - 700',
     'Acima de R$ 700',
   ],
+}
+
+const DEFAULT_POTLUCK_OPTIONS: WishlistOptions = {
+  categories: [
+    'Pratos típicos',
+    'Bebidas',
+    'Descartáveis',
+    'Sobremesas',
+    'Apoio',
+    'Outros',
+  ],
+  priceRanges: [],
+}
+
+export const DEFAULT_WISHLIST_OPTIONS = DEFAULT_GIFT_OPTIONS
+
+function getDefaultWishlistOptions(kind?: WishlistKind | string | null) {
+  return normalizeWishlistKind(kind) === 'potluck'
+    ? DEFAULT_POTLUCK_OPTIONS
+    : DEFAULT_GIFT_OPTIONS
 }
 
 function uniqueClean(values: unknown, fallback: string[]) {
@@ -25,27 +46,34 @@ function uniqueClean(values: unknown, fallback: string[]) {
       return true
     })
 
-  return cleaned.length ? cleaned : [...fallback]
+  return cleaned
 }
 
-export function createDefaultWishlistOptions(): WishlistOptions {
+export function createDefaultWishlistOptions(
+  kind?: WishlistKind | string | null
+): WishlistOptions {
+  const fallback = getDefaultWishlistOptions(kind)
+
   return {
-    categories: [...DEFAULT_WISHLIST_OPTIONS.categories],
-    priceRanges: [...DEFAULT_WISHLIST_OPTIONS.priceRanges],
+    categories: [...fallback.categories],
+    priceRanges: [...fallback.priceRanges],
   }
 }
 
 export function normalizeWishlistOptions(
-  value?: Partial<WishlistOptions> | null
+  value?: Partial<WishlistOptions> | null,
+  kind?: WishlistKind | string | null
 ): WishlistOptions {
+  const fallback = getDefaultWishlistOptions(kind)
+
   return {
     categories: uniqueClean(
       value?.categories,
-      DEFAULT_WISHLIST_OPTIONS.categories
+      fallback.categories
     ),
     priceRanges: uniqueClean(
       value?.priceRanges,
-      DEFAULT_WISHLIST_OPTIONS.priceRanges
+      fallback.priceRanges
     ),
   }
 }
@@ -59,4 +87,16 @@ export function includeCurrentOption(options: string[], currentValue: string) {
   )
 
   return exists ? options : [current, ...options]
+}
+
+export function usesWishlistCategories(
+  value?: Partial<WishlistOptions> | null
+) {
+  return Array.isArray(value?.categories) && value.categories.length > 0
+}
+
+export function usesWishlistPriceRanges(
+  value?: Partial<WishlistOptions> | null
+) {
+  return Array.isArray(value?.priceRanges) && value.priceRanges.length > 0
 }

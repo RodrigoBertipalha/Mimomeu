@@ -1,8 +1,25 @@
-import type { Gift } from '../../types/wishlist'
+import type { Gift, WishlistKind } from '../../types/wishlist'
+import {
+  formatMoney,
+  getGiftAvailableCount,
+  getGiftContributedAmount,
+  getGiftFundingMode,
+  getGiftQuantity,
+  getGiftRemainingAmount,
+  getGiftReservedCount,
+  getGiftReservations,
+  getGiftTargetAmount,
+  isGiftFinancial,
+  isGiftFullyReserved,
+} from '../../utils/gifts'
+import { getListTypeConfig, normalizeWishlistKind } from '../../utils/listTypes'
 import Icon from '../ui/Icon'
 
 type GiftListProps = {
   gifts: Gift[]
+  listKind?: WishlistKind
+  showCategories?: boolean
+  showPriceRange?: boolean
   onReserve?: (gift: Gift) => void
   onReleaseReserve?: (gift: Gift) => void
   onEdit?: (gift: Gift) => void
@@ -26,21 +43,28 @@ function priorityClass(priority: Gift['priority']) {
 
 function GiftList({
   gifts,
+  listKind = 'gift',
+  showCategories = true,
+  showPriceRange,
   onReserve,
   onReleaseReserve,
   onEdit,
   emptyTitle,
   emptyDescription,
 }: GiftListProps) {
+  const normalizedListKind = normalizeWishlistKind(listKind)
+  const config = getListTypeConfig(normalizedListKind)
+  const shouldShowPriceRange = showPriceRange ?? config.showPriceRange
+
   if (!gifts.length) {
     return (
       <div className="rounded-lg border border-dashed border-[var(--color-line)] bg-[var(--color-empty-bg)] p-8 text-center shadow-[var(--shadow-soft)]">
         <p className="text-sm font-bold text-[var(--color-text)]">
-          {emptyTitle ?? 'Nenhum presente cadastrado'}
+          {emptyTitle ?? `Nenhum ${config.itemSingular} cadastrado`}
         </p>
         <p className="mt-1 text-sm text-[var(--color-muted)]">
           {emptyDescription ??
-            'Quando você adicionar itens, eles aparecem aqui.'}
+            `Quando você adicionar ${config.itemPlural}, eles aparecem aqui.`}
         </p>
       </div>
     )
@@ -55,6 +79,18 @@ function GiftList({
       }
     >
       {gifts.map((gift, index) => {
+        const quantity = getGiftQuantity(gift)
+        const reservedCount = getGiftReservedCount(gift)
+        const availableCount = getGiftAvailableCount(gift)
+        const isFull = isGiftFullyReserved(gift)
+        const isFinancial = isGiftFinancial(gift)
+        const targetAmount = getGiftTargetAmount(gift)
+        const contributedAmount = getGiftContributedAmount(gift)
+        const remainingAmount = getGiftRemainingAmount(gift)
+        const contributionProgress = targetAmount
+          ? Math.min(100, Math.round((contributedAmount / targetAmount) * 100))
+          : 0
+        const reservations = getGiftReservations(gift)
         const photoClass = photoClasses[index % photoClasses.length]
         const photoContainerClass = onEdit
           ? `relative aspect-[4/5] overflow-hidden ${photoClass}`
@@ -90,7 +126,7 @@ function GiftList({
                   src={gift.imageUrl}
                   alt=""
                   className={
-                    gift.reserved && onEdit
+                    isFull && onEdit
                       ? 'h-full w-full object-cover opacity-60 grayscale-[30%] transition duration-700 hover:scale-105'
                       : 'h-full w-full object-cover transition duration-700 hover:scale-105'
                   }
@@ -115,11 +151,11 @@ function GiftList({
                 </button>
               ) : null}
 
-              {gift.reserved && onEdit ? (
+              {isFull && onEdit ? (
                 <div className="absolute inset-0 flex items-center justify-center bg-[rgba(17,19,22,0.16)]">
                   <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(51,53,56,0.72)] px-4 py-2 text-sm font-bold text-[var(--color-muted)] backdrop-blur-md">
                     <Icon name="lock" className="h-4 w-4" />
-                    Reservado
+                    {config.reservedLabel}
                   </span>
                 </div>
               ) : null}
@@ -127,14 +163,24 @@ function GiftList({
               <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
                 <span
                   className={
-                    gift.reserved
+                    isFull
                       ? `${badgeBase} border-[rgba(255,255,255,0.14)] bg-[rgba(51,53,56,0.58)] text-[var(--color-muted)]`
                       : `${badgeBase} border-[rgba(190,205,164,0.34)] bg-[rgba(190,205,164,0.13)] text-[var(--color-primary-deep)]`
                   }
                 >
-                  {gift.reserved ? 'Reservado' : 'Disponível'}
+                  {isFull
+                    ? isFinancial
+                      ? 'Meta completa'
+                      : config.reservedLabel
+                    : isFinancial
+                      ? getGiftFundingMode(gift) === 'shared'
+                        ? 'Presente em grupo'
+                        : 'Valor cheio'
+                    : normalizedListKind === 'potluck'
+                      ? `Faltam ${availableCount}`
+                      : config.availableLabel}
                 </span>
-                {gift.priority ? (
+                {config.showPriority && gift.priority ? (
                   <span className={`${badgeBase} ${priorityClass(gift.priority)}`}>
                     {gift.priority === 'Alta' ? (
                       <Icon name="star" className="h-3.5 w-3.5" />
@@ -142,7 +188,7 @@ function GiftList({
                     {gift.priority} prioridade
                   </span>
                 ) : null}
-                {gift.hasDiscount ? (
+                {config.showDiscount && gift.hasDiscount ? (
                   <span
                     className={`${badgeBase} border-[rgba(190,205,164,0.34)] bg-[rgba(190,205,164,0.13)] text-[var(--color-primary-deep)]`}
                   >
@@ -158,12 +204,18 @@ function GiftList({
                   <h3 className="break-words text-lg font-extrabold">
                     {gift.name}
                   </h3>
-                  <p className="mt-1 text-xs font-semibold text-[var(--color-muted)]">
-                    {gift.category || 'Presente'}
-                  </p>
+                  {showCategories ? (
+                    <p className="mt-1 text-xs font-semibold text-[var(--color-muted)]">
+                      {gift.category || (isFinancial ? 'Financeiro' : config.itemSingular)}
+                    </p>
+                  ) : null}
                 </div>
                 <span className="shrink-0 text-xs font-medium text-[var(--color-muted)]">
-                  Qtd: 1
+                  {isFinancial
+                    ? `${contributionProgress}%`
+                    : normalizedListKind === 'potluck'
+                    ? `${reservedCount}/${quantity}`
+                    : 'Qtd: 1'}
                 </span>
               </div>
 
@@ -173,23 +225,90 @@ function GiftList({
                 </p>
               ) : null}
 
-              <div className="mt-5">
-                <p className="text-xs font-medium text-[var(--color-muted)]">
-                  Faixa de preço
-                </p>
-                <p className="mt-1 text-xl font-extrabold text-[var(--color-primary-deep)]">
-                  {gift.priceRange || 'A definir'}
-                </p>
-              </div>
-
-              {gift.reservedBy ? (
-                <div className="mt-3 rounded-md bg-[var(--color-bg-soft)] px-3 py-2 text-xs font-bold text-[var(--color-secondary-deep)]">
-                  <p>Reservado por: {gift.reservedBy}</p>
-                  {gift.reservedContact ? (
-                    <p className="mt-1 font-semibold text-[var(--color-muted)]">
-                      Contato: {gift.reservedContact}
+              {isFinancial ? (
+                <div className="mt-5">
+                  <div className="flex items-end justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-medium text-[var(--color-muted)]">
+                        Arrecadado
+                      </p>
+                      <p className="mt-1 text-xl font-extrabold text-[var(--color-primary-deep)]">
+                        {formatMoney(contributedAmount)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs font-medium text-[var(--color-muted)]">
+                        Meta
+                      </p>
+                      <p className="mt-1 text-sm font-extrabold text-[var(--color-text)]">
+                        {formatMoney(targetAmount)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="ui-progress-track mt-3 h-2">
+                    <div
+                      className="ui-progress-value"
+                      style={{ width: `${contributionProgress}%` }}
+                    />
+                  </div>
+                  {!isFull ? (
+                    <p className="mt-2 text-xs font-semibold text-[var(--color-muted)]">
+                      Faltam {formatMoney(remainingAmount)}
                     </p>
                   ) : null}
+                </div>
+              ) : shouldShowPriceRange ? (
+                <div className="mt-5">
+                  <p className="text-xs font-medium text-[var(--color-muted)]">
+                    Faixa de preço
+                  </p>
+                  <p className="mt-1 text-xl font-extrabold text-[var(--color-primary-deep)]">
+                    {gift.priceRange || 'A definir'}
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-5">
+                  <p className="text-xs font-medium text-[var(--color-muted)]">
+                    Reservas combinadas
+                  </p>
+                  <p className="mt-1 text-xl font-extrabold text-[var(--color-primary-deep)]">
+                    {reservedCount} de {quantity}
+                  </p>
+                </div>
+              )}
+
+              {reservations.length ? (
+                <div className="mt-3 rounded-md bg-[var(--color-bg-soft)] px-3 py-2 text-xs font-bold text-[var(--color-secondary-deep)]">
+                  <p>
+                    {isFinancial
+                      ? 'Contribuíram:'
+                      : normalizedListKind === 'potluck'
+                      ? 'Vai levar:'
+                      : 'Reservado por:'}{' '}
+                    {reservations.map((reservation) => reservation.guestName).join(', ')}
+                  </p>
+                  {onEdit
+                    ? reservations
+                        .filter(
+                          (reservation) =>
+                            reservation.guestContact ||
+                            reservation.contributionAmount
+                        )
+                        .map((reservation) => (
+                          <p
+                            key={reservation.id}
+                            className="mt-1 font-semibold text-[var(--color-muted)]"
+                          >
+                            {reservation.guestName}: {' '}
+                            {isFinancial
+                              ? formatMoney(reservation.contributionAmount)
+                              : reservation.guestContact}
+                            {isFinancial && reservation.guestContact
+                              ? ` · ${reservation.guestContact}`
+                              : ''}
+                          </p>
+                        ))
+                    : null}
                 </div>
               ) : null}
 
@@ -198,22 +317,30 @@ function GiftList({
                   <button
                     type="button"
                     className={
-                      gift.reserved
+                      isFull
                         ? 'ui-button-secondary w-full cursor-not-allowed opacity-70'
                         : 'ui-button-primary w-full'
                     }
-                    disabled={gift.reserved}
+                    disabled={isFull}
                     onClick={(event) => {
                       event.stopPropagation()
                       onReserve(gift)
                     }}
                   >
                     <Icon name="heart" className="h-5 w-5" />
-                    {gift.reserved ? 'Já reservado' : 'Reservar presente'}
+                    {isFull
+                      ? isFinancial
+                        ? 'Meta completa'
+                        : config.unavailableLabel
+                      : isFinancial
+                        ? getGiftFundingMode(gift) === 'shared'
+                          ? 'Contribuir com grupo'
+                          : 'Contribuir valor cheio'
+                        : config.reserveActionLabel}
                   </button>
                 ) : null}
 
-                {onReleaseReserve && gift.reserved ? (
+                {onReleaseReserve && reservedCount > 0 ? (
                   <button
                     type="button"
                     className="ui-button-secondary w-full"
@@ -222,11 +349,11 @@ function GiftList({
                       onReleaseReserve(gift)
                     }}
                   >
-                    Liberar reserva
+                    {config.releaseActionLabel}
                   </button>
                 ) : null}
 
-                {gift.link ? (
+                {config.showProductLink && gift.link ? (
                   <a
                     href={gift.link}
                     target="_blank"

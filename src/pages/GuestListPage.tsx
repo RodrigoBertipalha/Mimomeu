@@ -4,8 +4,20 @@ import { useAuth } from '../auth/authContext'
 import ReserveGiftModal from '../components/gifts/ReserveGiftModal'
 import PublicPreview from '../components/public/PublicPreview'
 import Icon from '../components/ui/Icon'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { useWishlist } from '../hooks/useWishlist'
 import type { Gift, ReservationGuest, Wishlist } from '../types/wishlist'
+import {
+  getGiftReservations,
+  getGiftReservedCount,
+  getGiftRemainingAmount,
+  isGiftFinancial,
+  isGiftFullyReserved,
+  normalizeMoneyAmount,
+  withGiftAvailability,
+} from '../utils/gifts'
+import { getListTypeConfig, normalizeWishlistKind } from '../utils/listTypes'
+import { usesWishlistPriceRanges } from '../utils/wishlistOptions'
 
 function GuestListPage() {
   const { publicSlug, listId } = useParams()
@@ -17,6 +29,7 @@ function GuestListPage() {
   const [pendingGift, setPendingGift] = useState<Gift | null>(null)
   const [reservedGift, setReservedGift] = useState<Gift | null>(null)
   const [isReserving, setIsReserving] = useState(false)
+  useBodyScrollLock(Boolean(reservedGift))
 
   const publicKey = publicSlug ?? listId ?? ''
 
@@ -53,7 +66,7 @@ function GuestListPage() {
   }, [loadPublicWishlist, publicKey])
 
   function handleReserveRequest(gift: Gift) {
-    if (gift.reserved) return
+    if (isGiftFullyReserved(gift)) return
     setPendingGift(gift)
   }
 
@@ -67,16 +80,34 @@ function GuestListPage() {
       const success = await reservePublicGift(publicKey, pendingGift.id, guest)
       if (!success) {
         setPendingGift(null)
-        setError('Este presente já foi reservado.')
+        setError(
+          getListTypeConfig(list?.listKind).alreadyReservedError
+        )
         return
       }
 
-      setReservedGift({
+      const now = new Date().toISOString()
+      const contributionAmount = isGiftFinancial(pendingGift)
+        ? Math.min(
+            getGiftRemainingAmount(pendingGift),
+            normalizeMoneyAmount(guest.contributionAmount) ||
+              getGiftRemainingAmount(pendingGift)
+          )
+        : 0
+      setReservedGift(withGiftAvailability({
         ...pendingGift,
-        reserved: true,
-        reservedBy: guest.name,
-        reservedContact: guest.contact,
-      })
+        reservedCount: getGiftReservedCount(pendingGift) + 1,
+        reservations: [
+          ...getGiftReservations(pendingGift),
+          {
+            id: `reservation-${Date.now()}`,
+            guestName: guest.name,
+            guestContact: guest.contact,
+            contributionAmount,
+            createdAt: now,
+          },
+        ],
+      }) as Gift)
       setPendingGift(null)
 
       const updated = await loadPublicWishlist(publicKey)
@@ -148,6 +179,8 @@ function GuestListPage() {
       {pendingGift ? (
         <ReserveGiftModal
           gift={pendingGift}
+          listKind={list.listKind}
+          showPriceRange={usesWishlistPriceRanges(list.options)}
           isSubmitting={isReserving}
           onCancel={() => setPendingGift(null)}
           onConfirm={handleReserveConfirm}
@@ -155,16 +188,27 @@ function GuestListPage() {
       ) : null}
 
       {reservedGift ? (
-        <div className="fixed inset-0 z-30 grid place-items-center bg-[var(--color-modal-backdrop)] px-4 backdrop-blur-md">
-          <section className="ui-panel w-full max-w-xl p-8 text-center">
+        <div
+          className="fixed inset-0 z-30 grid place-items-center overflow-y-auto bg-[var(--color-modal-backdrop)] px-4 py-8 backdrop-blur-md"
+          onClick={() => setReservedGift(null)}
+        >
+          <section
+            className="ui-panel w-full max-w-xl p-8 text-center"
+            onClick={(event) => event.stopPropagation()}
+          >
             <span className="mx-auto inline-flex h-24 w-24 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-primary-contrast)]">
               <Icon name="check" className="h-12 w-12" />
             </span>
             <h2 className="mt-6 text-3xl font-extrabold">
-              Reserva confirmada com sucesso!
+              {getListTypeConfig(normalizeWishlistKind(list.listKind))
+                .reserveSuccessTitle}
             </h2>
             <p className="mt-4 text-sm text-[var(--color-muted)]">
-              Você reservou: <strong>{reservedGift.name}</strong>
+              {
+                getListTypeConfig(normalizeWishlistKind(list.listKind))
+                  .reserveSuccessPrefix
+              }{' '}
+              <strong>{reservedGift.name}</strong>
             </p>
             <button
               type="button"

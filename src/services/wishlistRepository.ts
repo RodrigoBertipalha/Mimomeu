@@ -2,11 +2,20 @@ import { supabase } from '../lib/supabase'
 import type {
   Gift,
   GiftPriority,
+  GiftReservation,
   ReservationGuest,
   Wishlist,
   WishlistActivity,
 } from '../types/wishlist'
 import { normalizeWishlistActivity } from '../utils/activity'
+import {
+  normalizeGiftFundingMode,
+  normalizeGiftKind,
+  normalizeGiftQuantity,
+  normalizeMoneyAmount,
+  withGiftAvailability,
+} from '../utils/gifts'
+import { normalizeWishlistKind } from '../utils/listTypes'
 import { normalizeWishlistOptions } from '../utils/wishlistOptions'
 
 type RepositoryError = {
@@ -18,11 +27,15 @@ type ReservationRow = {
   id: string
   guest_name: string
   guest_contact: string
+  contribution_amount?: number
   created_at: string
 }
 
 type GiftRow = {
   id: string
+  gift_kind?: string
+  funding_mode?: string
+  target_amount?: number
   name: string
   product_url: string
   note: string
@@ -31,6 +44,7 @@ type GiftRow = {
   image_url: string
   has_discount: boolean
   priority: string
+  quantity_required?: number
   created_at: string
   updated_at: string
   reservations?: ReservationRow[]
@@ -44,6 +58,7 @@ type WishlistRow = {
   owner_name: string
   message: string
   public_slug: string
+  list_kind?: string
   gift_categories?: string[]
   price_ranges?: string[]
   activity_log?: WishlistActivity[]
@@ -62,6 +77,9 @@ function ensureSupabase() {
 
 let supportsWishlistOptions = true
 let supportsWishlistActivity = true
+let supportsWishlistKind = true
+let supportsGiftQuantity = true
+let supportsFinancialGifts = true
 
 function isMissingWishlistOptionsError(error: unknown) {
   const repositoryError = error as RepositoryError
@@ -80,14 +98,46 @@ function isMissingWishlistActivityError(error: unknown) {
   return message.includes('activity_log')
 }
 
+function isMissingWishlistKindError(error: unknown) {
+  const repositoryError = error as RepositoryError
+  const message = repositoryError.message?.toLowerCase() ?? ''
+
+  return message.includes('list_kind')
+}
+
+function isMissingGiftQuantityError(error: unknown) {
+  const repositoryError = error as RepositoryError
+  const message = repositoryError.message?.toLowerCase() ?? ''
+
+  return message.includes('quantity_required')
+}
+
+function isMissingFinancialGiftError(error: unknown) {
+  const repositoryError = error as RepositoryError
+  const message = repositoryError.message?.toLowerCase() ?? ''
+
+  return (
+    message.includes('gift_kind') ||
+    message.includes('funding_mode') ||
+    message.includes('target_amount') ||
+    message.includes('contribution_amount')
+  )
+}
+
 function rememberMissingWishlistColumns(error: unknown) {
   const repositoryError = error as RepositoryError
   const missingOptions = isMissingWishlistOptionsError(error)
   const missingActivity = isMissingWishlistActivityError(error)
+  const missingKind = isMissingWishlistKindError(error)
+  const missingGiftQuantity = isMissingGiftQuantityError(error)
+  const missingFinancialGifts = isMissingFinancialGiftError(error)
   const unknownMissingColumn =
     (repositoryError.code === '42703' || repositoryError.code === 'PGRST204') &&
     !missingOptions &&
-    !missingActivity
+    !missingActivity &&
+    !missingKind &&
+    !missingGiftQuantity &&
+    !missingFinancialGifts
 
   if (missingOptions || unknownMissingColumn) {
     supportsWishlistOptions = false
@@ -97,19 +147,51 @@ function rememberMissingWishlistColumns(error: unknown) {
     supportsWishlistActivity = false
   }
 
-  return missingOptions || missingActivity || unknownMissingColumn
+  if (missingKind || unknownMissingColumn) {
+    supportsWishlistKind = false
+  }
+
+  if (missingGiftQuantity || unknownMissingColumn) {
+    supportsGiftQuantity = false
+  }
+
+  if (missingFinancialGifts || unknownMissingColumn) {
+    supportsFinancialGifts = false
+  }
+
+  return (
+    missingOptions ||
+    missingActivity ||
+    missingKind ||
+    missingGiftQuantity ||
+    missingFinancialGifts ||
+    unknownMissingColumn
+  )
 }
 
 function normalizePriority(value: string): GiftPriority {
   return value === 'Baixa' || value === 'Média' || value === 'Alta' ? value : ''
 }
 
+function mapReservation(row: ReservationRow): GiftReservation {
+  return {
+    id: row.id,
+    guestName: row.guest_name ?? '',
+    guestContact: row.guest_contact ?? '',
+    contributionAmount: normalizeMoneyAmount(row.contribution_amount),
+    createdAt: row.created_at ?? '',
+  }
+}
+
 function mapGift(row: GiftRow | Gift): Gift {
   if ('product_url' in row) {
-    const reservation = row.reservations?.[0]
+    const reservations = (row.reservations ?? []).map(mapReservation)
 
-    return {
+    return withGiftAvailability({
       id: row.id,
+      giftKind: normalizeGiftKind(row.gift_kind),
+      fundingMode: normalizeGiftFundingMode(row.funding_mode),
+      targetAmount: normalizeMoneyAmount(row.target_amount),
       name: row.name,
       link: row.product_url ?? '',
       note: row.note ?? '',
@@ -118,23 +200,33 @@ function mapGift(row: GiftRow | Gift): Gift {
       imageUrl: row.image_url ?? '',
       hasDiscount: Boolean(row.has_discount),
       priority: normalizePriority(row.priority ?? ''),
-      reserved: Boolean(reservation),
-      reservedBy: reservation?.guest_name ?? '',
-      reservedContact: reservation?.guest_contact ?? '',
+      quantity: normalizeGiftQuantity(row.quantity_required),
+      reserved: reservations.length >= normalizeGiftQuantity(row.quantity_required),
+      reservedBy: reservations.map((reservation) => reservation.guestName).join(', '),
+      reservedContact: reservations[0]?.guestContact ?? '',
+      contributedAmount: reservations.reduce(
+        (sum, reservation) => sum + reservation.contributionAmount,
+        0
+      ),
+      reservedCount: reservations.length,
+      reservations,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
-      reservedAt: reservation?.created_at ?? '',
-    }
+      reservedAt: reservations[reservations.length - 1]?.createdAt ?? '',
+    }) as Gift
   }
 
-  return row
+  return withGiftAvailability(row) as Gift
 }
 
 function mapWishlist(row: WishlistRow | Wishlist): Wishlist {
   if ('public_slug' in row) {
+    const listKind = normalizeWishlistKind(row.list_kind)
+
     return {
       id: row.id,
       publicSlug: row.public_slug,
+      listKind,
       title: row.title,
       eventDate: row.event_date ?? '',
       eventType: row.event_type ?? '',
@@ -143,7 +235,7 @@ function mapWishlist(row: WishlistRow | Wishlist): Wishlist {
       options: normalizeWishlistOptions({
         categories: row.gift_categories,
         priceRanges: row.price_ranges,
-      }),
+      }, listKind),
       gifts: (row.gifts ?? []).map(mapGift),
       activity: normalizeWishlistActivity(row.activity_log),
       createdAt: row.created_at,
@@ -151,9 +243,13 @@ function mapWishlist(row: WishlistRow | Wishlist): Wishlist {
     }
   }
 
+  const listKind = normalizeWishlistKind(row.listKind)
+
   return {
     ...row,
-    options: normalizeWishlistOptions(row.options),
+    listKind,
+    options: normalizeWishlistOptions(row.options, listKind),
+    gifts: row.gifts.map(mapGift),
     activity: normalizeWishlistActivity(row.activity),
   }
 }
@@ -162,12 +258,15 @@ function wishlistPayload(
   value: Wishlist,
   ownerId: string,
   includeOptions = supportsWishlistOptions,
-  includeActivity = supportsWishlistActivity
+  includeActivity = supportsWishlistActivity,
+  includeKind = supportsWishlistKind
 ) {
-  const options = normalizeWishlistOptions(value.options)
+  const listKind = normalizeWishlistKind(value.listKind)
+  const options = normalizeWishlistOptions(value.options, listKind)
   const activity = normalizeWishlistActivity(value.activity)
   const payload = {
     owner_id: ownerId,
+    ...(includeKind ? { list_kind: listKind } : {}),
     title: value.title.trim(),
     event_date: value.eventDate || null,
     event_type: value.eventType || '',
@@ -191,11 +290,14 @@ function wishlistPayload(
 function wishlistDetailsPayload(
   value: Omit<Wishlist, 'gifts'>,
   includeOptions = supportsWishlistOptions,
-  includeActivity = supportsWishlistActivity
+  includeActivity = supportsWishlistActivity,
+  includeKind = supportsWishlistKind
 ) {
-  const options = normalizeWishlistOptions(value.options)
+  const listKind = normalizeWishlistKind(value.listKind)
+  const options = normalizeWishlistOptions(value.options, listKind)
   const activity = normalizeWishlistActivity(value.activity)
   const payload = {
+    ...(includeKind ? { list_kind: listKind } : {}),
     title: value.title.trim(),
     event_date: value.eventDate || null,
     event_type: value.eventType || '',
@@ -216,9 +318,21 @@ function wishlistDetailsPayload(
       }
 }
 
-function giftPayload(value: Gift, wishlistId: string) {
+function giftPayload(
+  value: Gift,
+  wishlistId: string,
+  includeQuantity = supportsGiftQuantity,
+  includeFinancial = supportsFinancialGifts
+) {
   return {
     wishlist_id: wishlistId,
+    ...(includeFinancial
+      ? {
+          gift_kind: normalizeGiftKind(value.giftKind),
+          funding_mode: normalizeGiftFundingMode(value.fundingMode),
+          target_amount: normalizeMoneyAmount(value.targetAmount),
+        }
+      : {}),
     name: value.name.trim(),
     product_url: value.link || '',
     note: value.note || '',
@@ -227,10 +341,17 @@ function giftPayload(value: Gift, wishlistId: string) {
     image_url: value.imageUrl || '',
     has_discount: value.hasDiscount,
     priority: value.priority || '',
+    ...(includeQuantity
+      ? { quantity_required: normalizeGiftQuantity(value.quantity) }
+      : {}),
   }
 }
 
 function createWishlistSelect(includeOptions: boolean, includeActivity: boolean) {
+  const kindField = supportsWishlistKind
+    ? `
+  list_kind,`
+    : ''
   const optionFields = includeOptions
     ? `
   gift_categories,
@@ -249,6 +370,7 @@ function createWishlistSelect(includeOptions: boolean, includeActivity: boolean)
   owner_name,
   message,
   public_slug,
+  ${kindField}
   ${optionFields}
   ${activityField}
   created_at,
@@ -263,12 +385,20 @@ function createWishlistSelect(includeOptions: boolean, includeActivity: boolean)
     image_url,
     has_discount,
     priority,
+    ${supportsFinancialGifts
+      ? `
+    gift_kind,
+    funding_mode,
+    target_amount,`
+      : ''}
+    ${supportsGiftQuantity ? 'quantity_required,' : ''}
     created_at,
     updated_at,
     reservations (
       id,
       guest_name,
       guest_contact,
+      ${supportsFinancialGifts ? 'contribution_amount,' : ''}
       created_at
     )
   )
@@ -414,7 +544,22 @@ export async function updateRemoteWishlistActivity(
 
 export async function addRemoteGift(listId: string, gift: Gift) {
   const client = ensureSupabase()
-  const { error } = await client.from('gifts').insert(giftPayload(gift, listId))
+  let { error } = await client.from('gifts').insert(giftPayload(gift, listId))
+
+  if (error && rememberMissingWishlistColumns(error)) {
+    const fallback = await client
+      .from('gifts')
+      .insert(
+        giftPayload(
+          gift,
+          listId,
+          supportsGiftQuantity,
+          supportsFinancialGifts
+        )
+      )
+
+    error = fallback.error
+  }
 
   if (error) throw error
 
@@ -423,10 +568,26 @@ export async function addRemoteGift(listId: string, gift: Gift) {
 
 export async function updateRemoteGift(listId: string, gift: Gift) {
   const client = ensureSupabase()
-  const { error } = await client
+  let { error } = await client
     .from('gifts')
     .update(giftPayload(gift, listId))
     .eq('id', gift.id)
+
+  if (error && rememberMissingWishlistColumns(error)) {
+    const fallback = await client
+      .from('gifts')
+      .update(
+        giftPayload(
+          gift,
+          listId,
+          supportsGiftQuantity,
+          supportsFinancialGifts
+        )
+      )
+      .eq('id', gift.id)
+
+    error = fallback.error
+  }
 
   if (error) throw error
 
@@ -466,12 +627,25 @@ export async function reserveRemotePublicGift(
   guest: ReservationGuest
 ) {
   const client = ensureSupabase()
-  const { data, error } = await client.rpc('reserve_public_gift', {
+  let { data, error } = await client.rpc('reserve_public_gift', {
     slug_or_id: slugOrId,
     target_gift_id: giftId,
     guest_name: guest.name,
     guest_contact: guest.contact,
+    contribution_amount: normalizeMoneyAmount(guest.contributionAmount),
   })
+
+  if (error && rememberMissingWishlistColumns(error)) {
+    const fallback = await client.rpc('reserve_public_gift', {
+      slug_or_id: slugOrId,
+      target_gift_id: giftId,
+      guest_name: guest.name,
+      guest_contact: guest.contact,
+    })
+
+    data = fallback.data
+    error = fallback.error
+  }
 
   if (error) throw error
 

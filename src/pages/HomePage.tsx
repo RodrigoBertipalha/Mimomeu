@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import Icon from '../components/ui/Icon'
 import { useWishlist } from '../hooks/useWishlist'
+import { getGiftReservedCount, isGiftFullyReserved } from '../utils/gifts'
+import { getListTypeConfig, normalizeWishlistKind } from '../utils/listTypes'
 
 function HomePage() {
   const { wishlists } = useWishlist()
@@ -14,16 +16,16 @@ function HomePage() {
             Momentos com carinho
           </div>
           <h1 className="text-5xl font-extrabold leading-[1.08] tracking-tight sm:text-6xl">
-            Crie e compartilhe listas de presentes
+            Crie e compartilhe listas para cada ocasião
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-8 text-[var(--color-muted)]">
-            Crie listas para diferentes eventos, cadastre presentes, compartilhe
-            com convidados e acompanhe reservas em um só lugar.
+            Crie listas de presentes ou confraternização, compartilhe com
+            convidados e acompanhe reservas em um só lugar.
           </p>
 
           <div className="mt-9 grid gap-3 sm:grid-cols-[1fr_0.86fr]">
             <Link to="/list?new=1" className="ui-button-primary h-14">
-              Criar lista de presentes
+              Criar lista
               <Icon name="plus" className="h-5 w-5" />
             </Link>
             <Link to="/list" className="ui-button-secondary h-14">
@@ -76,9 +78,15 @@ function HomePage() {
 
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {wishlists.slice(0, 3).map((list) => {
-              const reservedCount = list.gifts.filter(
-                (gift) => gift.reserved
-              ).length
+              const listKind = normalizeWishlistKind(list.listKind)
+              const config = getListTypeConfig(listKind)
+              const reservedCount =
+                listKind === 'potluck'
+                  ? list.gifts.reduce(
+                      (sum, gift) => sum + getGiftReservedCount(gift),
+                      0
+                    )
+                  : list.gifts.filter((gift) => isGiftFullyReserved(gift)).length
 
               return (
                 <Link
@@ -91,7 +99,8 @@ function HomePage() {
                     {list.title}
                   </h3>
                   <p className="mt-2 text-sm text-[var(--color-muted)]">
-                    {list.gifts.length} presentes · {reservedCount} reservados
+                    {list.gifts.length} {config.itemPlural} · {reservedCount}{' '}
+                    {config.progressUnit}
                   </p>
                 </Link>
               )

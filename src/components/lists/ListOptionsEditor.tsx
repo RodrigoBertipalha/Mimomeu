@@ -1,9 +1,16 @@
 import { useState, type KeyboardEvent } from 'react'
-import type { WishlistOptions } from '../../types/wishlist'
+import type { WishlistKind, WishlistOptions } from '../../types/wishlist'
+import { getListTypeConfig, normalizeWishlistKind } from '../../utils/listTypes'
+import {
+  createDefaultWishlistOptions,
+  usesWishlistCategories,
+  usesWishlistPriceRanges,
+} from '../../utils/wishlistOptions'
 import Icon from '../ui/Icon'
 
 type ListOptionsEditorProps = {
   value: WishlistOptions
+  listKind?: WishlistKind
   onChange: (value: WishlistOptions) => void
 }
 
@@ -122,30 +129,83 @@ function OptionGroup({
   )
 }
 
-function ListOptionsEditor({ value, onChange }: ListOptionsEditorProps) {
-  const categories = value.categories.length ? value.categories : ['']
-  const priceRanges = value.priceRanges.length ? value.priceRanges : ['']
+function ListOptionsEditor({
+  value,
+  listKind,
+  onChange,
+}: ListOptionsEditorProps) {
+  const normalizedListKind = normalizeWishlistKind(listKind)
+  const config = getListTypeConfig(normalizedListKind)
+  const defaultOptions = createDefaultWishlistOptions(normalizedListKind)
+  const defaultPriceRanges = defaultOptions.priceRanges.length
+    ? defaultOptions.priceRanges
+    : ['A combinar']
+  const categoriesEnabled = usesWishlistCategories(value)
+  const priceRangesEnabled = usesWishlistPriceRanges(value)
+  const categories = categoriesEnabled ? value.categories : defaultOptions.categories
+  const priceRanges = priceRangesEnabled
+    ? value.priceRanges
+    : defaultPriceRanges
+
+  function handleToggleCategories(enabled: boolean) {
+    onChange({
+      ...value,
+      categories: enabled ? defaultOptions.categories : [],
+    })
+  }
+
+  function handleTogglePriceRanges(enabled: boolean) {
+    onChange({
+      ...value,
+      priceRanges: enabled ? defaultPriceRanges : [],
+    })
+  }
 
   return (
     <div className="grid gap-4">
-      <OptionGroup
-        label="Categorias"
-        addLabel="Adicionar"
-        placeholder="Nova categoria"
-        values={categories}
-        onChange={(categories) =>
-          onChange({ ...value, categories })
-        }
-      />
-      <OptionGroup
-        label="Faixas de preço"
-        addLabel="Adicionar"
-        placeholder="Nova faixa"
-        values={priceRanges}
-        onChange={(priceRanges) =>
-          onChange({ ...value, priceRanges })
-        }
-      />
+      <label className="flex items-center justify-between gap-4 rounded-lg border border-[var(--color-line)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm font-extrabold text-[var(--color-text)]">
+        Usar categorias
+        <input
+          type="checkbox"
+          className="h-4 w-4 accent-[var(--color-primary-deep)]"
+          checked={categoriesEnabled}
+          onChange={(event) => handleToggleCategories(event.target.checked)}
+        />
+      </label>
+
+      {categoriesEnabled ? (
+        <OptionGroup
+          label={config.categoryGroupLabel}
+          addLabel={config.categoryAddLabel}
+          placeholder={config.categoryPlaceholder}
+          values={categories}
+          onChange={(categories) =>
+            onChange({ ...value, categories: cleanValues(categories) })
+          }
+        />
+      ) : null}
+
+      <label className="flex items-center justify-between gap-4 rounded-lg border border-[var(--color-line)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm font-extrabold text-[var(--color-text)]">
+        Usar faixas de preço
+        <input
+          type="checkbox"
+          className="h-4 w-4 accent-[var(--color-primary-deep)]"
+          checked={priceRangesEnabled}
+          onChange={(event) => handleTogglePriceRanges(event.target.checked)}
+        />
+      </label>
+
+      {priceRangesEnabled ? (
+        <OptionGroup
+          label="Faixas de preço"
+          addLabel="Adicionar"
+          placeholder="Nova faixa"
+          values={priceRanges}
+          onChange={(priceRanges) =>
+            onChange({ ...value, priceRanges: cleanValues(priceRanges) })
+          }
+        />
+      ) : null}
     </div>
   )
 }

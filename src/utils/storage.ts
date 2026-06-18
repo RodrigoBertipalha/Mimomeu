@@ -1,5 +1,12 @@
 import type { Gift, GiftPriority, Wishlist } from '../types/wishlist'
 import { normalizeWishlistActivity } from './activity'
+import {
+  normalizeGiftFundingMode,
+  normalizeGiftKind,
+  normalizeMoneyAmount,
+  withGiftAvailability,
+} from './gifts'
+import { normalizeWishlistKind } from './listTypes'
 import { normalizeWishlistOptions } from './wishlistOptions'
 
 const ACTIVE_WISHLIST_KEY = 'mimo-meu:wishlist'
@@ -16,8 +23,12 @@ function normalizePriority(value: unknown): GiftPriority {
 }
 
 function normalizeGift(value: Partial<Gift>): Gift {
-  return {
+  return withGiftAvailability({
     id: value.id || createId('gift'),
+    giftKind: normalizeGiftKind(value.giftKind),
+    fundingMode: normalizeGiftFundingMode(value.fundingMode),
+    targetAmount: normalizeMoneyAmount(value.targetAmount),
+    contributedAmount: normalizeMoneyAmount(value.contributedAmount),
     name: value.name ?? '',
     link: value.link ?? '',
     note: value.note ?? '',
@@ -29,24 +40,29 @@ function normalizeGift(value: Partial<Gift>): Gift {
     reserved: Boolean(value.reserved),
     reservedBy: value.reservedBy ?? '',
     reservedContact: value.reservedContact ?? '',
+    quantity: value.quantity ?? 1,
+    reservedCount: value.reservedCount ?? 0,
+    reservations: value.reservations ?? [],
     createdAt: value.createdAt,
     updatedAt: value.updatedAt,
     reservedAt: value.reservedAt,
-  }
+  }) as Gift
 }
 
 export function normalizeWishlist(value: Partial<Wishlist>): Wishlist {
   const now = new Date().toISOString()
+  const listKind = normalizeWishlistKind(value.listKind)
 
   return {
     id: value.id || createId('list'),
     publicSlug: value.publicSlug,
+    listKind,
     title: value.title ?? '',
     eventDate: value.eventDate ?? '',
     eventType: value.eventType ?? '',
     ownerName: value.ownerName ?? '',
     message: value.message ?? '',
-    options: normalizeWishlistOptions(value.options),
+    options: normalizeWishlistOptions(value.options, listKind),
     gifts: Array.isArray(value.gifts)
       ? value.gifts.map((gift) => normalizeGift(gift))
       : [],

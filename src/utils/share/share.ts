@@ -1,7 +1,9 @@
 import type { Wishlist } from '../../types/wishlist'
+import { getListTypeConfig } from '../listTypes'
 
 export function buildShareMessage(list: Wishlist) {
-  const title = list.title || 'Lista de presentes'
+  const config = getListTypeConfig(list.listKind)
+  const title = list.title || config.name
   const typeLine = list.eventType ? `Evento: ${list.eventType}` : ''
   const dateLine = list.eventDate ? `Data: ${list.eventDate}` : ''
   const ownerLine = list.ownerName ? `Responsável: ${list.ownerName}` : ''

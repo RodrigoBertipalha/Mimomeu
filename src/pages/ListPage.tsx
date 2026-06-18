@@ -4,6 +4,13 @@ import ListForm from '../components/lists/ListForm'
 import Icon from '../components/ui/Icon'
 import Modal from '../components/ui/Modal'
 import { useWishlist } from '../hooks/useWishlist'
+import {
+  getGiftAvailableCount,
+  getGiftQuantity,
+  getGiftReservedCount,
+  isGiftFullyReserved,
+} from '../utils/gifts'
+import { getListTypeConfig, normalizeWishlistKind } from '../utils/listTypes'
 
 function ListPage() {
   const { wishlists, createWishlist, isLoading, error } = useWishlist()
@@ -62,12 +69,31 @@ function ListPage() {
         <section className="grid gap-4">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {wishlists.map((list) => {
-              const reservedCount = list.gifts.filter(
-                (gift) => gift.reserved
-              ).length
-              const availableCount = list.gifts.length - reservedCount
-              const progress = list.gifts.length
-                ? Math.round((reservedCount / list.gifts.length) * 100)
+              const listKind = normalizeWishlistKind(list.listKind)
+              const config = getListTypeConfig(listKind)
+              const totalCount =
+                listKind === 'potluck'
+                  ? list.gifts.reduce(
+                      (sum, gift) => sum + getGiftQuantity(gift),
+                      0
+                    )
+                  : list.gifts.length
+              const reservedCount =
+                listKind === 'potluck'
+                  ? list.gifts.reduce(
+                      (sum, gift) => sum + getGiftReservedCount(gift),
+                      0
+                    )
+                  : list.gifts.filter((gift) => isGiftFullyReserved(gift)).length
+              const availableCount =
+                listKind === 'potluck'
+                  ? list.gifts.reduce(
+                      (sum, gift) => sum + getGiftAvailableCount(gift),
+                      0
+                    )
+                  : list.gifts.length - reservedCount
+              const progress = totalCount
+                ? Math.round((reservedCount / totalCount) * 100)
                 : 0
 
               return (
@@ -86,21 +112,25 @@ function ListPage() {
 
                   <div className="mt-5 grid grid-cols-3 gap-3 border-y border-[var(--color-line)] py-4 text-sm">
                     <div>
-                      <p className="font-extrabold">{list.gifts.length}</p>
-                      <p className="text-xs text-[var(--color-muted)]">Itens</p>
+                      <p className="font-extrabold">{totalCount}</p>
+                      <p className="text-xs text-[var(--color-muted)]">
+                        {listKind === 'potluck' ? 'Vagas' : config.itemPlural}
+                      </p>
                     </div>
                     <div>
                       <p className="font-extrabold text-[var(--color-primary-deep)]">
                         {availableCount}
                       </p>
-                      <p className="text-xs text-[var(--color-muted)]">Livres</p>
+                      <p className="text-xs text-[var(--color-muted)]">
+                        {listKind === 'potluck' ? 'Faltam' : 'Livres'}
+                      </p>
                     </div>
                     <div>
                       <p className="font-extrabold text-[var(--color-tertiary-deep)]">
                         {reservedCount}
                       </p>
                       <p className="text-xs text-[var(--color-muted)]">
-                        Reserv.
+                        {listKind === 'potluck' ? 'Comb.' : 'Reserv.'}
                       </p>
                     </div>
                   </div>

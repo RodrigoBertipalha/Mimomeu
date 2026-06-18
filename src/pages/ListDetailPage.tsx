@@ -8,11 +8,21 @@ import ListOptionsEditor from '../components/lists/ListOptionsEditor'
 import ShareCard from '../components/share/ShareCard'
 import Icon from '../components/ui/Icon'
 import Modal from '../components/ui/Modal'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { useWishlist } from '../hooks/useWishlist'
 import type { Gift, Wishlist, WishlistOptions } from '../types/wishlist'
 import {
+  getGiftAvailableCount,
+  getGiftQuantity,
+  getGiftReservedCount,
+  isGiftFullyReserved,
+} from '../utils/gifts'
+import { getListTypeConfig, normalizeWishlistKind } from '../utils/listTypes'
+import {
   createDefaultWishlistOptions,
   normalizeWishlistOptions,
+  usesWishlistCategories,
+  usesWishlistPriceRanges,
 } from '../utils/wishlistOptions'
 
 function getListDetails(
@@ -22,6 +32,7 @@ function getListDetails(
   return {
     id: list.id,
     publicSlug: list.publicSlug,
+    listKind: list.listKind,
     title: list.title,
     eventDate: list.eventDate,
     eventType: list.eventType,
@@ -59,6 +70,7 @@ function ListDetailPage() {
   const routeNotice = (location.state as { notice?: string } | null)?.notice
   const [notice, setNotice] = useState(routeNotice ?? '')
   const [actionError, setActionError] = useState('')
+  useBodyScrollLock(isShareOpen)
 
   const list = listId ? findWishlist(listId) : null
 
@@ -100,7 +112,7 @@ function ListDetailPage() {
   function openOptionsModal() {
     if (!list) return
     setActionError('')
-    setOptionsDraft(normalizeWishlistOptions(list.options))
+    setOptionsDraft(normalizeWishlistOptions(list.options, list.listKind))
     setIsOptionsOpen(true)
   }
 
@@ -130,10 +142,24 @@ function ListDetailPage() {
     )
   }
 
-  const reservedCount = list.gifts.filter((gift) => gift.reserved).length
-  const availableCount = list.gifts.length - reservedCount
-  const progress = list.gifts.length
-    ? Math.round((reservedCount / list.gifts.length) * 100)
+  const listKind = normalizeWishlistKind(list.listKind)
+  const config = getListTypeConfig(listKind)
+  const showCategories = usesWishlistCategories(list.options)
+  const showPriceRanges = usesWishlistPriceRanges(list.options)
+  const totalCount =
+    listKind === 'potluck'
+      ? list.gifts.reduce((sum, gift) => sum + getGiftQuantity(gift), 0)
+      : list.gifts.length
+  const reservedCount =
+    listKind === 'potluck'
+      ? list.gifts.reduce((sum, gift) => sum + getGiftReservedCount(gift), 0)
+      : list.gifts.filter((gift) => isGiftFullyReserved(gift)).length
+  const availableCount =
+    listKind === 'potluck'
+      ? list.gifts.reduce((sum, gift) => sum + getGiftAvailableCount(gift), 0)
+      : list.gifts.length - reservedCount
+  const progress = totalCount
+    ? Math.round((reservedCount / totalCount) * 100)
     : 0
 
   return (
@@ -152,8 +178,7 @@ function ListDetailPage() {
             {list.title}
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--color-muted)]">
-            Acompanhe reservas, edite os dados da lista e gerencie os presentes
-            cadastrados.
+            {config.managementDescription}
           </p>
         </div>
 
@@ -210,35 +235,35 @@ function ListDetailPage() {
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr_2.1fr]">
         <article className="ui-panel p-6">
           <p className="text-sm font-bold text-[var(--color-muted)]">
-            Reservados
+            {config.reservedStatLabel}
           </p>
           <p className="mt-7 text-4xl font-extrabold text-[var(--color-tertiary-deep)]">
             {reservedCount}
           </p>
           <p className="mt-1 text-sm text-[var(--color-muted)]">
-            Presentes já escolhidos
+            {config.reservedStatDescription}
           </p>
         </article>
 
         <article className="ui-panel p-6">
           <p className="text-sm font-bold text-[var(--color-muted)]">
-            Disponíveis
+            {config.availableStatLabel}
           </p>
           <p className="mt-7 text-4xl font-extrabold text-[var(--color-primary-deep)]">
             {availableCount}
           </p>
           <p className="mt-1 text-sm text-[var(--color-muted)]">
-            Presentes ainda livres
+            {config.availableStatDescription}
           </p>
         </article>
 
         <article className="rounded-lg border border-[var(--color-line)] bg-[var(--color-primary-soft)] p-6">
           <p className="text-sm font-bold text-[var(--color-primary-deep)]">
-            Progresso da lista
+            {config.progressLabel}
           </p>
           <div className="mt-8 flex items-end justify-between gap-3">
             <p className="text-sm font-extrabold text-[var(--color-text)]">
-              {reservedCount} de {list.gifts.length} reservados
+              {reservedCount} de {totalCount} {config.progressUnit}
             </p>
             <p className="text-sm font-extrabold text-[var(--color-primary-deep)]">
               {progress}%
@@ -256,8 +281,10 @@ function ListDetailPage() {
       <section className="grid gap-5">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
           <div>
-            <p className="ui-kicker">Presentes</p>
-            <h2 className="mt-1 text-3xl font-extrabold">Itens da lista</h2>
+            <p className="ui-kicker">{config.itemsKicker}</p>
+            <h2 className="mt-1 text-3xl font-extrabold">
+              {config.itemsHeading}
+            </h2>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,320px)_auto_auto]">
@@ -268,7 +295,7 @@ function ListDetailPage() {
               />
               <input
                 className="ui-field w-full pl-12"
-                placeholder="Pesquisar presente..."
+                placeholder={config.searchPlaceholder}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
@@ -290,13 +317,16 @@ function ListDetailPage() {
               }}
             >
               <Icon name="plus" className="h-5 w-5" />
-              Adicionar presente
+              {config.addItemLabel}
             </button>
           </div>
         </div>
 
         <GiftList
           gifts={filteredGifts}
+          listKind={listKind}
+          showCategories={showCategories}
+          showPriceRange={showPriceRanges}
           onEdit={(gift) => {
             setActionError('')
             setEditingGift(gift)
@@ -304,7 +334,7 @@ function ListDetailPage() {
           onReleaseReserve={async (gift) => {
             try {
               await releaseGiftReservation(list.id, gift.id)
-              showNotice('Reserva liberada.')
+              showNotice(config.releaseSuccessMessage)
             } catch (submitError) {
               showActionError(
                 'Não foi possível liberar a reserva. Tente novamente.',
@@ -343,11 +373,16 @@ function ListDetailPage() {
                   list.id,
                   {
                     ...getListDetails(list),
+                    listKind: value.listKind,
                     title: value.title,
                     eventDate: value.eventDate,
                     eventType: value.eventType,
                     ownerName: value.ownerName,
                     message: value.message,
+                    options: normalizeWishlistOptions(
+                      value.options,
+                      value.listKind
+                    ),
                   },
                   'list_updated'
                 )
@@ -366,8 +401,8 @@ function ListDetailPage() {
 
       {isOptionsOpen ? (
         <Modal
-          title="Opções da lista"
-          description="Edite as categorias e faixas usadas nos presentes desta lista."
+          title={config.optionsTitle}
+          description={config.optionsDescription}
           onClose={() => {
             setActionError('')
             setIsOptionsOpen(false)
@@ -381,6 +416,7 @@ function ListDetailPage() {
             ) : null}
             <ListOptionsEditor
               value={optionsDraft}
+              listKind={listKind}
               onChange={setOptionsDraft}
             />
             <div className="grid gap-3 sm:grid-cols-2">
@@ -403,7 +439,7 @@ function ListDetailPage() {
                       list.id,
                       getListDetails(
                         list,
-                        normalizeWishlistOptions(optionsDraft)
+                        normalizeWishlistOptions(optionsDraft, listKind)
                       ),
                       'options_updated'
                     )
@@ -425,8 +461,14 @@ function ListDetailPage() {
       ) : null}
 
       {isShareOpen ? (
-        <div className="fixed inset-0 z-30 overflow-y-auto bg-[var(--color-page-overlay)] px-4 py-8 backdrop-blur-sm">
-          <div className="mx-auto grid max-w-5xl gap-4">
+        <div
+          className="fixed inset-0 z-30 overflow-y-auto bg-[var(--color-page-overlay)] px-4 py-8 backdrop-blur-sm"
+          onClick={() => setIsShareOpen(false)}
+        >
+          <div
+            className="mx-auto grid max-w-5xl gap-4"
+            onClick={(event) => event.stopPropagation()}
+          >
             <div className="flex justify-end">
               <button
                 type="button"
@@ -443,8 +485,8 @@ function ListDetailPage() {
 
       {isAddGiftOpen ? (
         <Modal
-          title="Adicionar presente"
-          description="Cadastre um novo item para esta lista."
+          title={config.addItemLabel}
+          description={`Cadastre um novo ${config.itemSingular} para esta lista.`}
           onClose={() => {
             setActionError('')
             setIsAddGiftOpen(false)
@@ -457,12 +499,13 @@ function ListDetailPage() {
             </p>
           ) : null}
           <GiftForm
+            listKind={listKind}
             options={list.options}
             previewGifts={list.gifts}
-            listPreviewTitle="Prévia da sua lista"
+            listPreviewTitle={config.itemsHeading}
             draftKey={`mimo-meu:gift-draft:${list.id}`}
             allowDraftSave
-            submitLabel="Adicionar presente"
+            submitLabel={config.addItemLabel}
             onCancel={() => {
               setActionError('')
               setIsAddGiftOpen(false)
@@ -471,10 +514,12 @@ function ListDetailPage() {
               try {
                 await addGift(list.id, gift)
                 setIsAddGiftOpen(false)
-                showNotice('Presente adicionado.')
+                showNotice(
+                  `${config.itemSingular[0].toUpperCase()}${config.itemSingular.slice(1)} adicionado.`
+                )
               } catch (submitError) {
                 showActionError(
-                  'Não foi possível adicionar o presente. Tente novamente.',
+                  `Não foi possível adicionar o ${config.itemSingular}. Tente novamente.`,
                   submitError
                 )
               }
@@ -485,8 +530,8 @@ function ListDetailPage() {
 
       {editingGift ? (
         <Modal
-          title="Editar presente"
-          description="Atualize nome, descrição, preço, prioridade ou link."
+          title={`Editar ${config.itemSingular}`}
+          description={`Atualize os dados deste ${config.itemSingular}.`}
           onClose={() => {
             setActionError('')
             setEditingGift(null)
@@ -499,11 +544,12 @@ function ListDetailPage() {
             </p>
           ) : null}
           <GiftForm
+            listKind={listKind}
             options={list.options}
             previewGifts={list.gifts}
-            listPreviewTitle="Prévia da sua lista"
+            listPreviewTitle={config.itemsHeading}
             initialValue={editingGift}
-            submitLabel="Salvar presente"
+            submitLabel={config.editItemLabel}
             onCancel={() => {
               setActionError('')
               setEditingGift(null)
@@ -512,10 +558,12 @@ function ListDetailPage() {
               try {
                 await updateGift(list.id, gift)
                 setEditingGift(null)
-                showNotice('Presente atualizado.')
+                showNotice(
+                  `${config.itemSingular[0].toUpperCase()}${config.itemSingular.slice(1)} atualizado.`
+                )
               } catch (submitError) {
                 showActionError(
-                  'Não foi possível salvar o presente. Tente novamente.',
+                  `Não foi possível salvar o ${config.itemSingular}. Tente novamente.`,
                   submitError
                 )
               }

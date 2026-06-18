@@ -1,5 +1,11 @@
 export type GiftPriority = '' | 'Baixa' | 'Média' | 'Alta'
 
+export type WishlistKind = 'gift' | 'potluck'
+
+export type GiftKind = 'physical' | 'financial'
+
+export type GiftFundingMode = 'full' | 'shared'
+
 export type WishlistActivityType =
   | 'list_created'
   | 'list_updated'
@@ -19,8 +25,17 @@ export type WishlistActivity = {
   actor?: string
 }
 
+export type GiftReservation = {
+  id: string
+  guestName: string
+  guestContact: string
+  contributionAmount: number
+  createdAt: string
+}
+
 export type Gift = {
   id: string
+  giftKind: GiftKind
   name: string
   link: string
   note: string
@@ -32,6 +47,12 @@ export type Gift = {
   reserved: boolean
   reservedBy: string
   reservedContact: string
+  fundingMode: GiftFundingMode
+  targetAmount: number
+  contributedAmount: number
+  quantity: number
+  reservedCount: number
+  reservations: GiftReservation[]
   createdAt?: string
   updatedAt?: string
   reservedAt?: string
@@ -45,6 +66,7 @@ export type WishlistOptions = {
 export type Wishlist = {
   id: string
   publicSlug?: string
+  listKind: WishlistKind
   title: string
   eventDate: string
   eventType: string
@@ -60,4 +82,5 @@ export type Wishlist = {
 export type ReservationGuest = {
   name: string
   contact: string
+  contributionAmount?: number
 }

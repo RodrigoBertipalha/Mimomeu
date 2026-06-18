@@ -23,6 +23,16 @@ import {
   createWishlistActivity,
 } from '../utils/activity'
 import {
+  getGiftFundingMode,
+  getGiftRemainingAmount,
+  getGiftReservations,
+  getGiftTargetAmount,
+  isGiftFullyReserved,
+  isGiftFinancial,
+  normalizeMoneyAmount,
+  withGiftAvailability,
+} from '../utils/gifts'
+import {
   clearWishlist,
   getWishlist,
   loadWishlist,
@@ -346,17 +356,35 @@ export function useWishlist() {
     const nextValue: Wishlist = {
       ...current,
       gifts: current.gifts.map((gift) => {
-        if (gift.id !== giftId || gift.reserved) return gift
+        if (gift.id !== giftId || isGiftFullyReserved(gift)) return gift
 
         reserved = true
-        reservedGift = {
+        const contributionAmount = isGiftFinancial(gift)
+          ? getGiftFundingMode(gift) === 'shared'
+            ? Math.min(
+                getGiftRemainingAmount(gift),
+                normalizeMoneyAmount(guest.contributionAmount)
+              )
+            : getGiftRemainingAmount(gift) || getGiftTargetAmount(gift)
+          : 0
+        const reservations = [
+          ...getGiftReservations(gift),
+          {
+            id: `reservation-${Date.now()}-${Math.random()
+              .toString(16)
+              .slice(2)}`,
+            guestName: guest.name,
+            guestContact: guest.contact,
+            contributionAmount,
+            createdAt: now,
+          },
+        ]
+        reservedGift = withGiftAvailability({
           ...gift,
-          reserved: true,
-          reservedBy: guest.name,
-          reservedContact: guest.contact,
+          reservations,
           reservedAt: now,
           updatedAt: now,
-        }
+        }) as Gift
 
         return reservedGift
       }),
@@ -419,14 +447,16 @@ export function useWishlist() {
           ...current,
           gifts: current.gifts.map((gift) =>
             gift.id === giftId
-              ? {
+              ? withGiftAvailability({
                   ...gift,
                   reserved: false,
                   reservedBy: '',
                   reservedContact: '',
+                  reservedCount: 0,
+                  reservations: [],
                   reservedAt: '',
                   updatedAt: now,
-                }
+                }) as Gift
               : gift
           ),
         },

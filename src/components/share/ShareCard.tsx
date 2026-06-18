@@ -5,6 +5,7 @@ import {
   getShareUrl,
   getWhatsappLink,
 } from '../../utils/share/share'
+import { getListTypeConfig } from '../../utils/listTypes'
 import Icon from '../ui/Icon'
 
 type ShareCardProps = {
@@ -16,8 +17,9 @@ function ShareCard({ list }: ShareCardProps) {
   const [copyError, setCopyError] = useState('')
   const shareUrl = getShareUrl(list)
   const whatsappLink = getWhatsappLink(list)
+  const config = getListTypeConfig(list.listKind)
   const mailLink = `mailto:?subject=${encodeURIComponent(
-    list.title || 'Lista de presentes'
+    list.title || config.name
   )}&body=${encodeURIComponent(`${buildShareMessage(list)}\n${shareUrl}`)}`
 
   async function handleCopy() {
@@ -39,11 +41,10 @@ function ShareCard({ list }: ShareCardProps) {
           <Icon name="share" className="h-10 w-10" />
         </span>
         <h2 className="mt-7 text-4xl font-extrabold text-[var(--color-primary-deep)]">
-          Sua lista está pronta!
+          {config.shareTitle}
         </h2>
         <p className="mx-auto mt-4 max-w-lg text-base leading-7 text-[var(--color-secondary-deep)]">
-          Agora é só enviar para seus convidados e começar a receber mimos
-          inesquecíveis.
+          {config.shareDescription}
         </p>
       </div>
 

@@ -1,8 +1,30 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
-import type { Gift, GiftPriority, WishlistOptions } from '../../types/wishlist'
+import type {
+  Gift,
+  GiftFundingMode,
+  GiftKind,
+  GiftPriority,
+  WishlistKind,
+  WishlistOptions,
+} from '../../types/wishlist'
+import {
+  formatMoney,
+  getGiftQuantity,
+  getGiftReservedCount,
+  normalizeGiftFundingMode,
+  normalizeGiftKind,
+  normalizeGiftQuantity,
+  normalizeMoneyAmount,
+} from '../../utils/gifts'
+import {
+  getListTypeConfig,
+  normalizeWishlistKind,
+} from '../../utils/listTypes'
 import {
   includeCurrentOption,
   normalizeWishlistOptions,
+  usesWishlistCategories,
+  usesWishlistPriceRanges,
 } from '../../utils/wishlistOptions'
 import Icon from '../ui/Icon'
 
@@ -12,6 +34,7 @@ type GiftFormProps = {
   submitLabel?: string
   title?: string
   description?: string
+  listKind?: WishlistKind
   options?: WishlistOptions
   previewGifts?: Gift[]
   listPreviewTitle?: string
@@ -23,6 +46,9 @@ type GiftFormProps = {
 type PreviewGift = Gift & { isDraft?: boolean }
 
 const blankState = {
+  giftKind: 'physical' as GiftKind,
+  fundingMode: 'full' as GiftFundingMode,
+  targetAmount: '',
   name: '',
   link: '',
   note: '',
@@ -31,9 +57,14 @@ const blankState = {
   imageUrl: '',
   hasDiscount: false,
   priority: '' as GiftPriority,
+  quantity: '1',
 }
 
 type GiftFormState = typeof blankState
+
+function createGiftId() {
+  return `gift-${Date.now()}`
+}
 
 function normalizePriority(value: unknown): GiftPriority {
   return value === 'Baixa' || value === 'Média' || value === 'Alta' ? value : ''
@@ -41,7 +72,10 @@ function normalizePriority(value: unknown): GiftPriority {
 
 function createState(value?: Gift): GiftFormState {
   return value
-    ? {
+      ? {
+        giftKind: normalizeGiftKind(value.giftKind),
+        fundingMode: normalizeGiftFundingMode(value.fundingMode),
+        targetAmount: value.targetAmount ? String(value.targetAmount) : '',
         name: value.name,
         link: value.link,
         note: value.note,
@@ -50,6 +84,7 @@ function createState(value?: Gift): GiftFormState {
         imageUrl: value.imageUrl,
         hasDiscount: value.hasDiscount,
         priority: value.priority,
+        quantity: String(value.quantity ?? 1),
       }
     : { ...blankState }
 }
@@ -66,6 +101,13 @@ function loadDraft(draftKey?: string) {
     return {
       ...blankState,
       name: parsed.name ?? '',
+      giftKind: normalizeGiftKind(parsed.giftKind),
+      fundingMode: normalizeGiftFundingMode(parsed.fundingMode),
+      targetAmount:
+        typeof parsed.targetAmount === 'string' ||
+        typeof parsed.targetAmount === 'number'
+          ? String(parsed.targetAmount)
+          : '',
       link: parsed.link ?? '',
       note: parsed.note ?? '',
       category: parsed.category ?? '',
@@ -73,6 +115,10 @@ function loadDraft(draftKey?: string) {
       imageUrl: parsed.imageUrl ?? '',
       hasDiscount: Boolean(parsed.hasDiscount),
       priority: normalizePriority(parsed.priority),
+      quantity:
+        typeof parsed.quantity === 'string' || typeof parsed.quantity === 'number'
+          ? String(parsed.quantity)
+          : '1',
     }
   } catch {
     return null
@@ -82,13 +128,17 @@ function loadDraft(draftKey?: string) {
 function hasDraftContent(value: GiftFormState) {
   return Boolean(
     value.name.trim() ||
+      value.giftKind !== 'physical' ||
+      value.fundingMode !== 'full' ||
+      value.targetAmount.trim() ||
       value.link.trim() ||
       value.note.trim() ||
       value.category.trim() ||
       value.priceRange ||
       value.imageUrl ||
       value.hasDiscount ||
-      value.priority
+      value.priority ||
+      value.quantity !== '1'
   )
 }
 
@@ -111,6 +161,10 @@ function createPreviewGift(
 
   return {
     id: initialValue?.id ?? 'gift-draft-preview',
+    giftKind: normalizeGiftKind(formData.giftKind),
+    fundingMode: normalizeGiftFundingMode(formData.fundingMode),
+    targetAmount: normalizeMoneyAmount(formData.targetAmount),
+    contributedAmount: initialValue?.contributedAmount ?? 0,
     name: formData.name.trim() || 'Presente em rascunho',
     link: formData.link.trim(),
     note: formData.note.trim(),
@@ -119,9 +173,12 @@ function createPreviewGift(
     imageUrl: formData.imageUrl,
     hasDiscount: formData.hasDiscount,
     priority: formData.priority,
+    quantity: normalizeGiftQuantity(formData.quantity),
     reserved: initialValue?.reserved ?? false,
     reservedBy: initialValue?.reservedBy ?? '',
     reservedContact: initialValue?.reservedContact ?? '',
+    reservedCount: initialValue?.reservedCount ?? 0,
+    reservations: initialValue?.reservations ?? [],
     createdAt: initialValue?.createdAt,
     updatedAt: initialValue?.updatedAt,
     reservedAt: initialValue?.reservedAt,
@@ -150,10 +207,15 @@ function createPreviewItems(
 function GiftPreviewList({
   gifts,
   title,
+  listKind,
+  showPriceRange,
 }: {
   gifts: PreviewGift[]
   title: string
+  listKind: WishlistKind
+  showPriceRange: boolean
 }) {
+  const config = getListTypeConfig(listKind)
   const countLabel = `${gifts.length} ${gifts.length === 1 ? 'item' : 'itens'}`
 
   return (
@@ -220,7 +282,13 @@ function GiftPreviewList({
                       Reservado
                     </>
                   ) : (
-                    gift.priceRange || 'Faixa a definir'
+                    gift.giftKind === 'financial'
+                      ? `Meta ${formatMoney(gift.targetAmount)}`
+                      : showPriceRange
+                      ? gift.priceRange || 'Faixa a definir'
+                      : `${getGiftReservedCount(gift)} de ${getGiftQuantity(
+                          gift
+                        )} combinados`
                   )}
                 </p>
 
@@ -239,7 +307,7 @@ function GiftPreviewList({
             Nenhum item na lista
           </p>
           <p className="mt-1 text-sm text-[var(--color-muted)]">
-            O primeiro presente aparece aqui enquanto você preenche.
+            O primeiro {config.itemSingular} aparece aqui enquanto você preenche.
           </p>
         </div>
       )}
@@ -257,6 +325,7 @@ function GiftForm({
   submitLabel,
   title,
   description,
+  listKind = 'gift',
   options,
   previewGifts = [],
   listPreviewTitle = 'Prévia da sua lista',
@@ -264,6 +333,8 @@ function GiftForm({
   allowDraftSave = false,
   onCancel,
 }: GiftFormProps) {
+  const normalizedListKind = normalizeWishlistKind(listKind)
+  const config = getListTypeConfig(normalizedListKind)
   const [formData, setFormData] = useState(() =>
     initialValue ? createState(initialValue) : loadDraft(draftKey) ?? createState()
   )
@@ -271,7 +342,17 @@ function GiftForm({
   const [successMessage, setSuccessMessage] = useState('')
   const [draftMessage, setDraftMessage] = useState('')
   const [formError, setFormError] = useState('')
-  const wishlistOptions = normalizeWishlistOptions(options)
+  const wishlistOptions = normalizeWishlistOptions(options, normalizedListKind)
+  const showCategories = usesWishlistCategories(wishlistOptions)
+  const priceRangesEnabled = usesWishlistPriceRanges(wishlistOptions)
+  const canUseFinancialGift = normalizedListKind === 'gift'
+  const currentGiftKind = canUseFinancialGift
+    ? normalizeGiftKind(formData.giftKind)
+    : 'physical'
+  const isFinancialGift = currentGiftKind === 'financial'
+  const currentFundingMode = normalizeGiftFundingMode(formData.fundingMode)
+  const showPriceRange = priceRangesEnabled && !isFinancialGift
+  const showDiscount = config.showDiscount && !isFinancialGift
   const categoryOptions = includeCurrentOption(
     wishlistOptions.categories,
     formData.category
@@ -327,30 +408,72 @@ function GiftForm({
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!formData.name.trim()) {
-      setFormError('Informe o nome do presente para adicionar à lista.')
+      setFormError(`Informe o nome do ${config.itemSingular} para adicionar à lista.`)
       return
     }
 
     const now = new Date().toISOString()
+    const nextQuantity = config.showQuantity
+      ? normalizeGiftQuantity(formData.quantity)
+      : 1
+    const nextTargetAmount = isFinancialGift
+      ? normalizeMoneyAmount(formData.targetAmount)
+      : 0
 
-    if (!isValidUrl(formData.link)) {
+    if (
+      config.showQuantity &&
+      initialValue &&
+      nextQuantity < getGiftReservedCount(initialValue)
+    ) {
+      setFormError(
+        `Este item já tem ${getGiftReservedCount(
+          initialValue
+        )} reservas. Libere reservas antes de reduzir o total.`
+      )
+      return
+    }
+
+    if (isFinancialGift && nextTargetAmount <= 0) {
+      setFormError('Informe a meta financeira deste presente.')
+      return
+    }
+
+    if (
+      isFinancialGift &&
+      initialValue &&
+      nextTargetAmount < normalizeMoneyAmount(initialValue.contributedAmount)
+    ) {
+      setFormError(
+        'A meta não pode ficar abaixo do valor que já foi contribuído.'
+      )
+      return
+    }
+
+    if (config.showProductLink && !isValidUrl(formData.link)) {
       setLinkError('Informe uma URL começando com http:// ou https://.')
       return
     }
 
     onSubmit({
-      id: initialValue?.id ?? `gift-${Date.now()}`,
+      id: initialValue?.id ?? createGiftId(),
+      giftKind: currentGiftKind,
+      fundingMode: isFinancialGift ? currentFundingMode : 'full',
+      targetAmount: nextTargetAmount,
+      contributedAmount: initialValue?.contributedAmount ?? 0,
       name: formData.name.trim(),
-      link: formData.link.trim(),
+      link: config.showProductLink ? formData.link.trim() : '',
       note: formData.note.trim(),
-      category: formData.category.trim(),
-      priceRange: formData.priceRange,
-      imageUrl: formData.imageUrl,
-      hasDiscount: formData.hasDiscount,
-      priority: formData.priority,
+      category: showCategories ? formData.category.trim() : '',
+      priceRange: showPriceRange ? formData.priceRange : '',
+      imageUrl: config.showImage ? formData.imageUrl : '',
+      hasDiscount: showDiscount ? formData.hasDiscount : false,
+      priority: config.showPriority ? formData.priority : '',
+      quantity: isFinancialGift ? 1 : nextQuantity,
       reserved: initialValue?.reserved ?? false,
       reservedBy: initialValue?.reservedBy ?? '',
       reservedContact: initialValue?.reservedContact ?? '',
+      reservedCount: initialValue?.reservedCount ?? 0,
+      reservations: initialValue?.reservations ?? [],
       createdAt: initialValue?.createdAt ?? now,
       updatedAt: now,
       reservedAt: initialValue?.reservedAt ?? '',
@@ -360,7 +483,7 @@ function GiftForm({
 
     if (!initialValue) {
       setFormData(createState())
-      setSuccessMessage('Presente adicionado à lista.')
+      setSuccessMessage(`${config.itemSingular[0].toUpperCase()}${config.itemSingular.slice(1)} adicionado à lista.`)
       setDraftMessage('')
       setTimeout(() => setSuccessMessage(''), 2500)
     }
@@ -387,51 +510,109 @@ function GiftForm({
           </div>
         ) : null}
 
-        <label className="ui-label">
-          <span className="flex items-center justify-between gap-3">
-            Imagem do presente
-            <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
-              Opcional
+        {canUseFinancialGift ? (
+          <div className="grid gap-4 rounded-lg border border-[var(--color-line)] bg-[var(--color-bg-soft)] p-4">
+            <label className="ui-label">
+              Tipo do presente
+              <select
+                className="ui-field"
+                value={currentGiftKind}
+                onChange={(event) =>
+                  handleChange('giftKind', event.target.value)
+                }
+              >
+                <option value="physical">Presente comum</option>
+                <option value="financial">Presente financeiro</option>
+              </select>
+            </label>
+
+            {isFinancialGift ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="ui-label">
+                  <span className="flex items-center justify-between gap-3">
+                    Meta do presente
+                    <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+                      Obrigatório
+                    </span>
+                  </span>
+                  <input
+                    type="number"
+                    min="1"
+                    step="0.01"
+                    className="ui-field"
+                    placeholder="Ex: 2400"
+                    value={formData.targetAmount}
+                    onChange={(event) =>
+                      handleChange('targetAmount', event.target.value)
+                    }
+                  />
+                </label>
+
+                <label className="ui-label">
+                  Forma de contribuição
+                  <select
+                    className="ui-field"
+                    value={currentFundingMode}
+                    onChange={(event) =>
+                      handleChange('fundingMode', event.target.value)
+                    }
+                  >
+                    <option value="full">Uma pessoa fecha o valor</option>
+                    <option value="shared">Várias pessoas contribuem</option>
+                  </select>
+                </label>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {config.showImage ? (
+          <label className="ui-label">
+            <span className="flex items-center justify-between gap-3">
+              {config.itemImageLabel}
+              <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
+                Opcional
+              </span>
             </span>
-          </span>
-          <span className="ui-dropzone">
-            {formData.imageUrl ? (
-              <img
-                src={formData.imageUrl}
-                alt=""
-                className="h-44 w-full rounded-lg object-cover"
-              />
-            ) : (
-              <>
-                <Icon
-                  name="camera"
-                  className="h-9 w-9 text-[var(--color-muted)]"
+            <span className="ui-dropzone">
+              {formData.imageUrl ? (
+                <img
+                  src={formData.imageUrl}
+                  alt=""
+                  className="h-44 w-full rounded-lg object-cover"
                 />
-                <span>Toque para carregar ou arraste uma foto</span>
-                <span className="text-xs text-[var(--color-subtle)]">
-                  JPG, PNG até 5MB
-                </span>
-              </>
-            )}
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              className="sr-only"
-              onChange={handleImageChange}
-            />
-          </span>
-        </label>
+              ) : (
+                <>
+                  <Icon
+                    name="camera"
+                    className="h-9 w-9 text-[var(--color-muted)]"
+                  />
+                  <span>{config.itemImageEmptyLabel}</span>
+                  <span className="text-xs text-[var(--color-subtle)]">
+                    JPG, PNG até 5MB
+                  </span>
+                </>
+              )}
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="sr-only"
+                onChange={handleImageChange}
+              />
+            </span>
+          </label>
+        ) : null}
 
         <label className="ui-label">
           <span className="flex items-center justify-between gap-3">
-            Nome do presente
+            {config.itemNameLabel}
             <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
               Obrigatório
             </span>
           </span>
           <input
             className="ui-field"
-            placeholder="Ex: Tênis de corrida"
+            placeholder={config.itemNamePlaceholder}
             value={formData.name}
             onChange={(event) => handleChange('name', event.target.value)}
             required
@@ -440,128 +621,168 @@ function GiftForm({
 
         <label className="ui-label">
           <span className="flex items-center justify-between gap-3">
-            Descrição
+            {config.itemDescriptionLabel}
             <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
               Opcional
             </span>
           </span>
           <textarea
             className="ui-field min-h-[112px] resize-y"
-            placeholder="Conte detalhes como tamanho, cor ou preferência."
+            placeholder={config.itemDescriptionPlaceholder}
             value={formData.note}
             onChange={(event) => handleChange('note', event.target.value)}
           />
         </label>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="ui-label">
-            <span className="flex items-center justify-between gap-3">
-              Faixa de preço
-              <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
-                Opcional
-              </span>
-            </span>
-            <select
-              className="ui-field"
-              value={formData.priceRange}
-              onChange={(event) =>
-                handleChange('priceRange', event.target.value)
-              }
-            >
-              <option value="">Selecione uma faixa</option>
-              {priceRangeOptions.map((priceRange) => (
-                <option key={priceRange} value={priceRange}>
-                  {priceRange}
-                </option>
-              ))}
-            </select>
-          </label>
+        {showPriceRange || config.showPriority ? (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {showPriceRange ? (
+              <label className="ui-label">
+                <span className="flex items-center justify-between gap-3">
+                  Faixa de preço
+                  <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
+                    Opcional
+                  </span>
+                </span>
+                <select
+                  className="ui-field"
+                  value={formData.priceRange}
+                  onChange={(event) =>
+                    handleChange('priceRange', event.target.value)
+                  }
+                >
+                  <option value="">Selecione uma faixa</option>
+                  {priceRangeOptions.map((priceRange) => (
+                    <option key={priceRange} value={priceRange}>
+                      {priceRange}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
 
-          <label className="ui-label">
-            <span className="flex items-center justify-between gap-3">
-              Prioridade
-              <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
-                Opcional
-              </span>
-            </span>
-            <select
-              className="ui-field"
-              value={formData.priority}
-              onChange={(event) =>
-                handleChange('priority', event.target.value as GiftPriority)
-              }
-            >
-              <option value="">Sem prioridade</option>
-              <option value="Baixa">Baixa</option>
-              <option value="Média">Média</option>
-              <option value="Alta">Alta</option>
-            </select>
-          </label>
-        </div>
+            {config.showPriority ? (
+              <label className="ui-label">
+                <span className="flex items-center justify-between gap-3">
+                  Prioridade
+                  <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
+                    Opcional
+                  </span>
+                </span>
+                <select
+                  className="ui-field"
+                  value={formData.priority}
+                  onChange={(event) =>
+                    handleChange('priority', event.target.value as GiftPriority)
+                  }
+                >
+                  <option value="">Sem prioridade</option>
+                  <option value="Baixa">Baixa</option>
+                  <option value="Média">Média</option>
+                  <option value="Alta">Alta</option>
+                </select>
+              </label>
+            ) : null}
+          </div>
+        ) : null}
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="ui-label">
-            <span className="flex items-center justify-between gap-3">
-              Categoria
-              <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
-                Opcional
-              </span>
-            </span>
-            <select
-              className="ui-field"
-              value={formData.category}
-              onChange={(event) => handleChange('category', event.target.value)}
-            >
-              <option value="">Selecione uma categoria</option>
-              {categoryOptions.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </label>
+        {showCategories || config.showQuantity || showDiscount ? (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {showCategories ? (
+              <label className="ui-label">
+                <span className="flex items-center justify-between gap-3">
+                  Categoria
+                  <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
+                    Opcional
+                  </span>
+                </span>
+                <select
+                  className="ui-field"
+                  value={formData.category}
+                  onChange={(event) =>
+                    handleChange('category', event.target.value)
+                  }
+                >
+                  <option value="">Selecione uma categoria</option>
+                  {categoryOptions.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
 
-          <label className="ui-label">
-            <span className="flex items-center justify-between gap-3">
-              Desconto
-              <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
-                Opcional
+            {config.showQuantity ? (
+            <label className="ui-label">
+              <span className="flex items-center justify-between gap-3">
+                {config.quantityLabel}
+                <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+                  Obrigatório
+                </span>
               </span>
-            </span>
-            <span className="flex min-h-11 items-center gap-3 rounded-md border border-[var(--color-line)] bg-[var(--color-card-soft)] px-3 text-sm font-semibold text-[var(--color-text)]">
               <input
-                type="checkbox"
-                className="h-4 w-4 accent-[var(--color-primary-deep)]"
-                checked={formData.hasDiscount}
+                type="number"
+                min="1"
+                max="99"
+                className="ui-field"
+                value={formData.quantity}
                 onChange={(event) =>
-                  handleChange('hasDiscount', event.target.checked)
+                  handleChange('quantity', event.target.value)
                 }
               />
-              Está com desconto
-            </span>
-          </label>
-        </div>
+              <span className="text-xs font-semibold text-[var(--color-muted)]">
+                {config.quantityHelp}
+              </span>
+            </label>
+            ) : null}
 
-        <label className="ui-label">
-          <span className="flex items-center justify-between gap-3">
-            Link do produto
-            <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
-              Opcional
+            {showDiscount ? (
+            <label className="ui-label">
+              <span className="flex items-center justify-between gap-3">
+                Desconto
+                <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
+                  Opcional
+                </span>
+              </span>
+              <span className="flex min-h-11 items-center gap-3 rounded-md border border-[var(--color-line)] bg-[var(--color-card-soft)] px-3 text-sm font-semibold text-[var(--color-text)]">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-[var(--color-primary-deep)]"
+                  checked={formData.hasDiscount}
+                  onChange={(event) =>
+                    handleChange('hasDiscount', event.target.checked)
+                  }
+                />
+                Está com desconto
+              </span>
+            </label>
+            ) : null}
+          </div>
+        ) : null}
+
+        {config.showProductLink ? (
+          <label className="ui-label">
+            <span className="flex items-center justify-between gap-3">
+              Link do produto
+              <span className="text-[10px] font-semibold text-[var(--color-subtle)]">
+                Opcional
+              </span>
             </span>
-          </span>
-          <input
-            className="ui-field"
-            placeholder="https://..."
-            value={formData.link}
-            onChange={(event) => handleChange('link', event.target.value)}
-            aria-invalid={Boolean(linkError)}
-          />
-          {linkError ? (
-            <span className="text-xs font-semibold text-[var(--color-danger)]">
-              {linkError}
-            </span>
-          ) : null}
-        </label>
+            <input
+              className="ui-field"
+              placeholder="https://..."
+              value={formData.link}
+              onChange={(event) => handleChange('link', event.target.value)}
+              aria-invalid={Boolean(linkError)}
+            />
+            {linkError ? (
+              <span className="text-xs font-semibold text-[var(--color-danger)]">
+                {linkError}
+              </span>
+            ) : null}
+          </label>
+        ) : null}
 
         {formError ? (
           <p className="rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
@@ -608,13 +829,18 @@ function GiftForm({
             </button>
           ) : null}
           <button type="submit" className="ui-button-primary w-full">
-            {submitLabel ?? 'Adicionar presente'}
+            {submitLabel ?? config.addItemLabel}
             <Icon name="gift" className="h-5 w-5" />
           </button>
         </div>
       </div>
 
-      <GiftPreviewList gifts={previewItems} title={listPreviewTitle} />
+      <GiftPreviewList
+        gifts={previewItems}
+        title={listPreviewTitle}
+        listKind={normalizedListKind}
+        showPriceRange={priceRangesEnabled}
+      />
     </form>
   )
 }
