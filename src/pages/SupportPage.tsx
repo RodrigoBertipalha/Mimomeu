@@ -81,7 +81,7 @@ function SupportPage() {
     setStatus('')
 
     try {
-      const result = await sendSupportMessage({
+      await sendSupportMessage({
         topic: selectedTopic.id,
         topicTitle: selectedTopic.title,
         name: senderName,
@@ -90,11 +90,7 @@ function SupportPage() {
         userId: user?.id,
       })
 
-      setStatus(
-        result.storedLocally
-          ? 'Mensagem salva neste navegador. Com Supabase configurado, ela será enviada para o banco.'
-          : 'Mensagem enviada. Obrigado por ajudar a melhorar o Mimo Meu.'
-      )
+      setStatus('Mensagem enviada. Obrigado por ajudar a melhorar o Mimo Meu.')
       setMessage('')
     } catch {
       setError(

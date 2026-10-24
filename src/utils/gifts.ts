@@ -34,10 +34,14 @@ export function normalizeMoneyAmount(value: unknown) {
 }
 
 export function formatMoney(value: unknown) {
-  return normalizeMoneyAmount(value).toLocaleString('pt-BR', {
+  const amount = normalizeMoneyAmount(value)
+  const fractionDigits = Number.isInteger(amount) ? 0 : 2
+
+  return amount.toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-    maximumFractionDigits: 0,
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
   })
 }
 

@@ -1,7 +1,12 @@
 # Roadmap - MVP Mimo Meu
 
-Este documento descreve o estado atual do MVP e as próximas melhorias que fazem
-sentido para o produto.
+> **Documento histórico (estado de jun/2026).** O estado atual, o que foi corrigido nas
+> rodadas de out/2026 e os próximos passos estão em [analise-2026-10.md](analise-2026-10.md).
+> As seções "Supabase", "Decisão Sobre Edge Function" e "Próximos passos" abaixo estão
+> desatualizadas: todas as migrations foram aplicadas e a Edge Function foi removida.
+
+Este documento descreve o estado do MVP em jun/2026 e as melhorias que faziam
+sentido para o produto naquele momento.
 
 ## Fluxo atual
 

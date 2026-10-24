@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
+import { useEscapeKey } from '../../hooks/useEscapeKey'
 
 type ModalProps = {
   title: string
@@ -19,6 +20,7 @@ function Modal({
 }: ModalProps) {
   const widthClass = size === 'wide' ? 'max-w-6xl' : 'max-w-3xl'
   useBodyScrollLock()
+  useEscapeKey(onClose)
 
   return createPortal(
     <div
@@ -26,6 +28,9 @@ function Modal({
       onClick={onClose}
     >
       <section
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
         className={`ui-panel w-full ${widthClass} p-5 sm:p-6`}
         onClick={(event) => event.stopPropagation()}
       >

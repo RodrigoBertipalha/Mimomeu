@@ -6,6 +6,9 @@ export type AuthContextValue = {
   session: Session | null
   isLoading: boolean
   isConfigured: boolean
+  isPasswordRecovery: boolean
+  requestPasswordReset: (email: string) => Promise<void>
+  finishPasswordRecovery: () => void
   signIn: (email: string, password: string) => Promise<void>
   signInWithGoogle: (redirectPath?: string) => Promise<void>
   signUp: (

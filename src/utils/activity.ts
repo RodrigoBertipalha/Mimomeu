@@ -11,6 +11,7 @@ const activityTypes: WishlistActivityType[] = [
   'options_updated',
   'gift_added',
   'gift_updated',
+  'gift_deleted',
   'gift_reserved',
   'reservation_released',
 ]
@@ -38,7 +39,7 @@ function isActivityType(value: unknown): value is WishlistActivityType {
 }
 
 function getGiftName(details: ActivityDetails) {
-  return details.gift?.name || details.giftName || 'presente'
+  return details.gift?.name || details.giftName || 'item'
 }
 
 function buildActivityMessage(
@@ -59,24 +60,30 @@ function buildActivityMessage(
   }
 
   if (type === 'options_updated') {
-    return 'Categorias e faixas de preço atualizadas.'
+    return 'Opções da lista atualizadas.'
   }
 
   if (type === 'gift_added') {
-    return `Presente "${giftName}" adicionado.`
+    return `"${giftName}" adicionado à lista.`
   }
 
   if (type === 'gift_updated') {
-    return `Presente "${giftName}" editado.`
+    return `"${giftName}" editado.`
+  }
+
+  if (type === 'gift_deleted') {
+    return `"${giftName}" removido da lista.`
   }
 
   if (type === 'gift_reserved') {
     return actor
       ? `${actor} reservou "${giftName}".`
-      : `Presente "${giftName}" reservado.`
+      : `"${giftName}" reservado.`
   }
 
-  return `Reserva de "${giftName}" liberada.`
+  return actor
+    ? `Reserva de ${actor} em "${giftName}" liberada.`
+    : `Reservas de "${giftName}" liberadas.`
 }
 
 export function createWishlistActivity(

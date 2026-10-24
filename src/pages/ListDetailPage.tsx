@@ -8,15 +8,29 @@ import ListOptionsEditor from '../components/lists/ListOptionsEditor'
 import ShareCard from '../components/share/ShareCard'
 import Icon from '../components/ui/Icon'
 import Modal from '../components/ui/Modal'
+import Toast from '../components/ui/Toast'
+import ConfirmDialog from '../components/ui/ConfirmDialog'
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
+import { useEscapeKey } from '../hooks/useEscapeKey'
 import { useWishlist } from '../hooks/useWishlist'
-import type { Gift, Wishlist, WishlistOptions } from '../types/wishlist'
+import { useAuth } from '../auth/authContext'
+import { deleteGiftImages, uploadGiftImage } from '../services/imageStorage'
+import type {
+  Gift,
+  GiftReservation,
+  Wishlist,
+  WishlistOptions,
+} from '../types/wishlist'
 import {
+  formatMoney,
   getGiftAvailableCount,
   getGiftQuantity,
+  getGiftReservations,
+  isGiftFinancial,
   getGiftReservedCount,
   isGiftFullyReserved,
 } from '../utils/gifts'
+import { formatEventDate } from '../utils/date'
 import { getListTypeConfig, normalizeWishlistKind } from '../utils/listTypes'
 import {
   createDefaultWishlistOptions,
@@ -54,10 +68,25 @@ function ListDetailPage() {
     updateWishlistDetails,
     addGift,
     updateGift,
+    deleteGift,
+    deleteWishlist,
     releaseGiftReservation,
+    releaseReservation,
+    refreshList,
     isLoading,
     error,
   } = useWishlist()
+
+  useEffect(() => {
+    if (listId) void refreshList(listId)
+  }, [listId, refreshList])
+  const { user } = useAuth()
+  const [deletingGift, setDeletingGift] = useState<Gift | null>(null)
+  const [releasing, setReleasing] = useState<{
+    gift: Gift
+    reservation: GiftReservation | null
+  } | null>(null)
+  const [isDeletingList, setIsDeletingList] = useState(false)
   const [query, setQuery] = useState('')
   const [isEditListOpen, setIsEditListOpen] = useState(false)
   const [isOptionsOpen, setIsOptionsOpen] = useState(false)
@@ -71,17 +100,19 @@ function ListDetailPage() {
   const [notice, setNotice] = useState(routeNotice ?? '')
   const [actionError, setActionError] = useState('')
   useBodyScrollLock(isShareOpen)
+  useEscapeKey(() => setIsShareOpen(false), isShareOpen)
 
   const list = listId ? findWishlist(listId) : null
 
   useEffect(() => {
-    if (!routeNotice) return
-
-    navigate(location.pathname, { replace: true, state: null })
-    const timeout = window.setTimeout(() => setNotice(''), 2500)
-
-    return () => window.clearTimeout(timeout)
+    if (routeNotice) navigate(location.pathname, { replace: true, state: null })
   }, [location.pathname, navigate, routeNotice])
+
+  useEffect(() => {
+    if (!notice) return
+    const timeout = window.setTimeout(() => setNotice(''), 2500)
+    return () => window.clearTimeout(timeout)
+  }, [notice])
 
   const filteredGifts = useMemo(() => {
     if (!list) return []
@@ -99,7 +130,6 @@ function ListDetailPage() {
   function showNotice(message: string) {
     setActionError('')
     setNotice(message)
-    setTimeout(() => setNotice(''), 2500)
   }
 
   function showActionError(fallback: string, submitError: unknown) {
@@ -142,6 +172,26 @@ function ListDetailPage() {
     )
   }
 
+  const isAnyModalOpen =
+    isEditListOpen ||
+    isOptionsOpen ||
+    isAddGiftOpen ||
+    isDeletingList ||
+    Boolean(releasing) ||
+    Boolean(editingGift) ||
+    Boolean(deletingGift)
+  const currentListId = list.id
+  async function uploadListImage(image: Blob) {
+    if (!user) throw new Error('Faça login para enviar fotos.')
+    return uploadGiftImage(image, user.id, currentListId)
+  }
+  function discardListImage(url: string) {
+    void deleteGiftImages([url])
+  }
+  const totalReservations = list.gifts.reduce(
+    (sum, gift) => sum + getGiftReservations(gift).length,
+    0
+  )
   const listKind = normalizeWishlistKind(list.listKind)
   const config = getListTypeConfig(listKind)
   const showCategories = usesWishlistCategories(list.options)
@@ -172,7 +222,7 @@ function ListDetailPage() {
           </Link>
           <p className="mt-5 text-xs font-semibold text-[var(--color-muted)]">
             {list.eventType || 'Evento'} ·{' '}
-            {list.eventDate || 'Data não definida'}
+            {formatEventDate(list.eventDate) || 'Data não definida'}
           </p>
           <h1 className="mt-3 max-w-4xl text-4xl font-extrabold leading-tight sm:text-5xl">
             {list.title}
@@ -214,22 +264,19 @@ function ListDetailPage() {
         </div>
       </header>
 
-      {notice ? (
-        <p className="rounded-md bg-[var(--color-primary-soft)] px-4 py-3 text-sm font-bold text-[var(--color-primary-deep)]">
-          {notice}
-        </p>
-      ) : null}
-
       {error ? (
         <p className="rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
           {error}
         </p>
       ) : null}
 
-      {actionError ? (
-        <p className="rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
-          {actionError}
-        </p>
+      <Toast message={notice} />
+      {!isAnyModalOpen ? (
+        <Toast
+          message={actionError}
+          tone="error"
+          onClose={() => setActionError('')}
+        />
       ) : null}
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr_2.1fr]">
@@ -331,17 +378,12 @@ function ListDetailPage() {
             setActionError('')
             setEditingGift(gift)
           }}
-          onReleaseReserve={async (gift) => {
-            try {
-              await releaseGiftReservation(list.id, gift.id)
-              showNotice(config.releaseSuccessMessage)
-            } catch (submitError) {
-              showActionError(
-                'Não foi possível liberar a reserva. Tente novamente.',
-                submitError
-              )
-            }
-          }}
+          onReleaseReserve={(gift) =>
+            setReleasing({ gift, reservation: null })
+          }
+          onReleaseReservation={(gift, reservation) =>
+            setReleasing({ gift, reservation })
+          }
         />
       </section>
 
@@ -364,6 +406,7 @@ function ListDetailPage() {
           <ListForm
             framed={false}
             initialValue={list}
+            kindLocked={list.gifts.length > 0}
             resetOnSubmit={false}
             submitLabel="Salvar alterações"
             onCancel={() => setIsEditListOpen(false)}
@@ -396,7 +439,114 @@ function ListDetailPage() {
               }
             }}
           />
+          <button
+            type="button"
+            className="mt-6 w-full rounded-md border border-[var(--color-danger)] px-4 py-3 text-sm font-extrabold text-[var(--color-danger)] transition hover:bg-[rgba(198,29,29,0.08)]"
+            onClick={() => {
+              setIsEditListOpen(false)
+              setIsDeletingList(true)
+            }}
+          >
+            <Icon name="trash" className="mr-2 inline h-4 w-4" />
+            Excluir lista
+          </button>
         </Modal>
+      ) : null}
+
+      {isDeletingList ? (
+        <ConfirmDialog
+          title="Excluir lista?"
+          description={`"${list.title}" será apagada com ${list.gifts.length} ${config.itemPlural} e ${totalReservations} reserva(s). O link público deixa de funcionar. Isso não pode ser desfeito.`}
+          confirmLabel="Excluir lista"
+          onCancel={() => setIsDeletingList(false)}
+          onConfirm={async () => {
+            try {
+              await deleteWishlist(list.id)
+              navigate('/list', { replace: true })
+            } catch (submitError) {
+              setIsDeletingList(false)
+              showActionError(
+                'Não foi possível excluir a lista. Tente novamente.',
+                submitError
+              )
+            }
+          }}
+        />
+      ) : null}
+
+      {releasing ? (
+        <ConfirmDialog
+          title={
+            releasing.reservation
+              ? `Liberar reserva de ${releasing.reservation.guestName}?`
+              : `Liberar todas as reservas?`
+          }
+          description={
+            releasing.reservation
+              ? isGiftFinancial(releasing.gift)
+                ? `A contribuição de ${releasing.reservation.guestName} (${formatMoney(
+                    releasing.reservation.contributionAmount
+                  )}) em "${releasing.gift.name}" será removida e esse valor volta a faltar na meta.`
+                : `A reserva de ${releasing.reservation.guestName} em "${releasing.gift.name}" será removida e a vaga volta a ficar disponível para os convidados.`
+              : `Todas as ${getGiftReservations(releasing.gift).length} reservas de "${releasing.gift.name}" serão removidas.`
+          }
+          confirmLabel="Liberar"
+          runningLabel="Liberando..."
+          onCancel={() => setReleasing(null)}
+          onConfirm={async () => {
+            try {
+              if (releasing.reservation) {
+                await releaseReservation(
+                  list.id,
+                  releasing.gift,
+                  releasing.reservation
+                )
+              } else {
+                await releaseGiftReservation(list.id, releasing.gift)
+              }
+              setReleasing(null)
+              showNotice(
+                releasing.reservation
+                  ? 'Reserva liberada.'
+                  : config.releaseSuccessMessage
+              )
+            } catch (submitError) {
+              setReleasing(null)
+              showActionError(
+                'Não foi possível liberar a reserva. Tente novamente.',
+                submitError
+              )
+            }
+          }}
+        />
+      ) : null}
+
+      {deletingGift ? (
+        <ConfirmDialog
+          title={`Excluir ${config.itemSingular}?`}
+          description={`"${deletingGift.name}" será removido da lista${
+            getGiftReservations(deletingGift).length
+              ? ` junto com ${getGiftReservations(deletingGift).length} reserva(s) de convidados`
+              : ''
+          }. Isso não pode ser desfeito.`}
+          confirmLabel={`Excluir ${config.itemSingular}`}
+          onCancel={() => setDeletingGift(null)}
+          onConfirm={async () => {
+            try {
+              await deleteGift(list.id, deletingGift)
+              setDeletingGift(null)
+              showNotice(
+                `${config.itemSingular[0].toUpperCase()}${config.itemSingular.slice(1)} excluído.`
+              )
+            } catch (submitError) {
+              setDeletingGift(null)
+              showActionError(
+                `Não foi possível excluir o ${config.itemSingular}. Tente novamente.`,
+                submitError
+              )
+            }
+          }}
+        />
       ) : null}
 
       {isOptionsOpen ? (
@@ -504,6 +654,8 @@ function ListDetailPage() {
             previewGifts={list.gifts}
             listPreviewTitle={config.itemsHeading}
             draftKey={`mimo-meu:gift-draft:${list.id}`}
+            uploadImage={uploadListImage}
+            discardImage={discardListImage}
             allowDraftSave
             submitLabel={config.addItemLabel}
             onCancel={() => {
@@ -517,11 +669,13 @@ function ListDetailPage() {
                 showNotice(
                   `${config.itemSingular[0].toUpperCase()}${config.itemSingular.slice(1)} adicionado.`
                 )
+                return true
               } catch (submitError) {
                 showActionError(
                   `Não foi possível adicionar o ${config.itemSingular}. Tente novamente.`,
                   submitError
                 )
+                return false
               }
             }}
           />
@@ -549,6 +703,8 @@ function ListDetailPage() {
             previewGifts={list.gifts}
             listPreviewTitle={config.itemsHeading}
             initialValue={editingGift}
+            uploadImage={uploadListImage}
+            discardImage={discardListImage}
             submitLabel={config.editItemLabel}
             onCancel={() => {
               setActionError('')
@@ -561,14 +717,27 @@ function ListDetailPage() {
                 showNotice(
                   `${config.itemSingular[0].toUpperCase()}${config.itemSingular.slice(1)} atualizado.`
                 )
+                return true
               } catch (submitError) {
                 showActionError(
                   `Não foi possível salvar o ${config.itemSingular}. Tente novamente.`,
                   submitError
                 )
+                return false
               }
             }}
           />
+          <button
+            type="button"
+            className="mt-6 w-full rounded-md border border-[var(--color-danger)] px-4 py-3 text-sm font-extrabold text-[var(--color-danger)] transition hover:bg-[rgba(198,29,29,0.08)]"
+            onClick={() => {
+              setDeletingGift(editingGift)
+              setEditingGift(null)
+            }}
+          >
+            <Icon name="trash" className="mr-2 inline h-4 w-4" />
+            Excluir {config.itemSingular}
+          </button>
         </Modal>
       ) : null}
     </section>

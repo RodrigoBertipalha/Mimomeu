@@ -15,6 +15,7 @@ type AuthProviderProps = {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<Session | null>(null)
   const [isLoading, setIsLoading] = useState(isSupabaseConfigured)
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false)
 
   useEffect(() => {
     if (!supabase) {
@@ -31,7 +32,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (event === 'PASSWORD_RECOVERY') setIsPasswordRecovery(true)
       setSession(nextSession)
       setIsLoading(false)
     })
@@ -48,6 +50,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
       session,
       isLoading,
       isConfigured: isSupabaseConfigured,
+      isPasswordRecovery,
+      async requestPasswordReset(email) {
+        if (!supabase) throw new Error('Supabase não está configurado.')
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/login`,
+        })
+
+        if (error) throw error
+      },
+      finishPasswordRecovery() {
+        setIsPasswordRecovery(false)
+      },
       async signIn(email, password) {
         if (!supabase) throw new Error('Supabase não está configurado.')
 
@@ -145,7 +160,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (error) throw error
       },
     }),
-    [isLoading, session]
+    [isLoading, isPasswordRecovery, session]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

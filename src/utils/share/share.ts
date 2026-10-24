@@ -1,11 +1,14 @@
 import type { Wishlist } from '../../types/wishlist'
+import { formatEventDate } from '../date'
 import { getListTypeConfig } from '../listTypes'
 
 export function buildShareMessage(list: Wishlist) {
   const config = getListTypeConfig(list.listKind)
   const title = list.title || config.name
   const typeLine = list.eventType ? `Evento: ${list.eventType}` : ''
-  const dateLine = list.eventDate ? `Data: ${list.eventDate}` : ''
+  const dateLine = list.eventDate
+    ? `Data: ${formatEventDate(list.eventDate, 'long')}`
+    : ''
   const ownerLine = list.ownerName ? `Responsável: ${list.ownerName}` : ''
   const parts = [title, typeLine, dateLine, ownerLine, list.message].filter(Boolean)
   return parts.join('\n')

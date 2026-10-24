@@ -66,9 +66,9 @@ function HomePage() {
         <section className="grid gap-4">
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>
-              <p className="ui-kicker">Listas locais</p>
+              <p className="ui-kicker">Suas listas</p>
               <h2 className="mt-2 text-2xl font-extrabold">
-                Criadas neste navegador
+                Continue de onde parou
               </h2>
             </div>
             <Link to="/list" className="ui-link">

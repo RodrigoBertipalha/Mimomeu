@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import ListForm from '../components/lists/ListForm'
 import Icon from '../components/ui/Icon'
@@ -10,10 +10,15 @@ import {
   getGiftReservedCount,
   isGiftFullyReserved,
 } from '../utils/gifts'
+import { formatEventDate } from '../utils/date'
 import { getListTypeConfig, normalizeWishlistKind } from '../utils/listTypes'
 
 function ListPage() {
-  const { wishlists, createWishlist, isLoading, error } = useWishlist()
+  const { wishlists, createWishlist, isLoading, error, refresh } = useWishlist()
+
+  useEffect(() => {
+    void refresh()
+  }, [refresh])
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
   const isCreateOpen = searchParams.get('new') === '1'
@@ -107,7 +112,7 @@ function ListPage() {
                     {list.title}
                   </h2>
                   <p className="mt-2 text-sm text-[var(--color-muted)]">
-                    {list.eventDate || 'Data não definida'}
+                    {formatEventDate(list.eventDate) || 'Data não definida'}
                   </p>
 
                   <div className="mt-5 grid grid-cols-3 gap-3 border-y border-[var(--color-line)] py-4 text-sm">

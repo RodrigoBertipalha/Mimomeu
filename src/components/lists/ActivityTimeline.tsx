@@ -21,8 +21,9 @@ function formatActivityDate(value: string) {
 
 function activityIcon(
   type: WishlistActivity['type']
-): 'gift' | 'heart' | 'check' | 'info' {
+): 'gift' | 'heart' | 'check' | 'info' | 'trash' {
   if (type === 'gift_added' || type === 'gift_updated') return 'gift'
+  if (type === 'gift_deleted') return 'trash'
   if (type === 'gift_reserved') return 'heart'
   if (type === 'reservation_released') return 'check'
 

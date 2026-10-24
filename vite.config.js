@@ -29,6 +29,9 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    server: {
+      allowedHosts: ['.trycloudflare.com'],
+    },
     define: {
       'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(supabaseUrl),
       'import.meta.env.VITE_SUPABASE_ANON_KEY':

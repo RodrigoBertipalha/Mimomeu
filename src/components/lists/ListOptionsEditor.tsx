@@ -50,7 +50,8 @@ function OptionGroup({
   }
 
   function handleBlur() {
-    onChange(cleanValues(values))
+    const cleaned = cleanValues(values)
+    if (cleaned.length) onChange(cleaned)
   }
 
   function handleAdd() {
@@ -179,31 +180,29 @@ function ListOptionsEditor({
           addLabel={config.categoryAddLabel}
           placeholder={config.categoryPlaceholder}
           values={categories}
-          onChange={(categories) =>
-            onChange({ ...value, categories: cleanValues(categories) })
-          }
+          onChange={(categories) => onChange({ ...value, categories })}
         />
       ) : null}
 
-      <label className="flex items-center justify-between gap-4 rounded-lg border border-[var(--color-line)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm font-extrabold text-[var(--color-text)]">
-        Usar faixas de preço
-        <input
-          type="checkbox"
-          className="h-4 w-4 accent-[var(--color-primary-deep)]"
-          checked={priceRangesEnabled}
-          onChange={(event) => handleTogglePriceRanges(event.target.checked)}
-        />
-      </label>
+      {config.showPriceRange ? (
+        <label className="flex items-center justify-between gap-4 rounded-lg border border-[var(--color-line)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm font-extrabold text-[var(--color-text)]">
+          Usar faixas de preço
+          <input
+            type="checkbox"
+            className="h-4 w-4 accent-[var(--color-primary-deep)]"
+            checked={priceRangesEnabled}
+            onChange={(event) => handleTogglePriceRanges(event.target.checked)}
+          />
+        </label>
+      ) : null}
 
-      {priceRangesEnabled ? (
+      {config.showPriceRange && priceRangesEnabled ? (
         <OptionGroup
           label="Faixas de preço"
           addLabel="Adicionar"
           placeholder="Nova faixa"
           values={priceRanges}
-          onChange={(priceRanges) =>
-            onChange({ ...value, priceRanges: cleanValues(priceRanges) })
-          }
+          onChange={(priceRanges) => onChange({ ...value, priceRanges })}
         />
       ) : null}
     </div>

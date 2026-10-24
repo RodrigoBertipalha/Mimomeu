@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
+import { useEscapeKey } from '../../hooks/useEscapeKey'
 import type { Gift, ReservationGuest, WishlistKind } from '../../types/wishlist'
 import {
   formatMoney,
@@ -49,6 +50,7 @@ function ReserveGiftModal({
   const [contributionAmount, setContributionAmount] = useState('')
   const [formError, setFormError] = useState('')
   useBodyScrollLock()
+  useEscapeKey(onCancel, !isSubmitting)
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -152,6 +154,7 @@ function ReserveGiftModal({
             <input
               className="ui-field"
               placeholder="Ex: Mariana Silva"
+              maxLength={80}
               value={name}
               onChange={(event) => {
                 setName(event.target.value)
@@ -203,6 +206,7 @@ function ReserveGiftModal({
             <input
               className="ui-field"
               placeholder="Opcional"
+              maxLength={120}
               value={contact}
               onChange={(event) => setContact(event.target.value)}
             />

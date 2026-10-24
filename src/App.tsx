@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthProvider'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+import { WishlistProvider } from './hooks/WishlistProvider'
 import Layout from './components/layout/Layout'
 import AboutPage from './pages/AboutPage'
 import AuthPage from './pages/AuthPage'
@@ -13,34 +14,36 @@ import SupportPage from './pages/SupportPage'
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/support" element={<SupportPage />} />
-            <Route path="/login" element={<AuthPage />} />
-            <Route
-              path="/list"
-              element={
-                <ProtectedRoute>
-                  <ListPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/g/:publicSlug" element={<GuestListPage />} />
-            <Route path="/list/:listId/guest" element={<GuestListPage />} />
-            <Route
-              path="/list/:listId"
-              element={
-                <ProtectedRoute>
-                  <ListDetailPage />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Layout>
-      </BrowserRouter>
+      <WishlistProvider>
+        <BrowserRouter>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/support" element={<SupportPage />} />
+              <Route path="/login" element={<AuthPage />} />
+              <Route
+                path="/list"
+                element={
+                  <ProtectedRoute>
+                    <ListPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/g/:publicSlug" element={<GuestListPage />} />
+              <Route path="/list/:listId/guest" element={<GuestListPage />} />
+              <Route
+                path="/list/:listId"
+                element={
+                  <ProtectedRoute>
+                    <ListDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </WishlistProvider>
     </AuthProvider>
   )
 }

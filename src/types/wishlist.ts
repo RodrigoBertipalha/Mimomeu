@@ -12,6 +12,7 @@ export type WishlistActivityType =
   | 'options_updated'
   | 'gift_added'
   | 'gift_updated'
+  | 'gift_deleted'
   | 'gift_reserved'
   | 'reservation_released'
 

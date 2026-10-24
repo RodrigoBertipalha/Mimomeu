@@ -3,38 +3,52 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../auth/authContext'
 import Icon from '../components/ui/Icon'
 
+type AuthMode = 'login' | 'signup' | 'forgot'
+
+function getMode(value: string | null): AuthMode {
+  return value === 'signup' || value === 'forgot' ? value : 'login'
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback
+}
+
 function AuthPage() {
   const {
     user,
     isConfigured,
     isLoading,
+    isPasswordRecovery,
     signIn,
     signInWithGoogle,
     signUp,
+    requestPasswordReset,
+    updatePassword,
+    finishPasswordRecovery,
   } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
   const next = searchParams.get('next') || '/list'
-  const modeParam = searchParams.get('mode')
-  const mode: 'login' | 'signup' = modeParam === 'signup' ? 'signup' : 'login'
+  const mode = getMode(searchParams.get('mode'))
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [passwordConfirmation, setPasswordConfirmation] = useState('')
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false)
 
   useEffect(() => {
-    if (user) navigate(next, { replace: true })
-  }, [navigate, next, user])
+    if (user && !isPasswordRecovery) navigate(next, { replace: true })
+  }, [isPasswordRecovery, navigate, next, user])
 
-  function handleModeChange(nextMode: 'login' | 'signup') {
+  function handleModeChange(nextMode: AuthMode) {
     const nextParams = new URLSearchParams(searchParams)
-    if (nextMode === 'signup') {
-      nextParams.set('mode', 'signup')
-    } else {
+    if (nextMode === 'login') {
       nextParams.delete('mode')
+    } else {
+      nextParams.set('mode', nextMode)
     }
     setSearchParams(nextParams)
     setError('')
@@ -48,7 +62,12 @@ function AuthPage() {
     setIsSubmitting(true)
 
     try {
-      if (mode === 'login') {
+      if (mode === 'forgot') {
+        await requestPasswordReset(email.trim())
+        setMessage(
+          'Se existir uma conta com esse e-mail, enviamos um link para criar uma nova senha. Confira também o spam.'
+        )
+      } else if (mode === 'login') {
         await signIn(email.trim(), password)
         navigate(next, { replace: true })
       } else {
@@ -62,11 +81,33 @@ function AuthPage() {
         }
       }
     } catch (submitError) {
-      setError(
-        submitError instanceof Error
-          ? submitError.message
-          : 'Não foi possível concluir. Tente novamente.'
-      )
+      setError(getErrorMessage(submitError, 'Não foi possível concluir. Tente novamente.'))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  async function handleNewPasswordSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setError('')
+
+    if (password.length < 6) {
+      setError('A nova senha precisa ter pelo menos 6 caracteres.')
+      return
+    }
+
+    if (password !== passwordConfirmation) {
+      setError('A confirmação da senha não confere.')
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      await updatePassword(password)
+      finishPasswordRecovery()
+      navigate('/list', { replace: true })
+    } catch (submitError) {
+      setError(getErrorMessage(submitError, 'Não foi possível salvar a nova senha.'))
     } finally {
       setIsSubmitting(false)
     }
@@ -80,11 +121,7 @@ function AuthPage() {
     try {
       await signInWithGoogle(next)
     } catch (submitError) {
-      setError(
-        submitError instanceof Error
-          ? submitError.message
-          : 'Não foi possível entrar com Google. Tente novamente.'
-      )
+      setError(getErrorMessage(submitError, 'Não foi possível entrar com Google. Tente novamente.'))
       setIsGoogleSubmitting(false)
     }
   }
@@ -106,12 +143,61 @@ function AuthPage() {
           Conecte o Supabase para ativar login.
         </h1>
         <p className="mt-4 text-sm leading-6 text-[var(--color-muted)]">
-          Crie um arquivo `.env` a partir do `.env.example` e preencha
-          `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`.
+          Crie um arquivo `.env.local` a partir do `.env.example`, preencha
+          `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` e reinicie o
+          servidor.
         </p>
         <Link to="/" className="ui-button-secondary mt-6 w-fit">
           Voltar ao início
         </Link>
+      </section>
+    )
+  }
+
+  const errorBox = error ? (
+    <p className="rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
+      {error}
+    </p>
+  ) : null
+
+  if (isPasswordRecovery) {
+    return (
+      <section className="mx-auto grid max-w-xl gap-6">
+        <div>
+          <p className="ui-kicker">Recuperar acesso</p>
+          <h1 className="mt-3 text-4xl font-extrabold leading-tight">
+            Crie uma nova senha
+          </h1>
+        </div>
+        <form className="ui-panel grid gap-5 p-6 sm:p-8" onSubmit={handleNewPasswordSubmit}>
+          <label className="ui-label">
+            Nova senha
+            <input
+              type="password"
+              className="ui-field"
+              placeholder="Mínimo 6 caracteres"
+              minLength={6}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </label>
+          <label className="ui-label">
+            Confirmar nova senha
+            <input
+              type="password"
+              className="ui-field"
+              minLength={6}
+              value={passwordConfirmation}
+              onChange={(event) => setPasswordConfirmation(event.target.value)}
+              required
+            />
+          </label>
+          {errorBox}
+          <button type="submit" className="ui-button-primary h-12" disabled={isSubmitting}>
+            {isSubmitting ? 'Salvando...' : 'Salvar nova senha'}
+          </button>
+        </form>
       </section>
     )
   }
@@ -130,48 +216,60 @@ function AuthPage() {
       </div>
 
       <form className="ui-panel grid gap-5 p-6 sm:p-8" onSubmit={handleSubmit}>
-        <div className="grid grid-cols-2 gap-2 rounded-lg bg-[var(--color-bg-soft)] p-1">
-          <button
-            type="button"
-            className={
-              mode === 'login'
-                ? 'ui-button-primary h-11'
-                : 'ui-button-secondary h-11 border-transparent bg-transparent'
-            }
-            onClick={() => handleModeChange('login')}
-          >
-            Entrar
-          </button>
-          <button
-            type="button"
-            className={
-              mode === 'signup'
-                ? 'ui-button-primary h-11'
-                : 'ui-button-secondary h-11 border-transparent bg-transparent'
-            }
-            onClick={() => handleModeChange('signup')}
-          >
-            Criar conta
-          </button>
-        </div>
+        {mode === 'forgot' ? (
+          <div>
+            <h2 className="text-2xl font-extrabold">Esqueci minha senha</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
+              Informe o e-mail da sua conta e enviaremos um link para criar uma
+              nova senha.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-2 rounded-lg bg-[var(--color-bg-soft)] p-1">
+              <button
+                type="button"
+                className={
+                  mode === 'login'
+                    ? 'ui-button-primary h-11'
+                    : 'ui-button-secondary h-11 border-transparent bg-transparent'
+                }
+                onClick={() => handleModeChange('login')}
+              >
+                Entrar
+              </button>
+              <button
+                type="button"
+                className={
+                  mode === 'signup'
+                    ? 'ui-button-primary h-11'
+                    : 'ui-button-secondary h-11 border-transparent bg-transparent'
+                }
+                onClick={() => handleModeChange('signup')}
+              >
+                Criar conta
+              </button>
+            </div>
 
-        <button
-          type="button"
-          className="ui-button-secondary h-12 justify-center"
-          onClick={handleGoogleSignIn}
-          disabled={isSubmitting || isGoogleSubmitting}
-        >
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-card)] text-sm font-extrabold text-[var(--color-primary-deep)] shadow-[var(--shadow-control)]">
-            G
-          </span>
-          {isGoogleSubmitting ? 'Abrindo Google...' : 'Continuar com Google'}
-        </button>
+            <button
+              type="button"
+              className="ui-button-secondary h-12 justify-center"
+              onClick={handleGoogleSignIn}
+              disabled={isSubmitting || isGoogleSubmitting}
+            >
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-card)] text-sm font-extrabold text-[var(--color-primary-deep)] shadow-[var(--shadow-control)]">
+                G
+              </span>
+              {isGoogleSubmitting ? 'Abrindo Google...' : 'Continuar com Google'}
+            </button>
 
-        <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.12em] text-[var(--color-subtle)]">
-          <span className="h-px flex-1 bg-[var(--color-line)]" />
-          ou
-          <span className="h-px flex-1 bg-[var(--color-line)]" />
-        </div>
+            <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.12em] text-[var(--color-subtle)]">
+              <span className="h-px flex-1 bg-[var(--color-line)]" />
+              ou
+              <span className="h-px flex-1 bg-[var(--color-line)]" />
+            </div>
+          </>
+        )}
 
         {mode === 'signup' ? (
           <label className="ui-label">
@@ -208,29 +306,37 @@ function AuthPage() {
           />
         </label>
 
-        <label className="ui-label">
-          <span className="flex items-center justify-between gap-3">
-            Senha
-            <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
-              Obrigatório
+        {mode !== 'forgot' ? (
+          <label className="ui-label">
+            <span className="flex items-center justify-between gap-3">
+              Senha
+              {mode === 'login' ? (
+                <button
+                  type="button"
+                  className="text-xs font-bold text-[var(--color-primary-deep)] underline-offset-4 hover:underline"
+                  onClick={() => handleModeChange('forgot')}
+                >
+                  Esqueci minha senha
+                </button>
+              ) : (
+                <span className="text-[10px] font-bold text-[var(--color-primary-deep)]">
+                  Obrigatório
+                </span>
+              )}
             </span>
-          </span>
-          <input
-            type="password"
-            className="ui-field"
-            placeholder="Mínimo 6 caracteres"
-            minLength={6}
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </label>
-
-        {error ? (
-          <p className="rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
-            {error}
-          </p>
+            <input
+              type="password"
+              className="ui-field"
+              placeholder="Mínimo 6 caracteres"
+              minLength={6}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </label>
         ) : null}
+
+        {errorBox}
 
         {message ? (
           <p className="rounded-md bg-[var(--color-primary-soft)] px-4 py-3 text-sm font-bold text-[var(--color-primary-deep)]">
@@ -245,11 +351,23 @@ function AuthPage() {
         >
           {isSubmitting
             ? 'Aguarde...'
-            : mode === 'login'
-              ? 'Entrar'
-              : 'Criar conta'}
+            : mode === 'forgot'
+              ? 'Enviar link de recuperação'
+              : mode === 'login'
+                ? 'Entrar'
+                : 'Criar conta'}
           <Icon name="arrow-right" className="h-5 w-5" />
         </button>
+
+        {mode === 'forgot' ? (
+          <button
+            type="button"
+            className="ui-link w-fit text-sm"
+            onClick={() => handleModeChange('login')}
+          >
+            Voltar para o login
+          </button>
+        ) : null}
       </form>
     </section>
   )

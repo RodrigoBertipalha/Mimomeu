@@ -1,4 +1,11 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from 'react'
+import { compressImage } from '../../utils/image'
 import type {
   Gift,
   GiftFundingMode,
@@ -29,7 +36,7 @@ import {
 import Icon from '../ui/Icon'
 
 type GiftFormProps = {
-  onSubmit: (gift: Gift) => void
+  onSubmit: (gift: Gift) => Promise<boolean>
   initialValue?: Gift
   submitLabel?: string
   title?: string
@@ -40,6 +47,8 @@ type GiftFormProps = {
   listPreviewTitle?: string
   draftKey?: string
   allowDraftSave?: boolean
+  uploadImage?: (image: Blob) => Promise<string>
+  discardImage?: (url: string) => void
   onCancel?: () => void
 }
 
@@ -112,7 +121,7 @@ function loadDraft(draftKey?: string) {
       note: parsed.note ?? '',
       category: parsed.category ?? '',
       priceRange: parsed.priceRange ?? '',
-      imageUrl: parsed.imageUrl ?? '',
+      imageUrl: parsed.imageUrl?.startsWith('data:') ? '' : parsed.imageUrl ?? '',
       hasDiscount: Boolean(parsed.hasDiscount),
       priority: normalizePriority(parsed.priority),
       quantity:
@@ -331,6 +340,8 @@ function GiftForm({
   listPreviewTitle = 'Prévia da sua lista',
   draftKey,
   allowDraftSave = false,
+  uploadImage,
+  discardImage,
   onCancel,
 }: GiftFormProps) {
   const normalizedListKind = normalizeWishlistKind(listKind)
@@ -342,6 +353,19 @@ function GiftForm({
   const [successMessage, setSuccessMessage] = useState('')
   const [draftMessage, setDraftMessage] = useState('')
   const [formError, setFormError] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const [pendingImage, setPendingImage] = useState<Blob | null>(null)
+  const [isProcessingImage, setIsProcessingImage] = useState(false)
+  const pendingImageUrl = useMemo(
+    () => (pendingImage ? URL.createObjectURL(pendingImage) : ''),
+    [pendingImage]
+  )
+  useEffect(() => {
+    return () => {
+      if (pendingImageUrl) URL.revokeObjectURL(pendingImageUrl)
+    }
+  }, [pendingImageUrl])
+  const previewImageUrl = pendingImageUrl || formData.imageUrl
   const wishlistOptions = normalizeWishlistOptions(options, normalizedListKind)
   const showCategories = usesWishlistCategories(wishlistOptions)
   const priceRangesEnabled = usesWishlistPriceRanges(wishlistOptions)
@@ -361,7 +385,10 @@ function GiftForm({
     wishlistOptions.priceRanges,
     formData.priceRange
   )
-  const draftPreviewGift = createPreviewGift(formData, initialValue)
+  const draftPreviewGift = createPreviewGift(
+    { ...formData, imageUrl: previewImageUrl },
+    initialValue
+  )
   const previewItems = createPreviewItems(
     previewGifts,
     draftPreviewGift,
@@ -375,22 +402,31 @@ function GiftForm({
     if (field === 'link') setLinkError('')
   }
 
-  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.currentTarget.files?.[0]
+  async function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget
+    const file = input.files?.[0]
+    input.value = ''
     if (!file) return
 
-    if (file.size > 5 * 1024 * 1024) {
-      window.alert('Escolha uma imagem de até 5MB.')
+    if (file.size > 20 * 1024 * 1024) {
+      setFormError('Escolha uma imagem de até 20MB.')
       return
     }
 
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        handleChange('imageUrl', reader.result)
-      }
+    setIsProcessingImage(true)
+    setFormError('')
+    try {
+      setPendingImage(await compressImage(file))
+    } catch {
+      setFormError('Não foi possível ler esta imagem. Tente outra foto.')
+    } finally {
+      setIsProcessingImage(false)
     }
-    reader.readAsDataURL(file)
+  }
+
+  function handleRemoveImage() {
+    setPendingImage(null)
+    handleChange('imageUrl', '')
   }
 
   function handleSaveDraft() {
@@ -405,8 +441,9 @@ function GiftForm({
     setDraftMessage('Rascunho guardado.')
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (isSaving) return
     if (!formData.name.trim()) {
       setFormError(`Informe o nome do ${config.itemSingular} para adicionar à lista.`)
       return
@@ -454,7 +491,22 @@ function GiftForm({
       return
     }
 
-    onSubmit({
+    setIsSaving(true)
+    let imageUrl = config.showImage ? formData.imageUrl : ''
+    let uploadedImageUrl = ''
+
+    if (config.showImage && pendingImage && uploadImage) {
+      try {
+        uploadedImageUrl = await uploadImage(pendingImage)
+        imageUrl = uploadedImageUrl
+      } catch {
+        setIsSaving(false)
+        setFormError('Não foi possível enviar a foto. Tente novamente.')
+        return
+      }
+    }
+
+    const saved = await onSubmit({
       id: initialValue?.id ?? createGiftId(),
       giftKind: currentGiftKind,
       fundingMode: isFinancialGift ? currentFundingMode : 'full',
@@ -465,7 +517,7 @@ function GiftForm({
       note: formData.note.trim(),
       category: showCategories ? formData.category.trim() : '',
       priceRange: showPriceRange ? formData.priceRange : '',
-      imageUrl: config.showImage ? formData.imageUrl : '',
+      imageUrl,
       hasDiscount: showDiscount ? formData.hasDiscount : false,
       priority: config.showPriority ? formData.priority : '',
       quantity: isFinancialGift ? 1 : nextQuantity,
@@ -478,11 +530,18 @@ function GiftForm({
       updatedAt: now,
       reservedAt: initialValue?.reservedAt ?? '',
     })
+    setIsSaving(false)
+
+    if (!saved) {
+      if (uploadedImageUrl) discardImage?.(uploadedImageUrl)
+      return
+    }
 
     if (draftKey) localStorage.removeItem(draftKey)
 
     if (!initialValue) {
       setFormData(createState())
+      setPendingImage(null)
       setSuccessMessage(`${config.itemSingular[0].toUpperCase()}${config.itemSingular.slice(1)} adicionado à lista.`)
       setDraftMessage('')
       setTimeout(() => setSuccessMessage(''), 2500)
@@ -575,9 +634,11 @@ function GiftForm({
               </span>
             </span>
             <span className="ui-dropzone">
-              {formData.imageUrl ? (
+              {isProcessingImage ? (
+                <span>Preparando foto...</span>
+              ) : previewImageUrl ? (
                 <img
-                  src={formData.imageUrl}
+                  src={previewImageUrl}
                   alt=""
                   className="h-44 w-full rounded-lg object-cover"
                 />
@@ -589,7 +650,7 @@ function GiftForm({
                   />
                   <span>{config.itemImageEmptyLabel}</span>
                   <span className="text-xs text-[var(--color-subtle)]">
-                    JPG, PNG até 5MB
+                    JPG, PNG ou WebP. A foto é otimizada automaticamente.
                   </span>
                 </>
               )}
@@ -597,10 +658,22 @@ function GiftForm({
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
                 className="sr-only"
+                disabled={isProcessingImage || isSaving}
                 onChange={handleImageChange}
               />
             </span>
           </label>
+        ) : null}
+
+        {config.showImage && previewImageUrl && !isProcessingImage ? (
+          <button
+            type="button"
+            className="-mt-3 w-fit text-xs font-bold text-[var(--color-danger)] underline-offset-4 hover:underline"
+            onClick={handleRemoveImage}
+            disabled={isSaving}
+          >
+            Remover foto
+          </button>
         ) : null}
 
         <label className="ui-label">
@@ -828,8 +901,12 @@ function GiftForm({
               Guardar rascunho
             </button>
           ) : null}
-          <button type="submit" className="ui-button-primary w-full">
-            {submitLabel ?? config.addItemLabel}
+          <button
+            type="submit"
+            className="ui-button-primary w-full"
+            disabled={isSaving}
+          >
+            {isSaving ? 'Salvando...' : submitLabel ?? config.addItemLabel}
             <Icon name="gift" className="h-5 w-5" />
           </button>
         </div>

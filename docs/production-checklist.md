@@ -13,27 +13,29 @@ produção com autenticação, banco remoto e compartilhamento público.
 ## Supabase
 
 - [x] Criar pasta `supabase/migrations` com schema, RLS, triggers e funções SQL.
-- [x] Criar pasta `supabase/functions` com Edge Function opcional para reserva.
 - [x] Criar projeto no Supabase.
-- [x] Aplicar a migration `supabase/migrations/202606140001_initial_schema.sql`.
-- [x] Aplicar a migration `supabase/migrations/202606160001_wishlist_options.sql`.
-- [x] Criar a migration `supabase/migrations/202606160002_activity_and_support.sql`.
-- [ ] Aplicar a migration `supabase/migrations/202606160002_activity_and_support.sql`.
-- [x] Criar a migration `supabase/migrations/202606180001_list_kinds_and_potluck.sql`.
-- [ ] Aplicar a migration `supabase/migrations/202606180001_list_kinds_and_potluck.sql`.
-- [x] Criar a migration `supabase/migrations/202606180002_financial_gifts.sql`.
-- [ ] Aplicar a migration `supabase/migrations/202606180002_financial_gifts.sql`.
+- [x] Aplicar a migration `202606140001_initial_schema.sql`.
+- [x] Aplicar a migration `202606160001_wishlist_options.sql`.
+- [x] Aplicar a migration `202606160002_activity_and_support.sql`.
+- [x] Aplicar a migration `202606180001_list_kinds_and_potluck.sql`.
+- [x] Aplicar a migration `202606180002_financial_gifts.sql`.
+- [x] Aplicar a migration `202610240001_restrict_public_reads.sql` (privacidade).
+- [x] Aplicar a migration `202610250001_reservation_limits.sql` (limites da reserva).
+- [x] Aplicar a migration `202610250002_gift_images_storage.sql` (bucket de fotos).
+- [x] Aplicar a migration `202610250003_gift_images_owner_select.sql` (exclusão de fotos).
 - [x] Conferir se Auth por e-mail/senha está habilitado.
 - [x] Desativar confirmação de e-mail no Supabase Auth para o MVP.
 - [x] Configurar URLs de redirect do Supabase para localhost e domínio final.
 - [x] Configurar provider Google no Supabase Auth e credenciais no Google Cloud.
-- [ ] Publicar Edge Function `reserve-gift`, se optar por usar function em vez de RPC direto.
+- [ ] Testar "Esqueci minha senha" com um e-mail real (o link volta para `/login`).
+- [ ] Antes de abrir para mais pessoas: resetar o banco (dados atuais são de teste).
 
 ## Decisão Sobre Edge Function
 
 - [x] Manter RPC direto como caminho atual de reserva no MVP.
-- [ ] Reavaliar Edge Function quando precisar de rate limit, captcha,
-  notificação, integração externa ou logs mais completos.
+- [x] Remover a Edge Function `reserve-gift`, que não era usada (out/2026).
+- [x] Limite de reservas por minuto feito direto na RPC, sem Edge Function.
+- [ ] Reavaliar Edge Function para captcha, notificação por e-mail ou integrações.
 
 ## Aplicação
 
@@ -47,7 +49,7 @@ produção com autenticação, banco remoto e compartilhamento público.
 - [x] Adicionar login com Google na tela de autenticação.
 - [x] Proteger rotas de gestão de listas.
 - [x] Migrar operações de listas/presentes para Supabase quando houver sessão.
-- [x] Manter fallback local para desenvolvimento sem Supabase configurado.
+- [x] Remover o fallback em localStorage, que não era alcançável (out/2026).
 - [x] Criar rota pública `/g/:publicSlug`.
 - [x] Ajustar compartilhamento para usar link público.
 - [x] Adicionar filtros e ordenação na visão do convidado.
@@ -70,15 +72,15 @@ produção com autenticação, banco remoto e compartilhamento público.
 - [x] Testar criação de lista em produção.
 - [x] Testar compartilhamento público em janela anônima.
 - [x] Testar reserva de presente em janela anônima.
-- [ ] Testar contribuição em presente financeiro em janela anônima.
+- [x] Testar contribuição em presente financeiro (feito em 24/10/2026).
 - [ ] Definir domínio final.
 
 ## Pós-MVP
 
-- [ ] Decidir se imagens dos presentes serão upload real no Supabase Storage.
+- [x] Imagens dos presentes no Supabase Storage, comprimidas no navegador (25/10/2026).
+- [x] Estados da reserva: processando, confirmado e erro visível (24/10/2026).
 - [ ] Criar política de privacidade.
 - [ ] Criar termos simples de uso.
 - [ ] Adicionar observabilidade básica.
 - [ ] Criar uma forma simples de consultar mensagens de suporte recebidas.
-- [ ] Melhorar estados da reserva: processando, confirmado e erro.
 - [ ] Adicionar atalhos para presentes recentes e reservas recentes.

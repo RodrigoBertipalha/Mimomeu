@@ -1,4 +1,4 @@
-import type { Gift, WishlistKind } from '../../types/wishlist'
+import type { Gift, GiftReservation, WishlistKind } from '../../types/wishlist'
 import {
   formatMoney,
   getGiftAvailableCount,
@@ -22,6 +22,7 @@ type GiftListProps = {
   showPriceRange?: boolean
   onReserve?: (gift: Gift) => void
   onReleaseReserve?: (gift: Gift) => void
+  onReleaseReservation?: (gift: Gift, reservation: GiftReservation) => void
   onEdit?: (gift: Gift) => void
   emptyTitle?: string
   emptyDescription?: string
@@ -31,14 +32,14 @@ const photoClasses = ['ui-photo-gift', 'ui-photo-table', 'ui-photo-kitchen']
 
 function priorityClass(priority: Gift['priority']) {
   if (priority === 'Alta') {
-    return 'border-[rgba(255,181,154,0.38)] bg-[rgba(255,181,154,0.14)] text-[var(--color-secondary-deep)]'
+    return 'border-[rgba(255,181,154,0.38)] bg-[var(--color-card)] text-[var(--color-secondary-deep)]'
   }
 
   if (priority === 'Média') {
-    return 'border-[rgba(190,205,164,0.34)] bg-[rgba(190,205,164,0.13)] text-[var(--color-primary-deep)]'
+    return 'border-[rgba(190,205,164,0.34)] bg-[var(--color-card)] text-[var(--color-primary-deep)]'
   }
 
-  return 'border-[rgba(255,255,255,0.16)] bg-[rgba(17,19,22,0.46)] text-[var(--color-muted)]'
+  return 'border-[rgba(255,255,255,0.16)] bg-[var(--color-card)] text-[var(--color-muted)]'
 }
 
 function GiftList({
@@ -48,6 +49,7 @@ function GiftList({
   showPriceRange,
   onReserve,
   onReleaseReserve,
+  onReleaseReservation,
   onEdit,
   emptyTitle,
   emptyDescription,
@@ -125,6 +127,8 @@ function GiftList({
                 <img
                   src={gift.imageUrl}
                   alt=""
+                  loading="lazy"
+                  decoding="async"
                   className={
                     isFull && onEdit
                       ? 'h-full w-full object-cover opacity-60 grayscale-[30%] transition duration-700 hover:scale-105'
@@ -164,8 +168,8 @@ function GiftList({
                 <span
                   className={
                     isFull
-                      ? `${badgeBase} border-[rgba(255,255,255,0.14)] bg-[rgba(51,53,56,0.58)] text-[var(--color-muted)]`
-                      : `${badgeBase} border-[rgba(190,205,164,0.34)] bg-[rgba(190,205,164,0.13)] text-[var(--color-primary-deep)]`
+                      ? `${badgeBase} border-[rgba(255,255,255,0.14)] bg-[var(--color-card)] text-[var(--color-muted)]`
+                      : `${badgeBase} border-[rgba(190,205,164,0.34)] bg-[var(--color-card)] text-[var(--color-primary-deep)]`
                   }
                 >
                   {isFull
@@ -190,7 +194,7 @@ function GiftList({
                 ) : null}
                 {config.showDiscount && gift.hasDiscount ? (
                   <span
-                    className={`${badgeBase} border-[rgba(190,205,164,0.34)] bg-[rgba(190,205,164,0.13)] text-[var(--color-primary-deep)]`}
+                    className={`${badgeBase} border-[rgba(190,205,164,0.34)] bg-[var(--color-card)] text-[var(--color-primary-deep)]`}
                   >
                     Com desconto
                   </span>
@@ -284,31 +288,46 @@ function GiftList({
                       ? 'Contribuíram:'
                       : normalizedListKind === 'potluck'
                       ? 'Vai levar:'
-                      : 'Reservado por:'}{' '}
-                    {reservations.map((reservation) => reservation.guestName).join(', ')}
+                      : 'Reservado por:'}
+                    {onReleaseReservation
+                      ? null
+                      : ` ${reservations.map((reservation) => reservation.guestName).join(', ')}`}
                   </p>
-                  {onEdit
-                    ? reservations
-                        .filter(
-                          (reservation) =>
-                            reservation.guestContact ||
-                            reservation.contributionAmount
-                        )
-                        .map((reservation) => (
-                          <p
-                            key={reservation.id}
-                            className="mt-1 font-semibold text-[var(--color-muted)]"
+                  {onReleaseReservation ? (
+                    <ul className="mt-2 grid gap-2">
+                      {reservations.map((reservation) => (
+                        <li
+                          key={reservation.id}
+                          className="flex items-center justify-between gap-2"
+                        >
+                          <span className="min-w-0 break-words">
+                            {reservation.guestName}
+                            <span className="block font-semibold text-[var(--color-muted)]">
+                              {[
+                                isFinancial
+                                  ? formatMoney(reservation.contributionAmount)
+                                  : '',
+                                reservation.guestContact,
+                              ]
+                                .filter(Boolean)
+                                .join(' · ')}
+                            </span>
+                          </span>
+                          <button
+                            type="button"
+                            className="shrink-0 rounded-md border border-[var(--color-line)] px-2 py-1 text-[11px] font-extrabold text-[var(--color-danger)] transition hover:border-[var(--color-danger)]"
+                            aria-label={`Liberar reserva de ${reservation.guestName}`}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              onReleaseReservation(gift, reservation)
+                            }}
                           >
-                            {reservation.guestName}: {' '}
-                            {isFinancial
-                              ? formatMoney(reservation.contributionAmount)
-                              : reservation.guestContact}
-                            {isFinancial && reservation.guestContact
-                              ? ` · ${reservation.guestContact}`
-                              : ''}
-                          </p>
-                        ))
-                    : null}
+                            Liberar
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </div>
               ) : null}
 
@@ -340,7 +359,7 @@ function GiftList({
                   </button>
                 ) : null}
 
-                {onReleaseReserve && reservedCount > 0 ? (
+                {onReleaseReserve && reservations.length > 1 ? (
                   <button
                     type="button"
                     className="ui-button-secondary w-full"
@@ -349,7 +368,7 @@ function GiftList({
                       onReleaseReserve(gift)
                     }}
                   >
-                    {config.releaseActionLabel}
+                    Liberar todas ({reservations.length})
                   </button>
                 ) : null}
 

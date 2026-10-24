@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Gift, Wishlist } from '../../types/wishlist'
+import { formatEventDate } from '../../utils/date'
 import { isGiftFullyReserved } from '../../utils/gifts'
 import {
   getListTypeConfig,
@@ -128,6 +129,9 @@ function PublicPreview({ list, onReserve }: PublicPreviewProps) {
     '{ownerNames}',
     ownerNames
   )
+  const eventDetails = [list.eventType, formatEventDate(list.eventDate, 'long')]
+    .filter(Boolean)
+    .join(' · ')
 
   function clearFilters() {
     setCategoryFilter('all')
@@ -148,9 +152,24 @@ function PublicPreview({ list, onReserve }: PublicPreviewProps) {
               {eventName}
             </span>
           </h2>
+          {eventDetails ? (
+            <p className="mt-4 text-sm font-extrabold text-[var(--color-secondary-deep)]">
+              {eventDetails}
+            </p>
+          ) : null}
           <p className="mt-5 max-w-3xl text-base leading-7 text-[var(--color-muted)]">
             {publicDescription}
           </p>
+          {list.message.trim() ? (
+            <blockquote className="mt-5 max-w-3xl whitespace-pre-line break-words rounded-lg border-l-4 border-[var(--color-primary-deep)] bg-[var(--color-bg-soft)] px-5 py-4 text-base leading-7 text-[var(--color-text)]">
+              {list.message.trim()}
+              {list.ownerName ? (
+                <span className="mt-2 block text-sm font-bold text-[var(--color-muted)]">
+                  — {list.ownerName}
+                </span>
+              ) : null}
+            </blockquote>
+          ) : null}
         </div>
       </header>
 

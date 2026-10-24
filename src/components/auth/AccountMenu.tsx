@@ -11,12 +11,21 @@ import Icon from '../ui/Icon'
 import Modal from '../ui/Modal'
 
 function getDisplayName(user: User | null) {
-  const metadataName = user?.user_metadata?.display_name
-  if (typeof metadataName === 'string' && metadataName.trim()) {
-    return metadataName.trim()
-  }
+  const metadata = user?.user_metadata ?? {}
+  const metadataName = [
+    metadata.display_name,
+    metadata.full_name,
+    metadata.name,
+  ].find((value) => typeof value === 'string' && value.trim())
+
+  if (typeof metadataName === 'string') return metadataName.trim()
 
   return user?.email?.split('@')[0] ?? 'Usuário'
+}
+
+function getAvatarUrl(user: User | null) {
+  const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture
+  return typeof avatarUrl === 'string' ? avatarUrl : ''
 }
 
 function getInitial(value: string) {
@@ -198,8 +207,17 @@ function AccountMenu() {
           {user ? (
             <div className="grid gap-2">
               <div className="flex items-center gap-3 border-b border-[var(--color-line)] px-2 pb-3">
-                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-sm font-extrabold text-[var(--color-primary-deep)]">
-                  {getInitial(name)}
+                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--color-primary-soft)] text-sm font-extrabold text-[var(--color-primary-deep)]">
+                  {getAvatarUrl(user) ? (
+                    <img
+                      src={getAvatarUrl(user)}
+                      alt=""
+                      referrerPolicy="no-referrer"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    getInitial(name)
+                  )}
                 </span>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-extrabold text-[var(--color-text)]">

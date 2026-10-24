@@ -21,6 +21,7 @@ type ListFormProps = {
   framed?: boolean
   showOptionsSetup?: boolean
   submitDisabled?: boolean
+  kindLocked?: boolean
   onCancel?: () => void
 }
 
@@ -53,6 +54,7 @@ function ListForm({
   framed = true,
   showOptionsSetup = false,
   submitDisabled = false,
+  kindLocked = false,
   onCancel,
 }: ListFormProps) {
   const [formData, setFormData] = useState<Wishlist>(
@@ -145,13 +147,16 @@ function ListForm({
             onChange={(event) =>
               handleKindChange(event.target.value as WishlistKind)
             }
+            disabled={kindLocked}
             required
           >
             <option value="gift">Lista de presentes</option>
             <option value="potluck">Confraternização</option>
           </select>
           <span className="text-xs font-semibold text-[var(--color-muted)]">
-            {config.description}
+            {kindLocked
+              ? 'O tipo não pode ser alterado depois que a lista tem itens.'
+              : config.description}
           </span>
         </label>
 

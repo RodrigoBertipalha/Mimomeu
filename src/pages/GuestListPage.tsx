@@ -4,10 +4,17 @@ import { useAuth } from '../auth/authContext'
 import ReserveGiftModal from '../components/gifts/ReserveGiftModal'
 import PublicPreview from '../components/public/PublicPreview'
 import Icon from '../components/ui/Icon'
+import Toast from '../components/ui/Toast'
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
-import { useWishlist } from '../hooks/useWishlist'
+import { useEscapeKey } from '../hooks/useEscapeKey'
+import {
+  fetchPublicWishlist as loadPublicWishlist,
+  reserveRemotePublicGift as reservePublicGift,
+  type ReservationFailureReason,
+} from '../services/wishlistRepository'
 import type { Gift, ReservationGuest, Wishlist } from '../types/wishlist'
 import {
+  formatMoney,
   getGiftReservations,
   getGiftReservedCount,
   getGiftRemainingAmount,
@@ -19,10 +26,18 @@ import {
 import { getListTypeConfig, normalizeWishlistKind } from '../utils/listTypes'
 import { usesWishlistPriceRanges } from '../utils/wishlistOptions'
 
+const fixableReservationErrors: Partial<Record<ReservationFailureReason, string>> = {
+  rate_limited:
+    'Muitas reservas em sequência. Aguarde um minuto e tente de novo.',
+  guest_required: 'Informe seu nome para confirmar.',
+  guest_too_long: 'O nome pode ter no máximo 80 caracteres.',
+  contact_too_long: 'O contato pode ter no máximo 120 caracteres.',
+  invalid_amount: 'Informe um valor de contribuição válido.',
+}
+
 function GuestListPage() {
   const { publicSlug, listId } = useParams()
   const { user } = useAuth()
-  const { loadPublicWishlist, reservePublicGift } = useWishlist()
   const [list, setList] = useState<Wishlist | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -30,6 +45,7 @@ function GuestListPage() {
   const [reservedGift, setReservedGift] = useState<Gift | null>(null)
   const [isReserving, setIsReserving] = useState(false)
   useBodyScrollLock(Boolean(reservedGift))
+  useEscapeKey(() => setReservedGift(null), Boolean(reservedGift))
 
   const publicKey = publicSlug ?? listId ?? ''
 
@@ -63,7 +79,7 @@ function GuestListPage() {
     return () => {
       active = false
     }
-  }, [loadPublicWishlist, publicKey])
+  }, [publicKey])
 
   function handleReserveRequest(gift: Gift) {
     if (isGiftFullyReserved(gift)) return
@@ -77,12 +93,21 @@ function GuestListPage() {
     setError('')
 
     try {
-      const success = await reservePublicGift(publicKey, pendingGift.id, guest)
-      if (!success) {
+      const result = await reservePublicGift(publicKey, pendingGift.id, guest)
+      if (!result.ok) {
+        const fixableMessage = fixableReservationErrors[result.reason]
+        if (fixableMessage) {
+          setError(fixableMessage)
+          return
+        }
+
         setPendingGift(null)
         setError(
-          getListTypeConfig(list?.listKind).alreadyReservedError
+          result.reason === 'not_found'
+            ? 'Este item não está mais disponível na lista.'
+            : getListTypeConfig(list?.listKind).alreadyReservedError
         )
+        setList(await loadPublicWishlist(publicKey))
         return
       }
 
@@ -168,11 +193,7 @@ function GuestListPage() {
         </Link>
       ) : null}
 
-      {error ? (
-        <p className="rounded-md bg-[rgba(198,29,29,0.1)] px-4 py-3 text-sm font-bold text-[var(--color-danger)]">
-          {error}
-        </p>
-      ) : null}
+      <Toast message={error} tone="error" onClose={() => setError('')} />
 
       <PublicPreview list={list} onReserve={handleReserveRequest} />
 
@@ -200,14 +221,18 @@ function GuestListPage() {
               <Icon name="check" className="h-12 w-12" />
             </span>
             <h2 className="mt-6 text-3xl font-extrabold">
-              {getListTypeConfig(normalizeWishlistKind(list.listKind))
-                .reserveSuccessTitle}
+              {isGiftFinancial(reservedGift)
+                ? 'Contribuição registrada!'
+                : getListTypeConfig(normalizeWishlistKind(list.listKind))
+                    .reserveSuccessTitle}
             </h2>
             <p className="mt-4 text-sm text-[var(--color-muted)]">
-              {
-                getListTypeConfig(normalizeWishlistKind(list.listKind))
-                  .reserveSuccessPrefix
-              }{' '}
+              {isGiftFinancial(reservedGift)
+                ? `Você contribuiu com ${formatMoney(
+                    getGiftReservations(reservedGift).slice(-1)[0]?.contributionAmount
+                  )} para:`
+                : getListTypeConfig(normalizeWishlistKind(list.listKind))
+                    .reserveSuccessPrefix}{' '}
               <strong>{reservedGift.name}</strong>
             </p>
             <button

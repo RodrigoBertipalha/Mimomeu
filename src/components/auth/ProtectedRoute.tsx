@@ -30,8 +30,9 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
           Configure o Supabase para usar login.
         </h1>
         <p className="mt-4 text-sm leading-6 text-[var(--color-muted)]">
-          Crie um arquivo `.env` com `VITE_SUPABASE_URL` e
-          `VITE_SUPABASE_ANON_KEY`. Use `.env.example` como base.
+          Crie um arquivo `.env.local` com `VITE_SUPABASE_URL` e
+          `VITE_SUPABASE_PUBLISHABLE_KEY` (use `.env.example` como base) e
+          reinicie o servidor.
         </p>
       </section>
     )
